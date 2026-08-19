@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="nb">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Klar</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="head">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+          <rect x="3.2" y="4.6" width="17.6" height="15.4" rx="3.4" />
+          <path d="M3.2 9.4h17.6M8.4 3.2v3M15.6 3.2v3" />
+          <path d="M7.6 13.4h4.2M7.6 16.6h7.4" />
+        </svg>
+      </div>
+      <div class="head__text">
+        <h1>Klar</h1>
+        <p>Tema for Visma InSchool</p>
+      </div>
+      <label class="switch" title="Slå temaet av eller på">
+        <input type="checkbox" id="enabled" />
+        <span class="switch__track"><span class="switch__knob"></span></span>
+      </label>
+    </header>
+
+    <main class="body">
+      <section class="row">
+        <span class="row__label">Utseende</span>
+        <div class="seg" role="group" data-field="scheme">
+          <button type="button" data-value="auto">Auto</button>
+          <button type="button" data-value="light">Lys</button>
+          <button type="button" data-value="dark">Mørk</button>
+        </div>
+      </section>
+
+      <section class="row row--stack">
+        <span class="row__label">Aksentfarge</span>
+        <div class="swatches" data-field="accent">
+          <button type="button" data-value="spruce" style="--sw: #17594e" title="Gran"></button>
+          <button type="button" data-value="ocean" style="--sw: #1a4f95" title="Hav"></button>
+          <button type="button" data-value="plum" style="--sw: #6d2f61" title="Plomme"></button>
+          <button type="button" data-value="amber" style="--sw: #8a5510" title="Rav"></button>
+          <button type="button" data-value="cobalt" style="--sw: #2f3ab5" title="Kobolt"></button>
+        </div>
+      </section>
+
+      <section class="row">
+        <span class="row__label">Tetthet</span>
+        <div class="seg" role="group" data-field="density">
+          <button type="button" data-value="cozy">Luftig</button>
+          <button type="button" data-value="compact">Kompakt</button>
+        </div>
+      </section>
+
+      <section class="row">
+        <span class="row__label">Sidemeny</span>
+        <div class="seg" role="group" data-field="sidebar">
+          <button type="button" data-value="dark">Mørk</button>
+          <button type="button" data-value="light">Lys</button>
+        </div>
+      </section>
+
+      <hr />
+
+      <section class="row row--toggle">
+        <span class="row__text"><strong>Hero øverst</strong><small>Hilsen, dato, uke og klokke</small></span>
+        <label class="switch switch--sm">
+          <input type="checkbox" id="hero" />
+          <span class="switch__track"><span class="switch__knob"></span></span>
+        </label>
+      </section>
+
+      <section class="row row--toggle">
+        <span class="row__text"><strong>Fargekodet timeplan</strong><small>Fast farge per fag</small></span>
+        <label class="switch switch--sm">
+          <input type="checkbox" id="colorCode" />
+          <span class="switch__track"><span class="switch__knob"></span></span>
+        </label>
+      </section>
+
+      <section class="row row--toggle">
+        <span class="row__text"><strong>Snarveiknapp</strong><small>Liten knapp nede til høyre</small></span>
+        <label class="switch switch--sm">
+          <input type="checkbox" id="fab" />
+          <span class="switch__track"><span class="switch__knob"></span></span>
+        </label>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span><kbd>Alt</kbd><kbd>⇧</kbd><kbd>D</kbd> lys/mørk</span>
+      <span><kbd>Alt</kbd><kbd>⇧</kbd><kbd>K</kbd> av/på</span>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

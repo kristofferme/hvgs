@@ -1,0 +1,325 @@
+/* ==========================================================================
+   Klar – komponenter: kort, knapper, felt, tabeller, dialoger
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Kort / seksjoner
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [data-klar-el='card'] {
+  background: var(--k-surface) !important;
+  color: var(--k-ink) !important;
+  border: 1px solid var(--k-line) !important;
+  border-radius: var(--k-r-lg) !important;
+  box-shadow: var(--k-shadow-1) !important;
+  padding: var(--k-space-5) !important;
+  margin-bottom: var(--k-space-4);
+  overflow: hidden;
+  transition: box-shadow var(--k-dur) var(--k-ease), border-color var(--k-dur) var(--k-ease),
+    transform var(--k-dur) var(--k-ease-out);
+}
+html[data-klar='on'] [data-klar-el='card'][data-klar-clickable]:hover {
+  border-color: var(--k-line-2) !important;
+  box-shadow: var(--k-shadow-2) !important;
+  transform: translateY(-1px);
+  cursor: pointer;
+}
+/* Kort inni kort skal ikke stables med skygge på skygge */
+html[data-klar='on'] [data-klar-el='card'] [data-klar-el='card'] {
+  background: var(--k-surface-2) !important;
+  box-shadow: none !important;
+  border-radius: var(--k-r) !important;
+}
+html[data-klar='on'] [data-klar-el='card'] > :is(h1, h2, h3, h4):first-child {
+  margin-top: 0 !important;
+}
+html[data-klar='on'] [data-klar-el='card-head'] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--k-space-3);
+  padding: 0 0 var(--k-space-3) !important;
+  margin: 0 0 var(--k-space-4) !important;
+  border-bottom: 1px solid var(--k-line) !important;
+  background: transparent !important;
+}
+
+/* --------------------------------------------------------------------------
+   Knapper
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [data-klar-el='btn'] {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 7px 14px !important;
+  border-radius: var(--k-r-sm) !important;
+  border: 1px solid var(--k-line-2) !important;
+  background: var(--k-surface) !important;
+  color: var(--k-ink) !important;
+  font-family: var(--k-font) !important;
+  font-size: var(--k-text-md) !important;
+  font-weight: 560 !important;
+  letter-spacing: -0.008em;
+  line-height: 1.2 !important;
+  text-transform: none !important;
+  text-decoration: none !important;
+  box-shadow: var(--k-shadow-1) !important;
+  cursor: pointer;
+  transition: background var(--k-dur) var(--k-ease), border-color var(--k-dur) var(--k-ease),
+    box-shadow var(--k-dur) var(--k-ease), transform 90ms var(--k-ease);
+}
+html[data-klar='on'] [data-klar-el='btn']:hover { background: var(--k-surface-2) !important; border-color: var(--k-line-strong) !important; }
+html[data-klar='on'] [data-klar-el='btn']:active { transform: translateY(1px); box-shadow: none !important; }
+html[data-klar='on'] [data-klar-el='btn'][disabled],
+html[data-klar='on'] [data-klar-el='btn'][aria-disabled='true'] {
+  opacity: 0.45;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+
+html[data-klar='on'] [data-klar-el='btn'][data-klar-variant='primary'] {
+  background: var(--k-accent) !important;
+  border-color: transparent !important;
+  color: var(--k-on-accent) !important;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--k-accent) 30%, transparent),
+    0 10px 20px -14px color-mix(in srgb, var(--k-accent) 70%, transparent) !important;
+}
+html[data-klar='on'] [data-klar-el='btn'][data-klar-variant='primary']:hover {
+  background: var(--k-accent-2) !important;
+}
+html[data-klar='on'] [data-klar-el='btn'][data-klar-variant='danger'] {
+  background: var(--k-danger-soft) !important;
+  border-color: color-mix(in srgb, var(--k-danger) 30%, transparent) !important;
+  color: var(--k-danger) !important;
+  box-shadow: none !important;
+}
+html[data-klar='on'] [data-klar-el='btn'][data-klar-variant='ghost'] {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--k-ink-2) !important;
+}
+html[data-klar='on'] [data-klar-el='btn'][data-klar-variant='ghost']:hover {
+  background: var(--k-surface-3) !important;
+  color: var(--k-ink) !important;
+}
+html[data-klar='on'] [data-klar-el='btn'][data-klar-variant='icon'] {
+  padding: 0 !important;
+  width: 36px;
+  min-width: 36px;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  border-radius: var(--k-r-sm) !important;
+  color: var(--k-ink-2) !important;
+}
+html[data-klar='on'] [data-klar-el='btn'][data-klar-variant='icon']:hover {
+  background: var(--k-surface-3) !important;
+  color: var(--k-ink) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Skjemafelt
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [data-klar-el='field'] {
+  min-height: 38px;
+  padding: 8px 12px !important;
+  border: 1px solid var(--k-line-2) !important;
+  border-radius: var(--k-r-sm) !important;
+  background: var(--k-surface) !important;
+  color: var(--k-ink) !important;
+  font-family: var(--k-font) !important;
+  font-size: var(--k-text-md) !important;
+  box-shadow: none !important;
+  transition: border-color var(--k-dur) var(--k-ease), box-shadow var(--k-dur) var(--k-ease),
+    background var(--k-dur) var(--k-ease);
+}
+html[data-klar='on'] [data-klar-el='field']:hover { border-color: var(--k-line-strong) !important; }
+html[data-klar='on'] [data-klar-el='field']:focus,
+html[data-klar='on'] [data-klar-el='field']:focus-visible {
+  outline: none !important;
+  border-color: var(--k-accent) !important;
+  box-shadow: var(--k-ring) !important;
+}
+html[data-klar='on'] [data-klar-el='field']::placeholder { color: var(--k-faint) !important; }
+html[data-klar='on'] select[data-klar-el='field'] { padding-right: 30px !important; }
+html[data-klar='on'] textarea[data-klar-el='field'] { min-height: 92px; line-height: 1.55; resize: vertical; }
+html[data-klar='on'] :is(input[type='checkbox'], input[type='radio'], progress, input[type='range']) {
+  accent-color: var(--k-accent);
+}
+html[data-klar='on'] label { color: var(--k-ink-2); font-size: var(--k-text-sm); font-weight: 540; }
+
+/* --------------------------------------------------------------------------
+   Tabeller
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [data-klar-el='table'] {
+  width: 100%;
+  border-collapse: collapse !important;
+  background: transparent !important;
+  font-size: var(--k-text-md) !important;
+}
+html[data-klar='on'] [data-klar-el='table'] :is(th, td) {
+  padding: 11px 14px !important;
+  text-align: left;
+  vertical-align: middle;
+  border: 0 !important;
+  border-bottom: 1px solid var(--k-line) !important;
+  background: transparent !important;
+  color: var(--k-ink-2) !important;
+}
+html[data-klar='on'] [data-klar-el='table'] th {
+  color: var(--k-muted) !important;
+  font-size: var(--k-text-xs) !important;
+  font-weight: 640 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+  border-bottom: 1px solid var(--k-line-2) !important;
+  white-space: nowrap;
+}
+html[data-klar='on'] [data-klar-el='table'] tbody tr {
+  transition: background var(--k-dur) var(--k-ease);
+}
+html[data-klar='on'] [data-klar-el='table'] tbody tr:hover :is(td, th) {
+  background: var(--k-surface-2) !important;
+}
+html[data-klar='on'] [data-klar-el='table'] tbody tr:last-child :is(td, th) { border-bottom: 0 !important; }
+
+/* --------------------------------------------------------------------------
+   Merkelapper, sjetonger og statuser
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [data-klar-el='badge'] {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px !important;
+  border-radius: var(--k-r-pill) !important;
+  background: var(--k-surface-3) !important;
+  color: var(--k-ink-2) !important;
+  border: 0 !important;
+  font-size: var(--k-text-xs) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  line-height: 1.5 !important;
+  white-space: nowrap;
+}
+html[data-klar='on'] [data-klar-el='badge'][data-klar-tone='ok'] { background: var(--k-ok-soft) !important; color: var(--k-ok) !important; }
+html[data-klar='on'] [data-klar-el='badge'][data-klar-tone='warn'] { background: var(--k-warn-soft) !important; color: var(--k-warn) !important; }
+html[data-klar='on'] [data-klar-el='badge'][data-klar-tone='danger'] { background: var(--k-danger-soft) !important; color: var(--k-danger) !important; }
+html[data-klar='on'] [data-klar-el='badge'][data-klar-tone='info'] { background: var(--k-info-soft) !important; color: var(--k-info) !important; }
+html[data-klar='on'] [data-klar-el='badge'][data-klar-tone='accent'] { background: var(--k-accent-soft) !important; color: var(--k-accent-ink) !important; }
+
+/* --------------------------------------------------------------------------
+   Faner
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [role='tablist'] {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--k-line) !important;
+  background: transparent !important;
+  padding: 0 0 2px !important;
+}
+html[data-klar='on'] [role='tab'] {
+  position: relative;
+  padding: 9px 14px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--k-muted) !important;
+  font-weight: 560 !important;
+  font-size: var(--k-text-md) !important;
+  text-transform: none !important;
+  border-radius: var(--k-r-sm) var(--k-r-sm) 0 0 !important;
+  transition: color var(--k-dur) var(--k-ease), background var(--k-dur) var(--k-ease);
+}
+html[data-klar='on'] [role='tab']:hover { color: var(--k-ink) !important; background: var(--k-surface-2) !important; }
+html[data-klar='on'] [role='tab'][aria-selected='true'] { color: var(--k-ink) !important; }
+html[data-klar='on'] [role='tab'][aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -3px;
+  height: 2px;
+  border-radius: var(--k-r-pill);
+  background: var(--k-accent);
+}
+
+/* --------------------------------------------------------------------------
+   Dialoger, menyer og overlegg
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] :is(dialog, [data-klar-el='surface']) {
+  background: var(--k-surface) !important;
+  color: var(--k-ink) !important;
+  border: 1px solid var(--k-line) !important;
+  border-radius: var(--k-r-lg) !important;
+  box-shadow: var(--k-shadow-3) !important;
+}
+html[data-klar='on'] [data-klar-el='backdrop'] {
+  background: var(--k-overlay) !important;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html[data-klar='on'] dialog::backdrop,
+html[data-klar='on'] :is(.cdk-overlay-backdrop, [class*='backdrop' i], [class*='overlay-shade' i]) {
+  background: var(--k-overlay) !important;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+html[data-klar='on'] :is([role='menu'], [role='listbox'], [data-klar-el='popover']) {
+  background: var(--k-surface) !important;
+  border: 1px solid var(--k-line) !important;
+  border-radius: var(--k-r) !important;
+  box-shadow: var(--k-shadow-3) !important;
+  padding: 6px !important;
+  color: var(--k-ink) !important;
+}
+html[data-klar='on'] :is([role='menuitem'], [role='option']) {
+  border-radius: var(--k-r-xs) !important;
+  padding: 8px 10px !important;
+  color: var(--k-ink-2) !important;
+  font-size: var(--k-text-md) !important;
+}
+html[data-klar='on'] :is([role='menuitem'], [role='option']):hover,
+html[data-klar='on'] [role='option'][aria-selected='true'] {
+  background: var(--k-surface-3) !important;
+  color: var(--k-ink) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Varsler
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [role='alert'] {
+  border-radius: var(--k-r) !important;
+  border: 1px solid color-mix(in srgb, var(--k-info) 26%, transparent) !important;
+  background: var(--k-info-soft) !important;
+  color: var(--k-ink) !important;
+  padding: var(--k-space-3) var(--k-space-4) !important;
+  box-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Ommaling av flater og tekst som ligger igjen fra originaldesignet
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [data-klar-paper='1'] { background-color: var(--k-surface) !important; }
+html[data-klar='on'] [data-klar-paper='2'] { background-color: var(--k-surface-2) !important; }
+html[data-klar='on'] [data-klar-paper='3'] { background-color: var(--k-surface-3) !important; }
+html[data-klar='on'] [data-klar-paper='0'] { background-color: var(--k-bg) !important; }
+html[data-klar='on'] [data-klar-ink='1'] { color: var(--k-ink) !important; }
+html[data-klar='on'] [data-klar-ink='2'] { color: var(--k-ink-2) !important; }
+html[data-klar='on'] [data-klar-ink='3'] { color: var(--k-muted) !important; }
+html[data-klar='on'] [data-klar-line] { border-color: var(--k-line) !important; }
+
+/* Laster-/skjelettflater */
+html[data-klar='on'] [class*='skeleton' i],
+html[data-klar='on'] [class*='placeholder' i]:empty {
+  background: linear-gradient(90deg, var(--k-surface-2), var(--k-surface-3), var(--k-surface-2)) !important;
+  background-size: 200% 100% !important;
+  animation: klar-shimmer 1.4s linear infinite;
+  border-radius: var(--k-r-sm) !important;
+}
+@keyframes klar-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}

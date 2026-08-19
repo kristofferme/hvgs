@@ -1,0 +1,91 @@
+/* ==========================================================================
+   Klar – timeplan og fargekoding av emner
+   ========================================================================== */
+
+html[data-klar='on'] [data-klar-el='event'] {
+  --hue-bg: var(--k-surface-2);
+  --hue-ink: var(--k-ink);
+  --hue-edge: var(--k-line-2);
+  position: relative;
+  background: var(--hue-bg) !important;
+  color: var(--hue-ink) !important;
+  border: 0 !important;
+  border-left: 3px solid var(--hue-edge) !important;
+  border-radius: var(--k-r-sm) !important;
+  padding: 7px 10px !important;
+  font-size: var(--k-text-sm) !important;
+  font-weight: 560 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.006em;
+  box-shadow: none !important;
+  overflow: hidden;
+  transition: box-shadow var(--k-dur) var(--k-ease), transform var(--k-dur) var(--k-ease-out),
+    filter var(--k-dur) var(--k-ease);
+}
+html[data-klar='on'] [data-klar-el='event']:hover {
+  box-shadow: var(--k-shadow-2) !important;
+  transform: translateY(-1px);
+  z-index: 3;
+}
+html[data-klar='on'] [data-klar-el='event'] * {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: inherit !important;
+}
+html[data-klar='on'] [data-klar-el='event'] :is(small, .k-sub) {
+  color: color-mix(in srgb, currentColor 68%, transparent) !important;
+  font-weight: 500 !important;
+}
+
+html[data-klar='on'] [data-klar-hue='1'] { --hue-bg: var(--h1-bg); --hue-ink: var(--h1-ink); --hue-edge: var(--h1-edge); }
+html[data-klar='on'] [data-klar-hue='2'] { --hue-bg: var(--h2-bg); --hue-ink: var(--h2-ink); --hue-edge: var(--h2-edge); }
+html[data-klar='on'] [data-klar-hue='3'] { --hue-bg: var(--h3-bg); --hue-ink: var(--h3-ink); --hue-edge: var(--h3-edge); }
+html[data-klar='on'] [data-klar-hue='4'] { --hue-bg: var(--h4-bg); --hue-ink: var(--h4-ink); --hue-edge: var(--h4-edge); }
+html[data-klar='on'] [data-klar-hue='5'] { --hue-bg: var(--h5-bg); --hue-ink: var(--h5-ink); --hue-edge: var(--h5-edge); }
+html[data-klar='on'] [data-klar-hue='6'] { --hue-bg: var(--h6-bg); --hue-ink: var(--h6-ink); --hue-edge: var(--h6-edge); }
+html[data-klar='on'] [data-klar-hue='7'] { --hue-bg: var(--h7-bg); --hue-ink: var(--h7-ink); --hue-edge: var(--h7-edge); }
+html[data-klar='on'] [data-klar-hue='8'] { --hue-bg: var(--h8-bg); --hue-ink: var(--h8-ink); --hue-edge: var(--h8-edge); }
+html[data-klar='on'] [data-klar-hue='9'] { --hue-bg: var(--h9-bg); --hue-ink: var(--h9-ink); --hue-edge: var(--h9-edge); }
+html[data-klar='on'] [data-klar-hue='10'] { --hue-bg: var(--h10-bg); --hue-ink: var(--h10-ink); --hue-edge: var(--h10-edge); }
+
+/* Avlyst/utgått time */
+html[data-klar='on'] [data-klar-el='event'][data-klar-state='cancelled'] {
+  filter: grayscale(0.85);
+  opacity: 0.65;
+  text-decoration: line-through;
+}
+
+/* Rutenettet rundt timene */
+html[data-klar='on'] [data-klar-grid] :is(td, th) {
+  border-color: var(--k-line) !important;
+  vertical-align: top;
+}
+html[data-klar='on'] [data-klar-grid] :is(td, th):first-child {
+  color: var(--k-muted) !important;
+  font-size: var(--k-text-sm) !important;
+  font-weight: 560 !important;
+  white-space: nowrap;
+}
+html[data-klar='on'] [data-klar-grid] tbody tr:hover :is(td, th) {
+  background: transparent !important;
+}
+
+/* Dagens kolonne */
+html[data-klar='on'] [data-klar-grid] :is(th, td)[data-klar-today] {
+  background: color-mix(in srgb, var(--k-accent) 7%, transparent) !important;
+}
+html[data-klar='on'] [data-klar-grid] th[data-klar-today] {
+  color: var(--k-accent-ink) !important;
+  position: relative;
+}
+html[data-klar='on'] [data-klar-grid] th[data-klar-today]::after {
+  content: 'I DAG';
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: var(--k-r-pill);
+  background: var(--k-accent);
+  color: var(--k-on-accent);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  vertical-align: middle;
+}

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>Timeplan – Visma InSchool (testside)</title>
+<style>
+  /* Etterligner en typisk Angular/Material-utgave: kalde grå toner, Roboto, flate kort. */
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Roboto, Arial, sans-serif; background:#f5f5f5; color:#212121; font-size:14px; }
+  .app { display:flex; min-height:100vh; }
+  .sidenav { width:250px; background:#fff; border-right:1px solid #e0e0e0; padding:8px; flex:0 0 250px; }
+  .sidenav .logo { padding:14px 12px; font-weight:700; color:#1565c0; }
+  .sidenav h3 { font-size:12px; color:#9e9e9e; padding:12px; margin:0; }
+  .sidenav a { display:block; padding:10px 12px; color:#424242; text-decoration:none; border-radius:2px; }
+  .sidenav a.active { background:#e3f2fd; color:#1565c0; font-weight:500; }
+  .sidenav a:hover { background:#f5f5f5; }
+  .content-wrapper { flex:1; min-width:0; }
+  .toolbar { height:56px; background:#1565c0; color:#fff; display:flex; align-items:center; gap:12px; padding:0 16px; }
+  .toolbar h2 { font-size:18px; margin:0; font-weight:500; flex:1; }
+  .page-content { padding:16px; }
+  .card { background:#fff; border:1px solid #e0e0e0; border-radius:4px; padding:16px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,.12); }
+  .card h3 { margin:0 0 12px; font-size:16px; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  button { font-family:inherit; font-size:14px; padding:8px 16px; border-radius:4px; border:1px solid #bdbdbd; background:#fff; cursor:pointer; }
+  button.primary { background:#1565c0; color:#fff; border-color:#1565c0; }
+  button.danger { background:#c62828; color:#fff; border-color:#c62828; }
+  input, select { font-family:inherit; font-size:14px; padding:8px; border:1px solid #bdbdbd; border-radius:4px; background:#fff; }
+  table { width:100%; border-collapse:collapse; }
+  th { text-align:left; font-size:12px; color:#616161; border-bottom:2px solid #e0e0e0; padding:8px; }
+  td { padding:8px; border-bottom:1px solid #eee; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; background:#e0e0e0; font-size:12px; }
+  .badge.ok { background:#c8e6c9; color:#1b5e20; }
+  .badge.warn { background:#ffe0b2; color:#e65100; }
+  .timetable { width:100%; border-collapse:collapse; table-layout:fixed; }
+  .timetable th { background:#fafafa; }
+  .timetable td { border:1px solid #eee; vertical-align:top; height:76px; padding:4px; }
+  .lesson { border-radius:2px; padding:6px; font-size:12px; color:#fff; height:100%; }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="sidenav">
+    <div class="logo">Visma InSchool</div>
+    <h3>Skole</h3>
+    <a href="#/app/dashboard">Oversikt</a>
+    <a href="#/app/timetable" class="active">Timeplan</a>
+    <a href="#/app/absence">Fravær</a>
+    <a href="#/app/assessment">Vurdering</a>
+    <a href="#/app/messages">Meldinger</a>
+    <h3>Meg</h3>
+    <a href="#/app/student">Elevkort</a>
+    <a href="#/app/settings">Innstillinger</a>
+  </nav>
+  <div class="content-wrapper">
+    <header class="toolbar">
+      <h2>Timeplan</h2>
+      <button class="primary">Ny avtale</button>
+      <button>Skriv ut</button>
+    </header>
+    <main class="page-content">
+      <div class="grid">
+        <div class="card"><h3>Timer i dag</h3><p style="font-size:28px;margin:0">6</p><span class="badge ok">Ingen endringer</span></div>
+        <div class="card"><h3>Fravær denne uka</h3><p style="font-size:28px;margin:0">2</p><span class="badge warn">1 udokumentert</span></div>
+        <div class="card"><h3>Neste prøve</h3><p style="font-size:28px;margin:0">21.08</p><span class="badge">Matematikk R1</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Uke 34</h3>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <select><option>Uke 34</option><option>Uke 35</option></select>
+          <input type="search" placeholder="Søk i timeplan">
+          <button>Forrige</button><button>Neste</button>
+        </div>
+        <table class="timetable">
+          <thead><tr><th style="width:70px">Tid</th><th>Mandag</th><th>Tirsdag</th><th>Onsdag</th><th>Torsdag</th><th>Fredag</th></tr></thead>
+          <tbody>
+            <tr><td>08:30</td>
+              <td><div class="lesson" style="background:#3f51b5">Matematikk R1<br><small>C204 · KME</small></div></td>
+              <td><div class="lesson" style="background:#009688">Norsk<br><small>B110 · ANO</small></div></td>
+              <td><div class="lesson" style="background:#e91e63">Kroppsøving<br><small>Hall · TRE</small></div></td>
+              <td><div class="lesson" style="background:#3f51b5">Matematikk R1<br><small>C204 · KME</small></div></td>
+              <td><div class="lesson" style="background:#ff9800">Engelsk<br><small>A102 · SVE</small></div></td>
+            </tr>
+            <tr><td>09:30</td>
+              <td><div class="lesson" style="background:#009688">Norsk<br><small>B110 · ANO</small></div></td>
+              <td><div class="lesson" style="background:#795548">Historie<br><small>A201 · LHA</small></div></td>
+              <td><div class="lesson" style="background:#3f51b5">Matematikk R1<br><small>C204 · KME</small></div></td>
+              <td><div class="lesson" style="background:#607d8b">Fysikk 1 – avlyst<br><small>D003</small></div></td>
+              <td><div class="lesson" style="background:#009688">Norsk<br><small>B110 · ANO</small></div></td>
+            </tr>
+            <tr><td>10:45</td>
+              <td><div class="lesson" style="background:#ff9800">Engelsk<br><small>A102 · SVE</small></div></td>
+              <td><div class="lesson" style="background:#3f51b5">Matematikk R1<br><small>C204 · KME</small></div></td>
+              <td><div class="lesson" style="background:#795548">Historie<br><small>A201 · LHA</small></div></td>
+              <td><div class="lesson" style="background:#009688">Norsk<br><small>B110 · ANO</small></div></td>
+              <td><div class="lesson" style="background:#4caf50">Biologi<br><small>D101 · MHA</small></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Kommende vurderinger</h3>
+        <table>
+          <thead><tr><th>Fag</th><th>Type</th><th>Dato</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Matematikk R1</td><td>Prøve</td><td>21.08.2026</td><td><span class="badge warn">Ikke levert</span></td></tr>
+            <tr><td>Norsk</td><td>Innlevering</td><td>26.08.2026</td><td><span class="badge ok">Levert</span></td></tr>
+            <tr><td>Historie</td><td>Muntlig</td><td>02.09.2026</td><td><span class="badge">Planlagt</span></td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px;display:flex;gap:8px"><button class="primary">Lagre</button><button>Avbryt</button><button class="danger">Slett</button></div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

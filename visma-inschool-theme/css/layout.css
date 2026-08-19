@@ -1,0 +1,279 @@
+/* ==========================================================================
+   Klar – skall: sidemeny, topplinje, innholdsflate, hero
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Sidemeny
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [data-klar-el='sidebar'] {
+  background: var(--k-nav-bg) !important;
+  color: var(--k-nav-ink) !important;
+  border-right: 1px solid var(--k-nav-line) !important;
+  box-shadow: none !important;
+  padding: var(--k-space-3) var(--k-space-3) var(--k-space-5) !important;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+html[data-klar='on'][data-klar-sidebar='light'] [data-klar-el='sidebar'] {
+  border-right: 1px solid var(--k-line) !important;
+}
+
+html[data-klar='on'] [data-klar-el='sidebar'] :is(*, *::before, *::after) {
+  border-color: var(--k-nav-line) !important;
+}
+html[data-klar='on'] [data-klar-el='sidebar'] :is(div, ul, li, nav, section, span) {
+  background-color: transparent !important;
+}
+/* Sidens egne tekstfarger (ofte mørk blå) ville forsvunnet mot den mørke
+   flaten – alt som ikke er merket av oss arver menyens farge i stedet. */
+html[data-klar='on'] [data-klar-el='sidebar']
+  :where(a, span, div, p, li, strong, b, small, label, i, em):not([data-klar-el]) {
+  color: inherit !important;
+}
+html[data-klar='on'] [data-klar-el='brand'] {
+  display: block;
+  color: var(--k-nav-active-ink) !important;
+  font-family: var(--k-font-display) !important;
+  font-size: var(--k-text-md) !important;
+  font-weight: 640 !important;
+  letter-spacing: -0.02em;
+  padding: 10px 12px 14px !important;
+  margin: 0 0 var(--k-space-2) !important;
+  background: transparent !important;
+}
+html[data-klar='on'] [data-klar-el='brand'] * { color: inherit !important; }
+html[data-klar='on'] [data-klar-el='sidebar'] :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--k-nav-muted) !important;
+  font-size: var(--k-text-xs) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em !important;
+  font-weight: 640 !important;
+  padding: var(--k-space-4) var(--k-space-3) var(--k-space-2);
+  margin: 0 !important;
+}
+
+/* Menypunkter */
+html[data-klar='on'] [data-klar-el='nav-item'] {
+  display: flex !important;
+  align-items: center;
+  gap: var(--k-space-3);
+  position: relative;
+  padding: 9px 12px !important;
+  margin: 2px 0 !important;
+  border-radius: var(--k-r-sm) !important;
+  color: var(--k-nav-muted) !important;
+  font-size: var(--k-text-md) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.008em;
+  text-decoration: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  transition: background var(--k-dur) var(--k-ease), color var(--k-dur) var(--k-ease),
+    transform var(--k-dur) var(--k-ease);
+}
+html[data-klar='on'] [data-klar-el='nav-item'] > * { color: inherit !important; }
+html[data-klar='on'] [data-klar-el='nav-item']:hover {
+  background: var(--k-nav-hover) !important;
+  color: var(--k-nav-active-ink) !important;
+}
+html[data-klar='on'] [data-klar-el='nav-item']:active { transform: translateY(0.5px); }
+
+html[data-klar='on'] [data-klar-el='nav-item'][data-klar-active] {
+  background: var(--k-nav-active-bg) !important;
+  color: var(--k-nav-active-ink) !important;
+  font-weight: 600 !important;
+}
+html[data-klar='on'] [data-klar-el='nav-item'][data-klar-active]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  translate: -6px -50%;
+  width: 3px;
+  height: 20px;
+  border-radius: var(--k-r-pill);
+  background: var(--k-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--k-accent) 18%, transparent);
+}
+html[data-klar='on'][data-klar-sidebar='light'] [data-klar-el='nav-item'][data-klar-active] {
+  color: var(--k-accent-ink) !important;
+}
+
+/* Merkelapper/tellere i menyen */
+html[data-klar='on'] [data-klar-el='nav-item'] [data-klar-el='badge'] {
+  margin-left: auto;
+  background: color-mix(in srgb, var(--k-accent) 22%, transparent) !important;
+  color: var(--k-nav-active-ink) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Topplinje
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [data-klar-el='topbar'] {
+  background: color-mix(in srgb, var(--k-bg) 82%, transparent) !important;
+  -webkit-backdrop-filter: saturate(1.6) blur(14px);
+  backdrop-filter: saturate(1.6) blur(14px);
+  color: var(--k-ink) !important;
+  border-bottom: 1px solid transparent !important;
+  box-shadow: none !important;
+  padding: var(--k-space-2) var(--k-space-5) !important;
+  transition: border-color var(--k-dur) var(--k-ease), box-shadow var(--k-dur) var(--k-ease);
+}
+/* Originalens topplinje er ofte mørkeblå med hvit tekst. Når flaten blir lys
+   må teksten følge med, ellers blir den usynlig. */
+html[data-klar='on'] [data-klar-el='topbar']
+  :where(span, div, p, a, li, strong, b, small, label, i, em):not([data-klar-el]) {
+  color: inherit !important;
+}
+html[data-klar='on'] [data-klar-el='topbar'] :is(h1, h2, h3) {
+  font-size: var(--k-text-lg) !important;
+  margin: 0 !important;
+}
+html[data-klar='on'][data-klar-scrolled] [data-klar-el='topbar'] {
+  border-bottom-color: var(--k-line) !important;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02), 0 10px 24px -22px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Innholdsflate
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] [data-klar-el='main'] {
+  background: transparent !important;
+  padding: var(--k-space-5) clamp(16px, 2.4vw, 34px) var(--k-space-7) !important;
+}
+html[data-klar='on'] [data-klar-el='main'] > * {
+  max-width: var(--k-content-max);
+}
+
+/* --------------------------------------------------------------------------
+   Hero – innsatt av utvidelsen øverst i innholdet
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] .klar-hero {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  grid-column: 1 / -1;
+  overflow: hidden;
+  border-radius: var(--k-r-xl);
+  padding: clamp(20px, 2.6vw, 32px) clamp(20px, 2.8vw, 36px);
+  margin: 0 0 var(--k-space-5);
+  color: var(--k-hero-ink);
+  background:
+    radial-gradient(120% 160% at 88% -30%, color-mix(in srgb, var(--k-hero-3) 55%, transparent) 0%, transparent 58%),
+    radial-gradient(90% 140% at 0% 120%, color-mix(in srgb, var(--k-hero-2) 70%, transparent) 0%, transparent 62%),
+    linear-gradient(118deg, var(--k-hero-1) 0%, var(--k-hero-2) 100%);
+  box-shadow: var(--k-shadow-2);
+  isolation: isolate;
+}
+html[data-klar='on'] .klar-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(105deg, rgba(0, 0, 0, 0.55), transparent 62%);
+  -webkit-mask-image: linear-gradient(105deg, rgba(0, 0, 0, 0.55), transparent 62%);
+  opacity: 0.5;
+  z-index: -1;
+}
+html[data-klar='on'] .klar-hero__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--k-space-5);
+  flex-wrap: wrap;
+}
+html[data-klar='on'] .klar-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--k-text-xs);
+  font-weight: 620;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--k-hero-muted);
+  margin-bottom: 10px;
+}
+html[data-klar='on'] .klar-hero__eyebrow::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.75;
+}
+html[data-klar='on'] .klar-hero__title {
+  font-family: var(--k-font-display) !important;
+  font-size: clamp(26px, 3.1vw, var(--k-text-3xl)) !important;
+  font-weight: 660 !important;
+  letter-spacing: -0.032em !important;
+  line-height: 1.06 !important;
+  margin: 0 !important;
+  color: var(--k-hero-ink) !important;
+  text-wrap: balance;
+}
+html[data-klar='on'] .klar-hero__sub {
+  margin: 10px 0 0 !important;
+  color: var(--k-hero-muted) !important;
+  font-size: var(--k-text-md);
+  max-width: 62ch;
+}
+html[data-klar='on'] .klar-hero__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--k-space-2);
+  flex-wrap: wrap;
+}
+html[data-klar='on'] .klar-hero__clock {
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(28px, 3.4vw, 40px);
+  font-weight: 620;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--k-hero-ink);
+}
+html[data-klar='on'] .klar-hero__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: var(--k-r-pill);
+  font-size: var(--k-text-sm);
+  font-weight: 560;
+  color: var(--k-hero-ink);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* --------------------------------------------------------------------------
+   Flytende temaknapp
+   -------------------------------------------------------------------------- */
+html[data-klar='on'] .klar-fab {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 2147483000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px 0 12px;
+  border: 1px solid var(--k-line) !important;
+  border-radius: var(--k-r-pill);
+  background: color-mix(in srgb, var(--k-surface) 88%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.4);
+  color: var(--k-ink);
+  font-family: var(--k-font);
+  font-size: var(--k-text-sm);
+  font-weight: 560;
+  cursor: pointer;
+  box-shadow: var(--k-shadow-2);
+  opacity: 0.55;
+  transition: opacity var(--k-dur) var(--k-ease), transform var(--k-dur) var(--k-ease-out);
+}
+html[data-klar='on'] .klar-fab:hover { opacity: 1; transform: translateY(-1px); }
+html[data-klar='on'] .klar-fab svg { width: 16px; height: 16px; }
+html[data-klar='on'][data-klar-fab='off'] .klar-fab { display: none; }

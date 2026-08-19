@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "Klar – moderne tema for Visma InSchool",
+  "short_name": "Klar",
+  "version": "1.0.0",
+  "description": "Gir Visma InSchool et rolig, moderne og godt lesbart design: tydelig sidemeny, fine kort, varm typografi og fargekodet timeplan.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Klar – tema for Visma InSchool",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://*.inschool.visma.no/*"],
+  "background": { "service_worker": "js/background.js" },
+  "content_scripts": [
+    {
+      "matches": ["https://*.inschool.visma.no/*"],
+      "js": ["js/settings.js", "js/inject.js", "js/classify.js", "js/hero.js", "js/main.js"],
+      "css": ["css/prepaint.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "css/*.css",
+        "fonts/*.woff2",
+        "icons/*.png"
+      ],
+      "matches": ["https://*.inschool.visma.no/*"]
+    }
+  ],
+  "commands": {
+    "toggle-theme": {
+      "suggested_key": { "default": "Alt+Shift+K" },
+      "description": "Slå temaet av eller på"
+    },
+    "toggle-scheme": {
+      "suggested_key": { "default": "Alt+Shift+D" },
+      "description": "Bytt mellom lys og mørk"
+    }
+  }
+}

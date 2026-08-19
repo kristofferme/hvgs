@@ -1,0 +1,160 @@
+/* ==========================================================================
+   Klar – typografi, flater og grunnleggende oppførsel
+   ========================================================================== */
+
+/* Skriften (Inter Variable) lastes av innholdsskriptet via FontFace-API-et og
+   registreres som «Klar Inter». Det gjør at den også virker på sider med
+   streng CSP for font-src. Faller ellers tilbake på systemets grotesk. */
+
+html[data-klar='on'] {
+  background: var(--k-bg) !important;
+  color: var(--k-ink);
+  font-size: var(--k-text-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scrollbar-color: var(--k-line-2) transparent;
+}
+
+html[data-klar='on'] body {
+  background: var(--k-bg) !important;
+  background-image:
+    radial-gradient(900px 520px at 12% -8%, color-mix(in srgb, var(--k-accent) 9%, transparent), transparent 68%),
+    radial-gradient(760px 440px at 96% 0%, color-mix(in srgb, var(--k-hero-3) 8%, transparent), transparent 62%) !important;
+  background-attachment: fixed !important;
+  color: var(--k-ink) !important;
+  font-family: var(--k-font) !important;
+  font-size: var(--k-text-base) !important;
+  line-height: 1.55 !important;
+  letter-spacing: -0.005em;
+  font-feature-settings: 'cv05' 1, 'cv08' 1, 'ss03' 1;
+}
+
+/* Skrifttype overalt – ikonfonter holdes utenfor med vilje. */
+html[data-klar='on']
+  :is(div, section, article, main, aside, nav, header, footer, form, p, span, a, li, ul, ol,
+      dl, dt, dd, h1, h2, h3, h4, h5, h6, table, thead, tbody, tr, td, th, label, small,
+      strong, b, em, blockquote, figcaption, button, input, select, textarea, option,
+      optgroup, legend, fieldset, summary, details, caption, address)
+  :not([class*='icon' i]):not([class*='Icon']):not([class*='fa-' i]):not([class*='material' i]):not([class*='glyph' i]):not([class*='symbol' i]) {
+  font-family: var(--k-font) !important;
+}
+
+html[data-klar='on'] :is([class*='icon' i], [class*='Icon'], mat-icon, .fa, [class*='fa-' i]) {
+  color: inherit;
+}
+
+/* Overskrifter -------------------------------------------------------------- */
+html[data-klar='on'] :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--k-font-display) !important;
+  color: var(--k-ink) !important;
+  font-weight: 640 !important;
+  letter-spacing: -0.022em !important;
+  line-height: 1.18 !important;
+  text-wrap: balance;
+  margin-block: 0 var(--k-space-3);
+}
+html[data-klar='on'] h1 { font-size: var(--k-text-2xl) !important; letter-spacing: -0.03em !important; }
+html[data-klar='on'] h2 { font-size: var(--k-text-xl) !important; }
+html[data-klar='on'] h3 { font-size: var(--k-text-lg) !important; }
+html[data-klar='on'] h4 { font-size: var(--k-text-md) !important; }
+html[data-klar='on'] :is(h5, h6) {
+  font-size: var(--k-text-xs) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.09em !important;
+  font-weight: 620 !important;
+  color: var(--k-muted) !important;
+}
+
+html[data-klar='on'] p { color: var(--k-ink-2); }
+html[data-klar='on'] small { color: var(--k-muted); font-size: var(--k-text-sm); }
+html[data-klar='on'] strong, html[data-klar='on'] b { font-weight: 620; color: var(--k-ink); }
+html[data-klar='on'] hr {
+  border: 0 !important;
+  border-top: 1px solid var(--k-line) !important;
+  margin: var(--k-space-5) 0 !important;
+}
+
+/* Lenker -------------------------------------------------------------------- */
+html[data-klar='on'] a:not([data-klar-el]) {
+  color: var(--k-accent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color var(--k-dur) var(--k-ease), opacity var(--k-dur) var(--k-ease);
+}
+html[data-klar='on'] a:not([data-klar-el]):hover { color: var(--k-accent-2); }
+
+/* Tall skal stå på linje i tabeller og timeplan */
+html[data-klar='on'] :is(td, th, time, [data-klar-el='event'], .k-num) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Fokus – ett tydelig, konsistent uttrykk overalt ---------------------------- */
+html[data-klar='on'] :is(a, button, input, select, textarea, [tabindex], [role='button'], [role='tab'], [role='menuitem']):focus-visible {
+  outline: 2px solid var(--k-accent) !important;
+  outline-offset: 2px !important;
+  border-radius: var(--k-r-xs);
+}
+html[data-klar='on'] ::selection {
+  background: color-mix(in srgb, var(--k-accent) 26%, transparent);
+  color: var(--k-ink);
+}
+
+/* Rullefelt ----------------------------------------------------------------- */
+html[data-klar='on'] ::-webkit-scrollbar { width: 11px; height: 11px; }
+html[data-klar='on'] ::-webkit-scrollbar-track { background: transparent; }
+html[data-klar='on'] ::-webkit-scrollbar-thumb {
+  background: var(--k-line-2);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: var(--k-r-pill);
+}
+html[data-klar='on'] ::-webkit-scrollbar-thumb:hover { background: var(--k-line-strong); background-clip: content-box; }
+html[data-klar='on'] ::-webkit-scrollbar-corner { background: transparent; }
+
+/* Kode og forkortelser ------------------------------------------------------ */
+html[data-klar='on'] :is(code, pre, kbd, samp) {
+  font-family: var(--k-font-mono) !important;
+  font-size: 0.92em;
+  background: var(--k-surface-3);
+  border-radius: var(--k-r-xs);
+  padding: 0.12em 0.38em;
+}
+html[data-klar='on'] pre { padding: var(--k-space-4); border: 1px solid var(--k-line); overflow: auto; }
+
+/* Bilder og medier ---------------------------------------------------------- */
+html[data-klar='on'] :is(img, svg, video):not([class*='icon' i]) { max-width: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-klar='on'] *,
+  html[data-klar='on'] *::before,
+  html[data-klar='on'] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Når temaet er slått av skal våre egne innslag forsvinne helt. */
+html:not([data-klar='on']) [data-klar-own]:not(style) {
+  display: none !important;
+}
+
+/* Utskrift: rolig papir, ingen pynt. */
+@media print {
+  html[data-klar='on'] .klar-fab,
+  html[data-klar='on'] .klar-hero {
+    display: none !important;
+  }
+  html[data-klar='on'],
+  html[data-klar='on'] body {
+    background: #fff !important;
+    background-image: none !important;
+    color: #000 !important;
+  }
+  html[data-klar='on'] [data-klar-el='card'] {
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}

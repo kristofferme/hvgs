@@ -1,0 +1,9 @@
+/* Injiseres av manifestet ved document_start, kun for å unngå at siden
+   blinker hvitt før hovedstilen er lastet. Bevisst minimal. */
+html[data-klar='on'] {
+  background: #f2f0ea;
+}
+html[data-klar='on'][data-klar-scheme='dark'] {
+  background: #0c0e10;
+  color-scheme: dark;
+}

@@ -7,9 +7,9 @@
 
 html[data-klar='on'] {
   /* Typografi ------------------------------------------------------------ */
-  --k-font: 'Klar Inter', 'Inter', ui-sans-serif, system-ui, -apple-system,
+  --k-font: 'Klar Switzer', ui-sans-serif, system-ui, -apple-system,
     'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --k-font-display: 'Klar Inter Display', 'Klar Inter', 'Inter', ui-sans-serif, system-ui,
+  --k-font-display: 'Klar Switzer', ui-sans-serif, system-ui,
     -apple-system, 'Segoe UI Variable Display', 'Segoe UI', Roboto, sans-serif;
   --k-font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Cascadia Mono', Menlo, monospace;
 
@@ -177,7 +177,6 @@ html[data-klar='on'] { /* gran – standard */
   --k-on-accent: #ffffff;
   --k-hero-1: #143f38;
   --k-hero-2: #1d6455;
-  --k-hero-3: #b6763a;
 }
 html[data-klar='on'][data-klar-accent='ocean'] {
   --k-accent: #1a4f95; --k-accent-2: #133c73; --k-accent-ink: #0f3565;
@@ -231,28 +230,28 @@ html[data-klar='on'][data-klar-scheme='dark'][data-klar-accent='cobalt'] {
    Fargekoder for timeplan/emner – 10 rolige, godt adskilte toner
    ========================================================================== */
 html[data-klar='on'] {
-  --h1-bg: #e3f0e9; --h1-ink: #14503f; --h1-edge: #2e7d5f;
-  --h2-bg: #e3ecf8; --h2-ink: #17406e; --h2-edge: #2f6dad;
-  --h3-bg: #f1e7f0; --h3-ink: #5b2a54; --h3-edge: #8e4a85;
-  --h4-bg: #f8eedd; --h4-ink: #6b4711; --h4-edge: #b07c22;
-  --h5-bg: #f8e9e2; --h5-ink: #6e3323; --h5-edge: #b15a3c;
-  --h6-bg: #dff0f1; --h6-ink: #12484f; --h6-edge: #2a7c86;
-  --h7-bg: #e8e9f8; --h7-ink: #2e3474; --h7-edge: #5058b4;
-  --h8-bg: #f9e8ee; --h8-ink: #6c2540; --h8-edge: #ae4468;
-  --h9-bg: #edf0de; --h9-ink: #45500f; --h9-edge: #74842a;
-  --h10-bg: #e8ecef; --h10-ink: #2f3a44; --h10-edge: #5a6b7a;
+  --h1-bg: #e3f0e9; --h1-ink: #14503f;
+  --h2-bg: #e3ecf8; --h2-ink: #17406e;
+  --h3-bg: #f1e7f0; --h3-ink: #5b2a54;
+  --h4-bg: #f8eedd; --h4-ink: #6b4711;
+  --h5-bg: #f8e9e2; --h5-ink: #6e3323;
+  --h6-bg: #dff0f1; --h6-ink: #12484f;
+  --h7-bg: #e8e9f8; --h7-ink: #2e3474;
+  --h8-bg: #f9e8ee; --h8-ink: #6c2540;
+  --h9-bg: #edf0de; --h9-ink: #45500f;
+  --h10-bg: #e8ecef; --h10-ink: #2f3a44;
 }
 html[data-klar='on'][data-klar-scheme='dark'] {
-  --h1-bg: #16251f; --h1-ink: #86d9b7; --h1-edge: #3e9c79;
-  --h2-bg: #15202e; --h2-ink: #97c4f5; --h2-edge: #3e7fc4;
-  --h3-bg: #241a24; --h3-ink: #dfa8d5; --h3-edge: #9e5f94;
-  --h4-bg: #2a2117; --h4-ink: #efc386; --h4-edge: #b5883b;
-  --h5-bg: #2a1d19; --h5-ink: #eeae96; --h5-edge: #b96b4c;
-  --h6-bg: #132325; --h6-ink: #8bd2d9; --h6-edge: #3b909a;
-  --h7-bg: #1b1d2e; --h7-ink: #b0b6f3; --h7-edge: #6068c6;
-  --h8-bg: #2a1a20; --h8-ink: #efa6be; --h8-edge: #ba5a79;
-  --h9-bg: #1f2416; --h9-ink: #c7d18d; --h9-edge: #869441;
-  --h10-bg: #1b1f23; --h10-ink: #b8c3cd; --h10-edge: #6a7a88;
+  --h1-bg: #16251f; --h1-ink: #86d9b7;
+  --h2-bg: #15202e; --h2-ink: #97c4f5;
+  --h3-bg: #241a24; --h3-ink: #dfa8d5;
+  --h4-bg: #2a2117; --h4-ink: #efc386;
+  --h5-bg: #2a1d19; --h5-ink: #eeae96;
+  --h6-bg: #132325; --h6-ink: #8bd2d9;
+  --h7-bg: #1b1d2e; --h7-ink: #b0b6f3;
+  --h8-bg: #2a1a20; --h8-ink: #efa6be;
+  --h9-bg: #1f2416; --h9-ink: #c7d18d;
+  --h10-bg: #1b1f23; --h10-ink: #b8c3cd;
 }
 
 /* Kompakt tetthet */

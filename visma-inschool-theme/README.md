@@ -20,7 +20,7 @@ moderne og godt lesbart design – uten å endre hvordan tjenesten fungerer.
 - **Fargekodet timeplan.** Hvert fag får sin faste, dempede tone – samme fag har samme farge hele uka.
   Dagens kolonne markeres med «I DAG», og avlyste timer tones ned.
 - **Lys og mørk modus** (eller «auto» etter systemvalget), fem aksentfarger, to tettheter.
-- **Typografi.** Inter Variable følger med utvidelsen, med systemfont som reserve.
+- **Typografi.** Switzer følger med utvidelsen i fire vekter, med systemfont som reserve.
 
 ## Installer
 
@@ -59,8 +59,14 @@ flater som skiller seg fra bakgrunnen på lystyrke, ikke på kant. Aksenten er d
 4.5:1 begge veier. Statusfarger (grønn, gul, rød, blå) er dempet mot samme papirtone,
 og timeplanen bruker ti toner som er valgt for å kunne stå ved siden av hverandre.
 
-**Typografi.** Inter Variable, med strammere sporing på overskrifter, tabulære tall i
-tabeller og timeplan, og små, versale etiketter til seksjonsoverskrifter.
+**Typografi.** Switzer (Indian Type Foundry, via Fontshare) i vektene 400/500/600/700 –
+en nøytral grotesk med åpne former som tåler små størrelser. Strammere sporing på
+overskrifter, tabulære tall i tabeller og timeplan, og små, versale etiketter til
+seksjonsoverskrifter.
+
+**Farge som flate, ikke som kant.** Ingen fargede rammer, streker eller kantlinjer på
+kort og timer – fargen ligger i flaten, kanten er alltid nøytral. Bakgrunnen er ensfarget,
+og heroen bruker én fargefamilie i stedet for flere toner om hverandre.
 
 **Form.** Én radiusskala (6/10/14/20/26 px), tre skyggenivåer, og bevegelse kun der den
 forklarer noe – 180 ms, alltid med respekt for `prefers-reduced-motion`.
@@ -95,7 +101,7 @@ Noen detaljer som er verdt å vite:
 
 Utvidelsen leser ingen skoledata og sender ingenting noe sted. Den har `storage` for egne
 innstillinger og tilgang til `*.inschool.visma.no` for å kunne style siden. Ingen
-nettverkskall, ingen sporing, ingen eksterne ressurser – Inter ligger i utvidelsen.
+nettverkskall, ingen sporing, ingen eksterne ressurser – Switzer ligger i utvidelsen.
 
 ## Utvikling
 
@@ -105,7 +111,7 @@ visma-inschool-theme/
 ├── css/     tokens, base, layout, komponenter, timeplan
 ├── js/      settings, inject, classify, hero, main, background
 ├── popup/   innstillingspanel
-├── fonts/   InterVariable.woff2
+├── fonts/   Switzer 400/500/600/700 + NOTICE.md
 └── test/    testsider + skjermbildeoppsett (Playwright)
 ```
 

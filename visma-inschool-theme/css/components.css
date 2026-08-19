@@ -59,7 +59,7 @@ html[data-klar='on'] [data-klar-el='btn'] {
   color: var(--k-ink) !important;
   font-family: var(--k-font) !important;
   font-size: var(--k-text-md) !important;
-  font-weight: 560 !important;
+  font-weight: 600 !important;
   letter-spacing: -0.008em;
   line-height: 1.2 !important;
   text-transform: none !important;
@@ -148,7 +148,7 @@ html[data-klar='on'] textarea[data-klar-el='field'] { min-height: 92px; line-hei
 html[data-klar='on'] :is(input[type='checkbox'], input[type='radio'], progress, input[type='range']) {
   accent-color: var(--k-accent);
 }
-html[data-klar='on'] label { color: var(--k-ink-2); font-size: var(--k-text-sm); font-weight: 540; }
+html[data-klar='on'] label { color: var(--k-ink-2); font-size: var(--k-text-sm); font-weight: 500; }
 
 /* --------------------------------------------------------------------------
    Tabeller
@@ -171,7 +171,7 @@ html[data-klar='on'] [data-klar-el='table'] :is(th, td) {
 html[data-klar='on'] [data-klar-el='table'] th {
   color: var(--k-muted) !important;
   font-size: var(--k-text-xs) !important;
-  font-weight: 640 !important;
+  font-weight: 600 !important;
   text-transform: uppercase;
   letter-spacing: 0.075em;
   border-bottom: 1px solid var(--k-line-2) !important;
@@ -225,7 +225,7 @@ html[data-klar='on'] [role='tab'] {
   border: 0 !important;
   background: transparent !important;
   color: var(--k-muted) !important;
-  font-weight: 560 !important;
+  font-weight: 600 !important;
   font-size: var(--k-text-md) !important;
   text-transform: none !important;
   border-radius: var(--k-r-sm) var(--k-r-sm) 0 0 !important;

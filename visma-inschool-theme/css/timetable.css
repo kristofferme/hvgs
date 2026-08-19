@@ -5,16 +5,14 @@
 html[data-klar='on'] [data-klar-el='event'] {
   --hue-bg: var(--k-surface-2);
   --hue-ink: var(--k-ink);
-  --hue-edge: var(--k-line-2);
   position: relative;
   background: var(--hue-bg) !important;
   color: var(--hue-ink) !important;
   border: 0 !important;
-  border-left: 3px solid var(--hue-edge) !important;
   border-radius: var(--k-r-sm) !important;
   padding: 7px 10px !important;
   font-size: var(--k-text-sm) !important;
-  font-weight: 560 !important;
+  font-weight: 600 !important;
   line-height: 1.35 !important;
   letter-spacing: -0.006em;
   box-shadow: none !important;
@@ -37,16 +35,16 @@ html[data-klar='on'] [data-klar-el='event'] :is(small, .k-sub) {
   font-weight: 500 !important;
 }
 
-html[data-klar='on'] [data-klar-hue='1'] { --hue-bg: var(--h1-bg); --hue-ink: var(--h1-ink); --hue-edge: var(--h1-edge); }
-html[data-klar='on'] [data-klar-hue='2'] { --hue-bg: var(--h2-bg); --hue-ink: var(--h2-ink); --hue-edge: var(--h2-edge); }
-html[data-klar='on'] [data-klar-hue='3'] { --hue-bg: var(--h3-bg); --hue-ink: var(--h3-ink); --hue-edge: var(--h3-edge); }
-html[data-klar='on'] [data-klar-hue='4'] { --hue-bg: var(--h4-bg); --hue-ink: var(--h4-ink); --hue-edge: var(--h4-edge); }
-html[data-klar='on'] [data-klar-hue='5'] { --hue-bg: var(--h5-bg); --hue-ink: var(--h5-ink); --hue-edge: var(--h5-edge); }
-html[data-klar='on'] [data-klar-hue='6'] { --hue-bg: var(--h6-bg); --hue-ink: var(--h6-ink); --hue-edge: var(--h6-edge); }
-html[data-klar='on'] [data-klar-hue='7'] { --hue-bg: var(--h7-bg); --hue-ink: var(--h7-ink); --hue-edge: var(--h7-edge); }
-html[data-klar='on'] [data-klar-hue='8'] { --hue-bg: var(--h8-bg); --hue-ink: var(--h8-ink); --hue-edge: var(--h8-edge); }
-html[data-klar='on'] [data-klar-hue='9'] { --hue-bg: var(--h9-bg); --hue-ink: var(--h9-ink); --hue-edge: var(--h9-edge); }
-html[data-klar='on'] [data-klar-hue='10'] { --hue-bg: var(--h10-bg); --hue-ink: var(--h10-ink); --hue-edge: var(--h10-edge); }
+html[data-klar='on'] [data-klar-hue='1'] { --hue-bg: var(--h1-bg); --hue-ink: var(--h1-ink); }
+html[data-klar='on'] [data-klar-hue='2'] { --hue-bg: var(--h2-bg); --hue-ink: var(--h2-ink); }
+html[data-klar='on'] [data-klar-hue='3'] { --hue-bg: var(--h3-bg); --hue-ink: var(--h3-ink); }
+html[data-klar='on'] [data-klar-hue='4'] { --hue-bg: var(--h4-bg); --hue-ink: var(--h4-ink); }
+html[data-klar='on'] [data-klar-hue='5'] { --hue-bg: var(--h5-bg); --hue-ink: var(--h5-ink); }
+html[data-klar='on'] [data-klar-hue='6'] { --hue-bg: var(--h6-bg); --hue-ink: var(--h6-ink); }
+html[data-klar='on'] [data-klar-hue='7'] { --hue-bg: var(--h7-bg); --hue-ink: var(--h7-ink); }
+html[data-klar='on'] [data-klar-hue='8'] { --hue-bg: var(--h8-bg); --hue-ink: var(--h8-ink); }
+html[data-klar='on'] [data-klar-hue='9'] { --hue-bg: var(--h9-bg); --hue-ink: var(--h9-ink); }
+html[data-klar='on'] [data-klar-hue='10'] { --hue-bg: var(--h10-bg); --hue-ink: var(--h10-ink); }
 
 /* Avlyst/utgått time */
 html[data-klar='on'] [data-klar-el='event'][data-klar-state='cancelled'] {
@@ -63,7 +61,7 @@ html[data-klar='on'] [data-klar-grid] :is(td, th) {
 html[data-klar='on'] [data-klar-grid] :is(td, th):first-child {
   color: var(--k-muted) !important;
   font-size: var(--k-text-sm) !important;
-  font-weight: 560 !important;
+  font-weight: 600 !important;
   white-space: nowrap;
 }
 html[data-klar='on'] [data-klar-grid] tbody tr:hover :is(td, th) {

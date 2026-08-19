@@ -2,8 +2,8 @@
    Klar – typografi, flater og grunnleggende oppførsel
    ========================================================================== */
 
-/* Skriften (Inter Variable) lastes av innholdsskriptet via FontFace-API-et og
-   registreres som «Klar Inter». Det gjør at den også virker på sider med
+/* Skriften (Switzer) lastes av innholdsskriptet via FontFace-API-et og
+   registreres som «Klar Switzer». Det gjør at den også virker på sider med
    streng CSP for font-src. Faller ellers tilbake på systemets grotesk. */
 
 html[data-klar='on'] {
@@ -18,10 +18,7 @@ html[data-klar='on'] {
 
 html[data-klar='on'] body {
   background: var(--k-bg) !important;
-  background-image:
-    radial-gradient(900px 520px at 12% -8%, color-mix(in srgb, var(--k-accent) 9%, transparent), transparent 68%),
-    radial-gradient(760px 440px at 96% 0%, color-mix(in srgb, var(--k-hero-3) 8%, transparent), transparent 62%) !important;
-  background-attachment: fixed !important;
+  background-image: none !important;
   color: var(--k-ink) !important;
   font-family: var(--k-font) !important;
   font-size: var(--k-text-base) !important;
@@ -48,7 +45,7 @@ html[data-klar='on'] :is([class*='icon' i], [class*='Icon'], mat-icon, .fa, [cla
 html[data-klar='on'] :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--k-font-display) !important;
   color: var(--k-ink) !important;
-  font-weight: 640 !important;
+  font-weight: 600 !important;
   letter-spacing: -0.022em !important;
   line-height: 1.18 !important;
   text-wrap: balance;
@@ -62,13 +59,13 @@ html[data-klar='on'] :is(h5, h6) {
   font-size: var(--k-text-xs) !important;
   text-transform: uppercase;
   letter-spacing: 0.09em !important;
-  font-weight: 620 !important;
+  font-weight: 600 !important;
   color: var(--k-muted) !important;
 }
 
 html[data-klar='on'] p { color: var(--k-ink-2); }
 html[data-klar='on'] small { color: var(--k-muted); font-size: var(--k-text-sm); }
-html[data-klar='on'] strong, html[data-klar='on'] b { font-weight: 620; color: var(--k-ink); }
+html[data-klar='on'] strong, html[data-klar='on'] b { font-weight: 600; color: var(--k-ink); }
 html[data-klar='on'] hr {
   border: 0 !important;
   border-top: 1px solid var(--k-line) !important;

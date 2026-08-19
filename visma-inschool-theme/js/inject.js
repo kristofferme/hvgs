@@ -55,16 +55,22 @@
     if (document.head) obs.observe(document.head, { childList: true });
   }
 
+  const WEIGHTS = [400, 500, 600, 700];
+
   async function injectFont() {
     if (!window.FontFace || !document.fonts) return;
-    try {
-      const buf = await fetch(url('fonts/InterVariable.woff2')).then((r) => r.arrayBuffer());
-      const face = new FontFace('Klar Inter', buf, { weight: '100 900', display: 'swap' });
-      await face.load();
-      document.fonts.add(face);
-    } catch (e) {
-      /* systemets egen grotesk brukes da – temaet fungerer uansett */
-    }
+    await Promise.all(
+      WEIGHTS.map(async (w) => {
+        try {
+          const buf = await fetch(url('fonts/Switzer-' + w + '.woff2')).then((r) => r.arrayBuffer());
+          const face = new FontFace('Klar Switzer', buf, { weight: String(w), display: 'swap' });
+          await face.load();
+          document.fonts.add(face);
+        } catch (e) {
+          /* systemets egen grotesk brukes da – temaet fungerer uansett */
+        }
+      })
+    );
   }
 
   NS.injectCss = injectCss;

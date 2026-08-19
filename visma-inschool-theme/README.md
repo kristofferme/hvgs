@@ -3,7 +3,7 @@
 En Chrome-utvidelse som gir Visma InSchool (`*.inschool.visma.no`) et rolig,
 moderne og godt lesbart design – uten å endre hvordan tjenesten fungerer.
 
-![Etter: timeplan i lys modus](docs/02-etter-lys.png)
+![Etter: startside i lys modus](docs/02-etter-lys.png)
 
 <table>
 <tr>
@@ -19,6 +19,8 @@ moderne og godt lesbart design – uten å endre hvordan tjenesten fungerer.
 - **Hero øverst.** Hilsen etter tid på døgnet, dato, ukenummer, semester og klokke.
 - **Fargekodet timeplan.** Hvert fag får sin faste, dempede tone – samme fag har samme farge hele uka.
   Dagens kolonne markeres med «I DAG», og avlyste timer tones ned.
+- **Lesbarhet som er målt, ikke antatt.** Hver tekst måles mot flaten den faktisk ligger
+  på, og løftes til minst 4.5:1 der appens egne farger ikke holder – med fargetonen i behold.
 - **Lys og mørk modus** (eller «auto» etter systemvalget), fem aksentfarger, to tettheter.
 - **Typografi.** Switzer følger med utvidelsen i fire vekter, med systemfont som reserve.
 
@@ -68,6 +70,10 @@ seksjonsoverskrifter.
 kort og timer – fargen ligger i flaten, kanten er alltid nøytral. Bakgrunnen er ensfarget,
 og heroen bruker én fargefamilie i stedet for flere toner om hverandre.
 
+**Kontrast.** Ingen tekst under WCAG AA. Semantiske farger (grønn, gul, rød, blå) er
+justert til å klare 4.5:1 mot sine egne bakgrunner, og alt annet rettes opp av
+kontrastmålingen som beskrives under.
+
 **Form.** Én radiusskala (6/10/14/20/26 px), tre skyggenivåer, og bevegelse kun der den
 forklarer noe – 180 ms, alltid med respekt for `prefers-reduced-motion`.
 
@@ -90,6 +96,18 @@ Noen detaljer som er verdt å vite:
 - **Flater males om.** Nesten-hvite og grå flater knyttes til paletten, og i mørk modus
   lysnes tekst som ellers ville forsvunnet. Elementer vi allerede har gitt en rolle,
   røres ikke.
+- **Kontrasten måles.** For hver tekst finner vi flaten den faktisk står på ved å gå
+  oppover i treet til første ugjennomsiktige farge. Er forholdet under 4.5:1, løftes
+  lysheten trinnvis med fargetonen i behold, til kravet er innfridd. Ligger teksten på
+  en gradient eller et bilde, lar vi den være – da kan vi ikke måle pålitelig. Målingen
+  gjentas ved hvert fullskann, siden flatene kan ha endret farge underveis.
+- **Appens egen luft respekteres.** Har hovedflaten allerede innrykk – typisk fordi
+  sidemenyen eller topplinja er `position: fixed` – legger vi ikke vår egen padding
+  oppå. Vi fyller bare på der det ikke finnes luft fra før.
+- **Fargekoding krever en klynge.** Fargede felter blir bare til timer når minst tre
+  ligger samlet under samme beholder. En enslig infoboks får beholde sin egen farge.
+  Tonen velges ut fra fagnavnet – den mest fremhevede teksten i timen – slik at samme
+  fag har samme farge uansett dag, tid og rom.
 - **Ruteendringer følges.** `hashchange`, `popstate` og `history.pushState` utløser nytt
   skann, i tillegg til en `MutationObserver` for innhold som lastes underveis.
 - **Stilarkene holdes bakerst** i `<html>`, slik at appens egne, dynamisk innlastede ark
@@ -115,20 +133,28 @@ visma-inschool-theme/
 └── test/    testsider + skjermbildeoppsett (Playwright)
 ```
 
-Testsidene etterligner to ganske ulike DOM-strukturer, slik at strukturgjenkjenningen
-kan prøves uten innlogging:
+Testsidene etterligner tre ganske ulike DOM-strukturer – `mock-vis.html` er bygd etter
+InSchool sin faktiske oppbygning med fast meny, pilleformede undermenypunkter og
+pastellfargede timer – slik at strukturgjenkjenningen kan prøves uten innlogging:
 
 ```bash
 npx http-server test -p 8899 -s &
-node test/screenshot.js            # skriver bilder til test/shots/
+node test/screenshot.js            # skjermbilder + hva som ble gjenkjent
+node test/audit.js                 # måler tekstkontrast på alle tre sidene
 ```
 
-Skriptet bygger en midlertidig kopi av utvidelsen som også treffer `localhost`, laster
-den i Chromium og skriver ut hva som ble gjenkjent på hver side.
+`audit.js` går gjennom hver tekst på siden, måler den mot flaten den ligger på og
+rapporterer alt under WCAG AA – med og uten temaet. Sist kjøring:
+
+| Side | Uten tema | Med tema (lys) | Med tema (mørk) |
+| --- | --- | --- | --- |
+| VIS-lik startside | 11 av 74 under kravet | 0 av 54 | 0 av 54 |
+| Timeplan | 22 av 84 under kravet | 0 av 60 | 0 av 60 |
+| Variant | 6 av 33 under kravet | 0 av 27 | 0 av 27 |
 
 ## Kjente begrensninger
 
-- Temaet er utviklet og testet mot to testsider som etterligner InSchool, ikke mot en
+- Temaet er utviklet og testet mot tre testsider som etterligner InSchool, ikke mot en
   innlogget konto. Strukturgjenkjenningen er laget for å tåle ukjent markup, men om en
   skjerm i den ekte tjenesten ser feil ut, er det som regel nok å justere terskler i
   `js/classify.js` eller legge til en regel i `css/components.css`.

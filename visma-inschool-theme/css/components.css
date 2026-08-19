@@ -142,7 +142,7 @@ html[data-klar='on'] [data-klar-el='field']:focus-visible {
   border-color: var(--k-accent) !important;
   box-shadow: var(--k-ring) !important;
 }
-html[data-klar='on'] [data-klar-el='field']::placeholder { color: var(--k-faint) !important; }
+html[data-klar='on'] [data-klar-el='field']::placeholder { color: var(--k-muted) !important; }
 html[data-klar='on'] select[data-klar-el='field'] { padding-right: 30px !important; }
 html[data-klar='on'] textarea[data-klar-el='field'] { min-height: 92px; line-height: 1.55; resize: vertical; }
 html[data-klar='on'] :is(input[type='checkbox'], input[type='radio'], progress, input[type='range']) {
@@ -306,6 +306,8 @@ html[data-klar='on'] [data-klar-paper='1'] { background-color: var(--k-surface) 
 html[data-klar='on'] [data-klar-paper='2'] { background-color: var(--k-surface-2) !important; }
 html[data-klar='on'] [data-klar-paper='3'] { background-color: var(--k-surface-3) !important; }
 html[data-klar='on'] [data-klar-paper='0'] { background-color: var(--k-bg) !important; }
+/* Tekstfarge justert av kontrastmålingen – hue beholdes, lysheten løftes. */
+html[data-klar='on'] [data-klar-ink='auto'] { color: var(--klar-fg) !important; }
 html[data-klar='on'] [data-klar-ink='1'] { color: var(--k-ink) !important; }
 html[data-klar='on'] [data-klar-ink='2'] { color: var(--k-ink-2) !important; }
 html[data-klar='on'] [data-klar-ink='3'] { color: var(--k-muted) !important; }

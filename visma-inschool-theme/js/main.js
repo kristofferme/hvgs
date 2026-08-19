@@ -29,7 +29,12 @@
   function refreshShell() {
     if (!NS.settings.enabled || !document.body) return;
     const parts = NS.classify.shell();
-    NS.hero.mount(parts.main || document.body);
+    const hosts = [parts.main, NS.classify.structuralMain(), document.body];
+    for (const host of hosts) {
+      if (!host) continue;
+      NS.hero.mount(host);
+      if (!NS.settings.hero || NS.hero.ok()) break;
+    }
   }
 
   function scheduleScan(nodes) {
@@ -141,11 +146,12 @@
 
   async function start() {
     applyAttrs(NS.settings); /* speilet – umiddelbart, uten blink */
-    NS.injectCss();
+    const css = NS.injectCss();
     NS.injectFont();
 
     const s = await NS.loadSettings();
     applyAttrs(s);
+    await css; /* kontrastmålingen er verdiløs før temaet faktisk gjelder */
 
     afterBody(() => {
       mountFab();

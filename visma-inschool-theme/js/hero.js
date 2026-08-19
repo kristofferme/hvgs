@@ -112,5 +112,13 @@
     }
   }
 
-  NS.hero = { mount, unmount };
+  /* Heroen skal ligge i en beholder som faktisk har bredde – ellers har vi
+     truffet feil element, og den flyttes til neste kandidat. */
+  function ok() {
+    if (!el || !el.isConnected) return false;
+    const r = el.getBoundingClientRect();
+    return r.width > 240 && r.height > 40;
+  }
+
+  NS.hero = { mount, unmount, ok };
 })();

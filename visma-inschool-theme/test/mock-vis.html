@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>Startside - Inschool (VIS-lik)</title>
+<style>
+  /* Etterligner Visma InSchool slik den faktisk er bygd:
+     - fast sidemeny, innhold som starter på x=0 med padding
+     - undermenypunkter som <a><span class="label">…</span></a>
+     - blågrå etikettekst med lav luminans (kontrastfelle i mørk modus)
+     - pastellfargede timer i timeplanen */
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Roboto,Arial,sans-serif;background:#fff;color:#2b3a4a;font-size:14px}
+  .topbar{position:fixed;top:0;left:0;right:0;height:64px;background:#fff;border-bottom:1px solid #dfe3e8;display:flex;align-items:center;gap:20px;padding:0 20px;z-index:5}
+  .logo{font-weight:700;color:#1a7a4c;font-size:17px}
+  .search{flex:1;max-width:340px;border:1px solid #cfd6dd;border-radius:3px;padding:8px 10px;color:#5a6b7c}
+  .year{border:1px solid #2b3a4a;padding:6px 12px;font-weight:600}
+  .rolechip{background:#e8eef5;color:#3f5a75;border-radius:12px;padding:3px 10px;font-size:12px}
+  .sidemenu{position:fixed;top:64px;bottom:0;left:0;width:215px;background:#fff;border-right:1px solid #dfe3e8;overflow:auto;padding:8px 0;z-index:4}
+  .sidemenu .group{display:flex;align-items:center;gap:10px;padding:11px 16px;color:#2b3a4a;cursor:pointer}
+  .sidemenu .group .chev{margin-left:auto;color:#8a97a4}
+  .sidemenu a{display:block;text-decoration:none;padding:2px 0}
+  .sidemenu a .label{display:inline-block;padding:6px 14px;margin-left:24px;border-radius:14px;background:#eef2f6;color:#3f5a75;font-size:13px}
+  .sidemenu a.active .label{background:#dff0e6;color:#14603c;font-weight:600}
+  .page{padding:84px 24px 40px 239px;background:#f4f6f8;min-height:100vh}
+  .pagehead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .pagehead h1{font-size:22px;margin:0}
+  .panel{background:#fff;border:1px solid #dfe3e8;border-radius:4px;padding:20px;margin-bottom:20px}
+  .panel h2{font-size:16px;margin:0 0 16px}
+  .row{display:flex;padding:9px 0;border-bottom:1px solid #edf0f3}
+  .key{width:210px;color:#6b7c93}          /* blågrå – blir uleselig uten kontrastfiks */
+  .value{color:#31465c}
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .btn{padding:8px 14px;border:1px solid #cfd6dd;background:#fff;border-radius:3px;cursor:pointer;font:inherit}
+  .btn.primary{background:#1a7a4c;color:#fff;border-color:#1a7a4c}
+  .tt{width:100%;border-collapse:collapse;table-layout:fixed}
+  .tt th{font-weight:500;color:#5a6b7c;padding:8px;border-bottom:1px solid #dfe3e8}
+  .tt td{border:1px solid #edf0f3;height:96px;vertical-align:top;padding:4px}
+  .lesson{border-radius:3px;padding:6px 8px;font-size:12px;height:100%}
+  .lesson .t{color:#41576d;font-size:11px}
+  .lesson .n{font-weight:600;color:#22384e;display:block;margin:2px 0}
+  .note{background:#e8eef5;border-left:3px solid #3f5a75;padding:12px;border-radius:3px;color:#3f5a75;margin-bottom:20px}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <span class="logo">InSchool</span>
+    <div class="search">Søk etter personer, sider og grupper</div>
+    <div style="flex:1"></div>
+    <div class="year">2026/2027</div>
+    <span class="rolechip">Kristoffer Meringdal</span>
+    <span class="rolechip">Skoleleder</span>
+  </div>
+
+  <nav class="sidemenu">
+    <a href="#/app/dashboard" class="active"><span class="label">Startside</span></a>
+    <a href="#/app/teaching"><span class="label">Undervisning</span></a>
+    <a href="#/app/classes"><span class="label">Klasser</span></a>
+    <div class="group">Elever <span class="chev">›</span></div>
+    <div class="group">Ansatte <span class="chev">›</span></div>
+    <div class="group">Kommunikasjon <span class="chev">›</span></div>
+    <div class="group">Arkiv <span class="chev">›</span></div>
+    <a href="#/app/timetableview"><span class="label">Timeplanvisning</span></a>
+    <a href="#/app/persongroups"><span class="label">Persongrupper</span></a>
+    <a href="#/app/appointments"><span class="label">Avtaler</span></a>
+    <div class="group">Vikar <span class="chev">›</span></div>
+    <a href="#/app/dayabsence"><span class="label">Dagsfravær</span></a>
+    <div class="group">Kodeverk <span class="chev">›</span></div>
+    <a href="#/app/remarks"><span class="label">Anmerkninger</span></a>
+    <a href="#/app/yearplanning"><span class="label">Skoleårsplanlegging</span></a>
+  </nav>
+
+  <div class="page">
+    <div class="pagehead"><h1>Startside</h1><span class="btn">Innstillinger</span></div>
+
+    <div class="note">Husk å registrere fravær innen fredag denne uka.</div>
+
+    <div class="panel">
+      <h2>Timeplan</h2>
+      <div class="toolbar">
+        <button class="btn">I dag</button><button class="btn">‹</button><button class="btn">›</button>
+        <strong>UKE 34, AUGUST 2026</strong>
+        <input class="btn" value="19.08.2026">
+        <button class="btn primary">Eksporter til Outlook</button>
+      </div>
+      <table class="tt">
+        <thead><tr><th style="width:64px"></th><th>Mandag 17</th><th>Tirsdag 18</th><th>Onsdag 19</th><th>Torsdag 20</th><th>Fredag 21</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="height:auto;color:#5a6b7c">08:00</td>
+            <td></td>
+            <td><div class="lesson" style="background:#e7f1e9"><span class="t">08:15 - 09:45 · Båt</span><span class="n">Fartøy og redskaper</span><span class="t">2FF/FFA2004/1 · Kristoffer Meringdal</span></div></td>
+            <td><div class="lesson" style="background:#e7f1e9"><span class="t">08:15 - 09:45 · Båt</span><span class="n">Fartøy og redskaper</span><span class="t">2FF/FFA2004/1 · Kristoffer Meringdal</span></div></td>
+            <td><div class="lesson" style="background:#eae9f5"><span class="t">08:15 - 09:45 · C204</span><span class="n">Matematikk 1P-Y</span><span class="t">2HT/MAT1106 · Lise Wiik</span></div></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td style="height:auto;color:#5a6b7c">10:00</td>
+            <td><div class="lesson" style="background:#f6eee3"><span class="t">10:00 - 11:30 · Hall</span><span class="n">Kroppsøving</span><span class="t">2HT/KRO1017 · Tor Rene</span></div></td>
+            <td></td>
+            <td><div class="lesson" style="background:#e7f1e9"><span class="t">10:00 - 11:30 · Båt</span><span class="n">Fartøy og redskaper</span><span class="t">2FF/FFA2004/1 · Kristoffer Meringdal</span></div></td>
+            <td><div class="lesson" style="background:#fdeaea"><span class="t">10:00 - 11:30 · D003</span><span class="n">Naturfag</span><span class="t">2HT/NAT1104 · Mari Berg</span></div></td>
+            <td><div class="lesson" style="background:#eae9f5"><span class="t">10:00 - 11:30 · C204</span><span class="n">Matematikk 1P-Y</span><span class="t">2HT/MAT1106 · Lise Wiik</span></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>Personalia</h2>
+      <div class="row"><span class="key">Fødselsnummer</span><span class="value">29090997872</span></div>
+      <div class="row"><span class="key">Navn</span><span class="value">Guro Birgitte</span></div>
+      <div class="row"><span class="key">Fødselsdato</span><span class="value">29.09.2009</span></div>
+      <div class="row"><span class="key">Programområde</span><span class="value">Helse- og oppvekstfag</span></div>
+      <div class="row"><span class="key">Kontaktlærer</span><span class="value">Lise Wiik</span></div>
+    </div>
+  </div>
+</body>
+</html>

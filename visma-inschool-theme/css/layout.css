@@ -55,6 +55,8 @@ html[data-klar='on'] [data-klar-el='sidebar'] :is(h1, h2, h3, h4, h5, h6) {
 html[data-klar='on'] [data-klar-el='nav-item'] {
   display: flex !important;
   align-items: center;
+  justify-content: flex-start !important;
+  text-align: left !important;
   gap: var(--k-space-3);
   position: relative;
   padding: 9px 12px !important;
@@ -98,11 +100,24 @@ html[data-klar='on'][data-klar-sidebar='light'] [data-klar-el='nav-item'][data-k
   color: var(--k-accent-ink) !important;
 }
 
-/* Merkelapper/tellere i menyen */
-html[data-klar='on'] [data-klar-el='nav-item'] [data-klar-el='badge'] {
-  margin-left: auto;
-  background: color-mix(in srgb, var(--k-accent) 22%, transparent) !important;
-  color: var(--k-nav-active-ink) !important;
+/* Menypunktene skal alltid stå på linje til venstre – appens egne piller,
+   ikoner og teller-elementer inni dem skal ikke dra teksten ut av flukt. */
+html[data-klar='on'] [data-klar-el='nav-item'] > :is(span, div, i, em, small) {
+  display: inline-flex !important;
+  align-items: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  font: inherit !important;
+  color: inherit !important;
+  text-align: left;
+  min-width: 0;
+}
+html[data-klar='on'] [data-klar-el='nav-item'] > :is(span, div):last-child:not(:first-child) {
+  margin-left: auto !important;
+  opacity: 0.7;
 }
 
 /* --------------------------------------------------------------------------
@@ -138,7 +153,16 @@ html[data-klar='on'][data-klar-scrolled] [data-klar-el='topbar'] {
    -------------------------------------------------------------------------- */
 html[data-klar='on'] [data-klar-el='main'] {
   background: transparent !important;
-  padding: var(--k-space-5) clamp(16px, 2.4vw, 34px) var(--k-space-7) !important;
+}
+/* Luft legges kun til der appen ikke har noen fra før – ellers ville vi
+   fjernet plassen som er satt av til en fast sidemeny eller topplinje. */
+html[data-klar='on'] [data-klar-el='main'][data-klar-padx] {
+  padding-left: clamp(16px, 2.4vw, 34px) !important;
+  padding-right: clamp(16px, 2.4vw, 34px) !important;
+}
+html[data-klar='on'] [data-klar-el='main'][data-klar-padt] {
+  padding-top: var(--k-space-5) !important;
+  padding-bottom: var(--k-space-7) !important;
 }
 html[data-klar='on'] [data-klar-el='main'] > * {
   max-width: var(--k-content-max);

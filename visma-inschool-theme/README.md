@@ -14,11 +14,14 @@ moderne og godt lesbart design – uten å endre hvordan tjenesten fungerer.
 
 ## Hva du får
 
-- **Tydelig sidemeny.** Mørk, rolig meny med aktiv markør, tydelig merkevareblokk og god luft.
+- **Tydelig sidemeny.** Rolig meny med tydelig aktiv markør, egen merkevareblokk og god luft –
+  lys som resten av grensesnittet, eller mørk om du heller vil ha det.
 - **Kort som ser ut som kort.** Én skyggeverdi, én kantfarge, konsekvent radius – ingen dobbelt innramming.
-- **Hero øverst.** Hilsen etter tid på døgnet, dato, ukenummer, semester og klokke.
-- **Fargekodet timeplan.** Hvert fag får sin faste, dempede tone – samme fag har samme farge hele uka.
-  Dagens kolonne markeres med «I DAG», og avlyste timer tones ned.
+- **En rolig hilsen på startsiden.** Dato, ukenummer, semester og klokke i samme flate som
+  kortene – og bare der. Resten av skjermene får være i fred.
+- **Fargekodet timeplan.** Hvert fag får sin faste tone, valgt slik at nabofagene er lette å
+  skille, og fargen huskes mellom økter. Dagens kolonne markeres med «I DAG», og avlyste
+  timer tones ned.
 - **Lesbarhet som er målt, ikke antatt.** Hver tekst måles mot flaten den faktisk ligger
   på, og løftes til minst 4.5:1 der appens egne farger ikke holder – med fargetonen i behold.
 - **Lys og mørk modus** (eller «auto» etter systemvalget), fem aksentfarger, to tettheter.
@@ -47,8 +50,8 @@ Innstillingene lagres i `chrome.storage.sync` og slår inn med én gang, uten om
 | Utseende | Auto / Lys / Mørk | Auto |
 | Aksentfarge | Gran, Hav, Plomme, Rav, Kobolt | Gran |
 | Tetthet | Luftig / Kompakt | Luftig |
-| Sidemeny | Mørk / Lys | Mørk |
-| Hero øverst | på / av | på |
+| Sidemeny | Lys / Mørk | Lys |
+| Hilsen på startsiden | på / av | på |
 | Fargekodet timeplan | på / av | på |
 | Snarveiknapp | på / av | på |
 
@@ -68,7 +71,13 @@ seksjonsoverskrifter.
 
 **Farge som flate, ikke som kant.** Ingen fargede rammer, streker eller kantlinjer på
 kort og timer – fargen ligger i flaten, kanten er alltid nøytral. Bakgrunnen er ensfarget,
-og heroen bruker én fargefamilie i stedet for flere toner om hverandre.
+og aksentfargen brukes bare der den betyr noe: aktivt menypunkt, primærknapp, fokus og
+dagens kolonne.
+
+**Temaet legger seg ikke oppå appen.** Har InSchool allerede luft i en beholder – typisk
+fordi sidemenyen eller topplinja er `position: fixed` – beholdes den. Kort som allerede
+har innvendig luft og avstand får beholde sin egen. Vi fyller bare på der det mangler,
+slik at ingen kolonner sklir under menyen og ingen lister blir dobbelt så luftige.
 
 **Kontrast.** Ingen tekst under WCAG AA. Semantiske farger (grønn, gul, rød, blå) er
 justert til å klare 4.5:1 mot sine egne bakgrunner, og alt annet rettes opp av
@@ -107,7 +116,9 @@ Noen detaljer som er verdt å vite:
 - **Fargekoding krever en klynge.** Fargede felter blir bare til timer når minst tre
   ligger samlet under samme beholder. En enslig infoboks får beholde sin egen farge.
   Tonen velges ut fra fagnavnet – den mest fremhevede teksten i timen – slik at samme
-  fag har samme farge uansett dag, tid og rom.
+  fag har samme farge uansett dag, tid og rom. Tonene deles ut i en rekkefølge som
+  hopper rundt fargesirkelen, ikke via en hash, slik at fag som står ved siden av
+  hverandre aldri får nesten samme farge. Tildelingen huskes i nettleseren.
 - **Ruteendringer følges.** `hashchange`, `popstate` og `history.pushState` utløser nytt
   skann, i tillegg til en `MutationObserver` for innhold som lastes underveis.
 - **Stilarkene holdes bakerst** i `<html>`, slik at appens egne, dynamisk innlastede ark

@@ -478,11 +478,48 @@
       .join(' ');
   }
 
-  /* Emnefarger: samme fag skal alltid få samme tone, uavhengig av dag. */
+  /* Emnefarger. En hash gir tilfeldige kollisjoner – to fag ved siden av
+     hverandre kan lande på nesten samme tone. I stedet deles tonene ut i en
+     fast rekkefølge som hopper rundt fargesirkelen, og den som er brukt minst
+     går først. Tildelingen huskes, slik at et fag beholder fargen sin. */
+  const HUE_ORDER = [2, 4, 1, 3, 6, 5, 7, 9, 8, 10];
+  const HUE_KEY = '__klar_subject_hues_v1';
+  let hueMap = null;
+
+  function loadHues() {
+    if (hueMap) return hueMap;
+    try {
+      hueMap = JSON.parse(localStorage.getItem(HUE_KEY) || '{}') || {};
+    } catch (e) {
+      hueMap = {};
+    }
+    return hueMap;
+  }
+
   function hueFor(key) {
-    let h = 0;
-    for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
-    return (h % 10) + 1;
+    if (!key) return HUE_ORDER[0];
+    const map = loadHues();
+    if (map[key]) return map[key];
+
+    const used = {};
+    Object.keys(map).forEach((k) => (used[map[k]] = (used[map[k]] || 0) + 1));
+    let pick = HUE_ORDER[0];
+    let least = Infinity;
+    for (const h of HUE_ORDER) {
+      const c = used[h] || 0;
+      if (c < least) {
+        least = c;
+        pick = h;
+      }
+    }
+    map[key] = pick;
+    if (Object.keys(map).length > 200) hueMap = map = { [key]: pick };
+    try {
+      localStorage.setItem(HUE_KEY, JSON.stringify(map));
+    } catch (e) {
+      /* uten lagring får fagene farge på nytt hver økt – fortsatt tydelig */
+    }
+    return pick;
   }
 
   const CANCEL_RE = /(avlyst|utgår|utgatt|cancel|fritatt)/i;
@@ -803,6 +840,9 @@
       } else if (cardDepth(el) < 2 && looksLikeCard(el, cs, rect)) {
         el.removeAttribute('data-klar-paper');
         el.setAttribute('data-klar-el', 'card');
+        /* Har kortet allerede luft og avstand fra appen, lar vi den stå. */
+        if ((parseFloat(cs.paddingLeft) || 0) < 8) el.setAttribute('data-klar-pad', '');
+        if ((parseFloat(cs.marginBottom) || 0) < 4) el.setAttribute('data-klar-gap', '');
         if (el.matches('a[href], [role="button"], [tabindex]:not([tabindex="-1"])')) {
           el.setAttribute('data-klar-clickable', '');
         }

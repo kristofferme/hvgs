@@ -7,7 +7,7 @@
     scheme: 'auto',
     accent: 'spruce',
     density: 'cozy',
-    sidebar: 'dark',
+    sidebar: 'light',
     hero: true,
     colorCode: true,
     fab: true,

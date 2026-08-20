@@ -30,8 +30,9 @@ html[data-klar='on'] [data-klar-el='event'] * {
   border-color: transparent !important;
   color: inherit !important;
 }
-html[data-klar='on'] [data-klar-el='event'] :is(small, .k-sub) {
-  color: color-mix(in srgb, currentColor 68%, transparent) !important;
+/* Klokkeslett, rom og lærer skiller seg med vekt, ikke med gjennomsiktighet –
+   dempet tekst på farget flate faller fort under kravet til kontrast. */
+html[data-klar='on'] [data-klar-el='event'] small {
   font-weight: 500 !important;
 }
 

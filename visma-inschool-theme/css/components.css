@@ -11,9 +11,6 @@ html[data-klar='on'] [data-klar-el='card'] {
   border: 1px solid var(--k-line) !important;
   border-radius: var(--k-r-lg) !important;
   box-shadow: var(--k-shadow-1) !important;
-  padding: var(--k-space-5) !important;
-  margin-bottom: var(--k-space-4);
-  overflow: hidden;
   transition: box-shadow var(--k-dur) var(--k-ease), border-color var(--k-dur) var(--k-ease),
     transform var(--k-dur) var(--k-ease-out);
 }
@@ -23,6 +20,9 @@ html[data-klar='on'] [data-klar-el='card'][data-klar-clickable]:hover {
   transform: translateY(-1px);
   cursor: pointer;
 }
+html[data-klar='on'] [data-klar-el='card'][data-klar-pad] { padding: var(--k-space-5) !important; }
+html[data-klar='on'] [data-klar-el='card'][data-klar-gap] { margin-bottom: var(--k-space-4); }
+
 /* Kort inni kort skal ikke stables med skygge på skygge */
 html[data-klar='on'] [data-klar-el='card'] [data-klar-el='card'] {
   background: var(--k-surface-2) !important;
@@ -32,17 +32,6 @@ html[data-klar='on'] [data-klar-el='card'] [data-klar-el='card'] {
 html[data-klar='on'] [data-klar-el='card'] > :is(h1, h2, h3, h4):first-child {
   margin-top: 0 !important;
 }
-html[data-klar='on'] [data-klar-el='card-head'] {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--k-space-3);
-  padding: 0 0 var(--k-space-3) !important;
-  margin: 0 0 var(--k-space-4) !important;
-  border-bottom: 1px solid var(--k-line) !important;
-  background: transparent !important;
-}
-
 /* --------------------------------------------------------------------------
    Knapper
    -------------------------------------------------------------------------- */
@@ -267,7 +256,7 @@ html[data-klar='on'] :is(.cdk-overlay-backdrop, [class*='backdrop' i], [class*='
   -webkit-backdrop-filter: blur(3px);
   backdrop-filter: blur(3px);
 }
-html[data-klar='on'] :is([role='menu'], [role='listbox'], [data-klar-el='popover']) {
+html[data-klar='on'] :is([role='menu'], [role='listbox']) {
   background: var(--k-surface) !important;
   border: 1px solid var(--k-line) !important;
   border-radius: var(--k-r) !important;

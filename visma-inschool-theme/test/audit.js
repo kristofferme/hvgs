@@ -58,11 +58,12 @@ const AUDIT = () => {
     const cs = getComputedStyle(el);
     if (cs.visibility === 'hidden' || cs.opacity === '0') return;
     const fg = parse(cs.color);
-    if (!fg || fg.a < 0.5) return;
+    if (!fg || fg.a < 0.15) return;
+    const over = (f, b) => ({ r: f.r * f.a + b.r * (1 - f.a), g: f.g * f.a + b.g * (1 - f.a), b: f.b * f.a + b.b * (1 - f.a) });
     const big = parseFloat(cs.fontSize) >= 24 || (parseFloat(cs.fontSize) >= 18.66 && parseInt(cs.fontWeight, 10) >= 600);
     const bg = bgOf(el);
     if (!bg) return; /* gradient/bilde bak teksten – kan ikke måles pålitelig */
-    const cr = ratio(fg, bg);
+    const cr = ratio(fg.a < 1 ? over(fg, bg) : fg, bg);
     out.push({
       text: (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 34),
       cls: (typeof el.className === 'string' ? el.className : '').slice(0, 22),

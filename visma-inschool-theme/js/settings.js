@@ -13,7 +13,7 @@
     scheme: 'auto', // auto | light | dark
     accent: 'spruce', // spruce | ocean | plum | amber | cobalt
     density: 'cozy', // cozy | compact
-    sidebar: 'dark', // dark | light
+    sidebar: 'light', // light | dark
     hero: true,
     colorCode: true,
     fab: true,

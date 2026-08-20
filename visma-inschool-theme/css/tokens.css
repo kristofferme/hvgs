@@ -20,26 +20,18 @@ html[data-klar='on'] {
   --k-text-lg: 18px;
   --k-text-xl: 22px;
   --k-text-2xl: 28px;
-  --k-text-3xl: 36px;
 
   /* Form ----------------------------------------------------------------- */
   --k-r-xs: 6px;
   --k-r-sm: 10px;
   --k-r: 14px;
   --k-r-lg: 20px;
-  --k-r-xl: 26px;
   --k-r-pill: 999px;
-
-  --k-space-1: 4px;
   --k-space-2: 8px;
   --k-space-3: 12px;
   --k-space-4: 16px;
   --k-space-5: 22px;
-  --k-space-6: 30px;
   --k-space-7: 44px;
-
-  --k-nav-w: 264px;
-  --k-content-max: 1480px;
 
   --k-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --k-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -54,17 +46,14 @@ html[data-klar='on'][data-klar-scheme='light'] {
   color-scheme: light;
 
   --k-bg: #f2f0ea;
-  --k-bg-2: #eae7df;
   --k-surface: #ffffff;
   --k-surface-2: #faf8f4;
   --k-surface-3: #f0ece4;
-  --k-surface-inset: #f6f4ef;
   --k-overlay: rgba(20, 24, 27, 0.38);
 
   --k-ink: #14181b;
   --k-ink-2: #3c454b;
   --k-muted: #6b757e;
-  --k-faint: #98a1a9;
 
   --k-line: #e3ded4;
   --k-line-2: #d3ccbf;
@@ -84,27 +73,25 @@ html[data-klar='on'][data-klar-scheme='light'] {
   --k-shadow-3: 0 2px 6px rgba(20, 24, 27, 0.05), 0 32px 60px -28px rgba(20, 24, 27, 0.38);
   --k-ring: 0 0 0 3px var(--k-accent-ring);
 
-  --k-nav-bg: linear-gradient(180deg, #171d20 0%, #12181a 58%, #101517 100%);
-  --k-nav-ink: #e9e6df;
-  --k-nav-muted: #98a29f;
-  --k-nav-line: rgba(255, 255, 255, 0.08);
-  --k-nav-hover: rgba(255, 255, 255, 0.07);
-  --k-nav-active-bg: rgba(255, 255, 255, 0.1);
-  --k-nav-active-ink: #ffffff;
-
-  --k-hero-ink: #f4f1ea;
-  --k-hero-muted: rgba(244, 241, 234, 0.72);
-}
-
-/* Lys sidemeny (valgfritt) */
-html[data-klar='on'][data-klar-sidebar='light'] {
-  --k-nav-bg: linear-gradient(180deg, #ffffff 0%, #fbf9f5 100%);
-  --k-nav-ink: #14181b;
-  --k-nav-muted: #6b757e;
+  --k-nav-bg: var(--k-surface);
+  --k-nav-ink: var(--k-ink);
+  --k-nav-muted: #5f6a73;
   --k-nav-line: var(--k-line);
-  --k-nav-hover: rgba(20, 24, 27, 0.045);
+  --k-nav-hover: rgba(20, 24, 27, 0.05);
   --k-nav-active-bg: var(--k-accent-soft);
   --k-nav-active-ink: var(--k-accent-ink);
+
+}
+
+/* Mørk sidemeny (valgfritt) */
+html[data-klar='on'][data-klar-sidebar='dark'] {
+  --k-nav-bg: #14191c;
+  --k-nav-ink: #e9e6df;
+  --k-nav-muted: #9aa3a8;
+  --k-nav-line: rgba(255, 255, 255, 0.08);
+  --k-nav-hover: rgba(255, 255, 255, 0.06);
+  --k-nav-active-bg: rgba(255, 255, 255, 0.1);
+  --k-nav-active-ink: #ffffff;
 }
 
 /* ==========================================================================
@@ -114,17 +101,14 @@ html[data-klar='on'][data-klar-scheme='dark'] {
   color-scheme: dark;
 
   --k-bg: #0c0e10;
-  --k-bg-2: #101315;
   --k-surface: #15181b;
   --k-surface-2: #1a1e22;
   --k-surface-3: #21262b;
-  --k-surface-inset: #101315;
   --k-overlay: rgba(4, 6, 8, 0.62);
 
   --k-ink: #eceae4;
   --k-ink-2: #c6ccd1;
   --k-muted: #8d979e;
-  --k-faint: #6b757c;
 
   --k-line: #262b30;
   --k-line-2: #333940;
@@ -143,26 +127,24 @@ html[data-klar='on'][data-klar-scheme='dark'] {
   --k-shadow-2: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 32px -20px rgba(0, 0, 0, 0.8);
   --k-shadow-3: 0 30px 60px -28px rgba(0, 0, 0, 0.9);
 
-  --k-nav-bg: linear-gradient(180deg, #121517 0%, #0f1214 100%);
+  --k-nav-bg: var(--k-surface);
+  --k-nav-ink: var(--k-ink);
+  --k-nav-muted: #8d979e;
+  --k-nav-line: var(--k-line);
+  --k-nav-hover: rgba(255, 255, 255, 0.05);
+  --k-nav-active-bg: var(--k-accent-soft);
+  --k-nav-active-ink: var(--k-accent-ink);
+
+}
+
+html[data-klar='on'][data-klar-scheme='dark'][data-klar-sidebar='dark'] {
+  --k-nav-bg: #101315;
   --k-nav-ink: #e7e4de;
   --k-nav-muted: #8b9499;
   --k-nav-line: rgba(255, 255, 255, 0.06);
   --k-nav-hover: rgba(255, 255, 255, 0.05);
   --k-nav-active-bg: rgba(255, 255, 255, 0.08);
   --k-nav-active-ink: #ffffff;
-
-  --k-hero-ink: #f2efe9;
-  --k-hero-muted: rgba(242, 239, 233, 0.7);
-}
-
-html[data-klar='on'][data-klar-scheme='dark'][data-klar-sidebar='light'] {
-  --k-nav-bg: linear-gradient(180deg, #1a1e22 0%, #15181b 100%);
-  --k-nav-ink: var(--k-ink);
-  --k-nav-muted: var(--k-muted);
-  --k-nav-line: var(--k-line);
-  --k-nav-hover: rgba(255, 255, 255, 0.05);
-  --k-nav-active-bg: var(--k-accent-soft);
-  --k-nav-active-ink: var(--k-accent-ink);
 }
 
 /* ==========================================================================
@@ -175,71 +157,60 @@ html[data-klar='on'] { /* gran – standard */
   --k-accent-soft: #e1efea;
   --k-accent-ring: rgba(23, 89, 78, 0.24);
   --k-on-accent: #ffffff;
-  --k-hero-1: #143f38;
-  --k-hero-2: #1d6455;
 }
 html[data-klar='on'][data-klar-accent='ocean'] {
   --k-accent: #1a4f95; --k-accent-2: #133c73; --k-accent-ink: #0f3565;
   --k-accent-soft: #e3ecf8; --k-accent-ring: rgba(26, 79, 149, 0.24); --k-on-accent: #ffffff;
-  --k-hero-1: #12325f; --k-hero-2: #1d5a9e; --k-hero-3: #2f9c9a;
 }
 html[data-klar='on'][data-klar-accent='plum'] {
   --k-accent: #6d2f61; --k-accent-2: #55234b; --k-accent-ink: #4a1f42;
   --k-accent-soft: #f2e7f0; --k-accent-ring: rgba(109, 47, 97, 0.24); --k-on-accent: #ffffff;
-  --k-hero-1: #45203e; --k-hero-2: #78356a; --k-hero-3: #c2694f;
 }
 html[data-klar='on'][data-klar-accent='amber'] {
   --k-accent: #8a5510; --k-accent-2: #6d420b; --k-accent-ink: #5e390a;
   --k-accent-soft: #f8edda; --k-accent-ring: rgba(138, 85, 16, 0.24); --k-on-accent: #ffffff;
-  --k-hero-1: #4a2f13; --k-hero-2: #8a5510; --k-hero-3: #2c6f5f;
 }
 html[data-klar='on'][data-klar-accent='cobalt'] {
   --k-accent: #2f3ab5; --k-accent-2: #242d90; --k-accent-ink: #1f2780;
   --k-accent-soft: #e6e8fa; --k-accent-ring: rgba(47, 58, 181, 0.24); --k-on-accent: #ffffff;
-  --k-hero-1: #1e2472; --k-hero-2: #3a46c9; --k-hero-3: #d0637f;
 }
 
 /* Aksent i mørk modus lysnes, slik at kontrasten holder seg over 4.5:1 */
 html[data-klar='on'][data-klar-scheme='dark'] {
   --k-accent: #5ec8a8; --k-accent-2: #7ad6bb; --k-accent-ink: #cdefe3;
   --k-accent-soft: #12302a; --k-accent-ring: rgba(94, 200, 168, 0.26); --k-on-accent: #06241e;
-  --k-hero-1: #10312b; --k-hero-2: #1b5548; --k-hero-3: #a9713c;
 }
 html[data-klar='on'][data-klar-scheme='dark'][data-klar-accent='ocean'] {
   --k-accent: #6fb1f7; --k-accent-2: #8cc1fa; --k-accent-ink: #d3e6fb;
   --k-accent-soft: #132639; --k-accent-ring: rgba(111, 177, 247, 0.26); --k-on-accent: #07203a;
-  --k-hero-1: #10263f; --k-hero-2: #1c4a7d; --k-hero-3: #2b8d8b;
 }
 html[data-klar='on'][data-klar-scheme='dark'][data-klar-accent='plum'] {
   --k-accent: #d693c9; --k-accent-2: #e3aad7; --k-accent-ink: #f2ddee;
   --k-accent-soft: #2a1a27; --k-accent-ring: rgba(214, 147, 201, 0.26); --k-on-accent: #2b1226;
-  --k-hero-1: #331a2e; --k-hero-2: #5f2b54; --k-hero-3: #b3604a;
 }
 html[data-klar='on'][data-klar-scheme='dark'][data-klar-accent='amber'] {
   --k-accent: #e6b06a; --k-accent-2: #f0c286; --k-accent-ink: #f7e5cb;
   --k-accent-soft: #2b2113; --k-accent-ring: rgba(230, 176, 106, 0.26); --k-on-accent: #2a1a06;
-  --k-hero-1: #33220f; --k-hero-2: #6d4310; --k-hero-3: #2a6a5c;
 }
 html[data-klar='on'][data-klar-scheme='dark'][data-klar-accent='cobalt'] {
   --k-accent: #94a0f5; --k-accent-2: #aab3f8; --k-accent-ink: #dfe3fd;
   --k-accent-soft: #191d3a; --k-accent-ring: rgba(148, 160, 245, 0.26); --k-on-accent: #131847;
-  --k-hero-1: #171c4d; --k-hero-2: #2f3aa0; --k-hero-3: #b2566f;
 }
 
 /* ==========================================================================
    Fargekoder for timeplan/emner – 10 rolige, godt adskilte toner
    ========================================================================== */
 html[data-klar='on'] {
-  --h1-bg: #e3f0e9; --h1-ink: #14503f;
-  --h2-bg: #e3ecf8; --h2-ink: #17406e;
-  --h3-bg: #f1e7f0; --h3-ink: #5b2a54;
-  --h4-bg: #f8eedd; --h4-ink: #6b4711;
-  --h5-bg: #f8e9e2; --h5-ink: #6e3323;
-  --h6-bg: #dff0f1; --h6-ink: #12484f;
-  --h7-bg: #e8e9f8; --h7-ink: #2e3474;
-  --h8-bg: #f9e8ee; --h8-ink: #6c2540;
-  --h9-bg: #edf0de; --h9-ink: #45500f;
-  --h10-bg: #e8ecef; --h10-ink: #2f3a44;
+  --h1-bg: #d8ecdf; --h1-ink: #14503f;
+  --h2-bg: #dde9f8; --h2-ink: #17406e;
+  --h3-bg: #f0e2ef; --h3-ink: #5b2a54;
+  --h4-bg: #f8ead2; --h4-ink: #6b4711;
+  --h5-bg: #f9e3d9; --h5-ink: #6e3323;
+  --h6-bg: #d5eef0; --h6-ink: #12484f;
+  --h7-bg: #e2e4f8; --h7-ink: #2e3474;
+  --h8-bg: #fae0e9; --h8-ink: #6c2540;
+  --h9-bg: #e9efd3; --h9-ink: #45500f;
+  --h10-bg: #e4e9ee; --h10-ink: #2f3a44;
 }
 html[data-klar='on'][data-klar-scheme='dark'] {
   --h1-bg: #16251f; --h1-ink: #86d9b7;
@@ -261,13 +232,9 @@ html[data-klar='on'][data-klar-density='compact'] {
   --k-text-lg: 16px;
   --k-text-xl: 20px;
   --k-text-2xl: 24px;
-  --k-text-3xl: 30px;
   --k-space-4: 12px;
   --k-space-5: 16px;
-  --k-space-6: 22px;
   --k-space-7: 30px;
   --k-r: 11px;
   --k-r-lg: 15px;
-  --k-r-xl: 20px;
-  --k-nav-w: 232px;
 }

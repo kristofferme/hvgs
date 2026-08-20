@@ -17,11 +17,16 @@
   .year{border:1px solid #2b3a4a;padding:6px 12px;font-weight:600}
   .rolechip{background:#e8eef5;color:#3f5a75;border-radius:12px;padding:3px 10px;font-size:12px}
   .sidemenu{position:fixed;top:64px;bottom:0;left:0;width:215px;background:#fff;border-right:1px solid #dfe3e8;overflow:auto;padding:8px 0;z-index:4}
-  .sidemenu .group{display:flex;align-items:center;gap:10px;padding:11px 16px;color:#2b3a4a;cursor:pointer}
-  .sidemenu .group .chev{margin-left:auto;color:#8a97a4}
-  .sidemenu a{display:block;text-decoration:none;padding:2px 0}
-  .sidemenu a .label{display:inline-block;padding:6px 14px;margin-left:24px;border-radius:14px;background:#eef2f6;color:#3f5a75;font-size:13px}
-  .sidemenu a.active .label{background:#dff0e6;color:#14603c;font-weight:600}
+  .menu-scroll{overflow:auto;height:100%}
+  .menu-item{display:flex;align-items:center;gap:10px;padding:9px 16px;color:#2b3a4a;cursor:pointer;text-decoration:none;font-size:13.5px}
+  .menu-item .icon{color:#8a97a4;font-size:13px;width:16px;text-align:center}
+  .menu-item .chev{margin-left:auto;color:#8a97a4}
+  .menu-item .label{display:inline-block;padding:5px 12px;border-radius:14px;background:#eef2f6;color:#3f5a75}
+  .menu-item.active .label,.menu-item.selected .label{background:#dff0e6;color:#14603c;font-weight:600}
+  /* Utvidet undermeny med egen mørk flate – dette er elementet som tidligere
+     ble forvekslet med hele menyen. */
+  .submenu-panel{background:#e7ecf1;padding:4px 0 8px;margin:2px 8px 8px;border-radius:6px}
+  .submenu-panel .menu-item{padding-left:34px}
   .page{padding:84px 24px 40px 239px;background:#f4f6f8;min-height:100vh}
   .pagehead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
   .pagehead h1{font-size:22px;margin:0}
@@ -53,21 +58,34 @@
   </div>
 
   <nav class="sidemenu">
-    <a href="#/app/dashboard" class="active"><span class="label">Startside</span></a>
-    <a href="#/app/teaching"><span class="label">Undervisning</span></a>
-    <a href="#/app/classes"><span class="label">Klasser</span></a>
-    <div class="group">Elever <span class="chev">›</span></div>
-    <div class="group">Ansatte <span class="chev">›</span></div>
-    <div class="group">Kommunikasjon <span class="chev">›</span></div>
-    <div class="group">Arkiv <span class="chev">›</span></div>
-    <a href="#/app/timetableview"><span class="label">Timeplanvisning</span></a>
-    <a href="#/app/persongroups"><span class="label">Persongrupper</span></a>
-    <a href="#/app/appointments"><span class="label">Avtaler</span></a>
-    <div class="group">Vikar <span class="chev">›</span></div>
-    <a href="#/app/dayabsence"><span class="label">Dagsfravær</span></a>
-    <div class="group">Kodeverk <span class="chev">›</span></div>
-    <a href="#/app/remarks"><span class="label">Anmerkninger</span></a>
-    <a href="#/app/yearplanning"><span class="label">Skoleårsplanlegging</span></a>
+    <div class="menu-scroll">
+      <a href="#/app/dashboard" class="menu-item active"><i class="icon">▣</i><span class="label">Startside</span></a>
+      <a href="#/app/teaching" class="menu-item"><i class="icon">▤</i><span class="label">Undervisning</span></a>
+      <a href="#/app/classes" class="menu-item"><i class="icon">▥</i><span class="label">Klasser</span></a>
+      <div class="menu-item group"><i class="icon">▦</i><span class="label">Elever</span><span class="chev">›</span></div>
+      <div class="menu-item group expanded"><i class="icon">▧</i><span class="label">Ansatte</span><span class="chev">⌄</span></div>
+      <div class="submenu-panel">
+        <a href="#/app/staff/overview" class="menu-item sub"><span class="label">Ansattoversikt</span></a>
+        <a href="#/app/staff/personal" class="menu-item sub"><span class="label">Personalia</span></a>
+        <a href="#/app/staff/position" class="menu-item sub"><span class="label">Stilling</span></a>
+        <a href="#/app/staff/competence" class="menu-item sub selected"><span class="label">Kompetanse</span></a>
+        <a href="#/app/staff/prefs" class="menu-item sub"><span class="label">Preferanser</span></a>
+        <a href="#/app/staff/account" class="menu-item sub"><span class="label">Konto</span></a>
+        <a href="#/app/staff/absence" class="menu-item sub"><span class="label">Fravær</span></a>
+        <a href="#/app/staff/groups" class="menu-item sub"><span class="label">Grupper og fag</span></a>
+        <a href="#/app/staff/timetable" class="menu-item sub"><span class="label">Timeplan</span></a>
+        <a href="#/app/staff/auth" class="menu-item sub"><span class="label">Autorisasjoner</span></a>
+      </div>
+      <div class="menu-item group"><i class="icon">▨</i><span class="label">Kommunikasjon</span><span class="chev">›</span></div>
+      <div class="menu-item group"><i class="icon">▩</i><span class="label">Arkiv</span><span class="chev">›</span></div>
+      <a href="#/app/timetableview" class="menu-item"><i class="icon">▤</i><span class="label">Timeplanvisning</span></a>
+      <a href="#/app/persongroups" class="menu-item"><i class="icon">▥</i><span class="label">Persongrupper</span></a>
+      <a href="#/app/appointments" class="menu-item"><i class="icon">▦</i><span class="label">Avtaler</span></a>
+      <div class="menu-item group"><i class="icon">▧</i><span class="label">Vikar</span><span class="chev">›</span></div>
+      <a href="#/app/dayabsence" class="menu-item"><i class="icon">▨</i><span class="label">Dagsfravær</span></a>
+      <a href="#/app/remarks" class="menu-item"><i class="icon">▩</i><span class="label">Anmerkninger</span></a>
+      <a href="#/app/yearplanning" class="menu-item"><i class="icon">▣</i><span class="label">Skoleårsplanlegging</span></a>
+    </div>
   </nav>
 
   <div class="page">

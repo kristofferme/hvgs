@@ -20,8 +20,9 @@ html[data-klar='on'][data-klar-sidebar='light'] [data-klar-el='sidebar'] {
 html[data-klar='on'] [data-klar-el='sidebar'] :is(*, *::before, *::after) {
   border-color: var(--k-nav-line) !important;
 }
-html[data-klar='on'] [data-klar-el='sidebar'] :is(div, ul, li, nav, section, span) {
+html[data-klar='on'] [data-klar-el='sidebar'] *:not([data-klar-el='nav-item']) {
   background-color: transparent !important;
+  box-shadow: none !important;
 }
 /* Sidens egne tekstfarger (ofte mørk blå) ville forsvunnet mot den mørke
    flaten – alt som ikke er merket av oss arver menyens farge i stedet. */
@@ -57,13 +58,16 @@ html[data-klar='on'] [data-klar-el='nav-item'] {
   align-items: center;
   justify-content: flex-start !important;
   text-align: left !important;
-  gap: var(--k-space-3);
+  gap: 10px;
   position: relative;
-  padding: 9px 12px !important;
+  padding-top: 9px !important;
+  padding-bottom: 9px !important;
+  padding-right: 12px !important;
   margin: 2px 0 !important;
+  min-width: 0;
   border-radius: var(--k-r-sm) !important;
-  color: var(--k-nav-muted) !important;
-  font-size: var(--k-text-md) !important;
+  color: var(--k-nav-ink) !important;
+  font-size: var(--k-text-base) !important;
   font-weight: 500 !important;
   letter-spacing: -0.008em;
   text-decoration: none !important;
@@ -72,10 +76,15 @@ html[data-klar='on'] [data-klar-el='nav-item'] {
   transition: background var(--k-dur) var(--k-ease), color var(--k-dur) var(--k-ease),
     transform var(--k-dur) var(--k-ease);
 }
+/* Uten eget innrykk fra appen setter vi vårt eget. Har punktet innrykk fra
+   før – typisk et undermenypunkt – er det hierarkiet vi vil beholde. */
+html[data-klar='on'] [data-klar-el='nav-item']:not([data-klar-indent]) {
+  padding-left: 12px !important;
+}
 html[data-klar='on'] [data-klar-el='nav-item'] > * { color: inherit !important; }
 html[data-klar='on'] [data-klar-el='nav-item']:hover {
   background: var(--k-nav-hover) !important;
-  color: var(--k-nav-ink) !important;
+  color: var(--k-nav-hover-ink) !important;
 }
 html[data-klar='on'] [data-klar-el='nav-item']:active { transform: translateY(0.5px); }
 
@@ -83,6 +92,15 @@ html[data-klar='on'] [data-klar-el='nav-item'][data-klar-active] {
   background: var(--k-nav-active-bg) !important;
   color: var(--k-nav-active-ink) !important;
   font-weight: 600 !important;
+}
+html[data-klar='on'] [data-klar-el='nav-item'] > :is(i, [class*='icon' i], svg) {
+  color: var(--k-nav-muted) !important;
+  flex: 0 0 auto;
+  width: 18px;
+  justify-content: center;
+}
+html[data-klar='on'] [data-klar-el='nav-item'][data-klar-active] > :is(i, [class*='icon' i], svg) {
+  color: currentColor !important;
 }
 html[data-klar='on'] [data-klar-el='nav-item'][data-klar-active]::before {
   content: '';
@@ -100,11 +118,12 @@ html[data-klar='on'][data-klar-sidebar='light'] [data-klar-el='nav-item'][data-k
   color: var(--k-accent-ink) !important;
 }
 
-/* Menypunktene skal alltid stå på linje til venstre – appens egne piller,
-   ikoner og teller-elementer inni dem skal ikke dra teksten ut av flukt. */
-html[data-klar='on'] [data-klar-el='nav-item'] > :is(span, div, i, em, small) {
+/* Appens egne piller og bokser inni menypunktene nulles ut – ikonet først,
+   etiketten tar plassen, og pil/teller legger seg til høyre. */
+html[data-klar='on'] [data-klar-el='nav-item'] > :is(span, div, i, em, small, b, strong) {
   display: inline-flex !important;
   align-items: center;
+  flex: 0 0 auto;
   margin: 0 !important;
   padding: 0 !important;
   background: transparent !important;
@@ -115,9 +134,16 @@ html[data-klar='on'] [data-klar-el='nav-item'] > :is(span, div, i, em, small) {
   text-align: left;
   min-width: 0;
 }
-html[data-klar='on'] [data-klar-el='nav-item'] > :is(span, div):last-child:not(:first-child) {
-  margin-left: auto !important;
-  opacity: 0.7;
+html[data-klar='on'] [data-klar-el='nav-item'] > [data-klar-label] {
+  flex: 1 1 auto !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block !important;
+}
+html[data-klar='on'] [data-klar-el='nav-item'] > [data-klar-tail] {
+  margin-left: 8px !important;
+  opacity: 0.65;
 }
 
 /* --------------------------------------------------------------------------

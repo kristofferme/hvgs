@@ -14,8 +14,9 @@ moderne og godt lesbart design – uten å endre hvordan tjenesten fungerer.
 
 ## Hva du får
 
-- **Tydelig sidemeny.** Rolig meny med tydelig aktiv markør, egen merkevareblokk og god luft –
-  lys som resten av grensesnittet, eller mørk om du heller vil ha det.
+- **Tydelig sidemeny.** Ikon, etikett og pil står der de skal, undermenyens innrykk beholdes,
+  og det aktive punktet er umulig å ta feil av – lys som resten av grensesnittet, eller mørk
+  om du heller vil ha det.
 - **Kort som ser ut som kort.** Én skyggeverdi, én kantfarge, konsekvent radius – ingen dobbelt innramming.
 - **En rolig hilsen på startsiden.** Dato, ukenummer, semester og klokke i samme flate som
   kortene – og bare der. Resten av skjermene får være i fred.
@@ -112,7 +113,16 @@ Noen detaljer som er verdt å vite:
   gjentas ved hvert fullskann, siden flatene kan ha endret farge underveis.
 - **Appens egen luft respekteres.** Har hovedflaten allerede innrykk – typisk fordi
   sidemenyen eller topplinja er `position: fixed` – legger vi ikke vår egen padding
-  oppå. Vi fyller bare på der det ikke finnes luft fra før.
+  oppå. Vi fyller bare på der det ikke finnes luft fra før. Det samme gjelder kort og
+  menypunkter: et undermenypunkt med eget innrykk beholder hierarkiet sitt. Verdiene
+  leses før elementet merkes, ellers ville vi lest vår egen luft.
+- **Den ytterste beholderen vinner.** Et utvidet undermenypanel kan se ut som en hel meny
+  for seg – høyt nok, mange nok lenker, helt til venstre. Ligger en kandidat inni en annen,
+  velges alltid den ytterste, og alt inni menyen males gjennomsiktig. Uten den regelen
+  fargelegges én del av menyen mens resten står igjen i appens egne farger.
+- **Menypunktene leses opp i deler.** Den lengste teksten i punktet er etiketten og får
+  plassen; det som kommer etter, er piler og tellere og legger seg til høyre. Uten det
+  ville et punkt med ikon fått teksten dyttet mot høyre kant.
 - **Fargekoding krever en klynge.** Fargede felter blir bare til timer når minst tre
   ligger samlet under samme beholder. En enslig infoboks får beholde sin egen farge.
   Tonen velges ut fra fagnavnet – den mest fremhevede teksten i timen – slik at samme

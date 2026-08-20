@@ -170,9 +170,8 @@
       .querySelectorAll('nav, aside, [role="navigation"], [class*="nav" i], [class*="menu" i], [class*="drawer" i], [id*="nav" i], [id*="menu" i]')
       .forEach((el) => candidates.add(el));
 
-    let best = null;
-    let bestScore = 0;
     const vh = window.innerHeight;
+    const qualified = [];
 
     candidates.forEach((el) => {
       if (isOurs(el)) return;
@@ -185,11 +184,25 @@
       let score = r.height / vh + Math.min(links, 24) / 6;
       if (looksLike(el, NAV_RE)) score += 4;
       if (el.tagName === 'NAV' || el.getAttribute('role') === 'navigation') score += 2;
-      /* Foretrekk den ytterste beholderen når flere overlapper */
-      score -= depthOf(el) * 0.05;
-      if (score > bestScore) {
-        bestScore = score;
-        best = el;
+      qualified.push({ el: el, score: score });
+    });
+
+    return pickOutermost(qualified);
+  }
+
+  /* Et utvidet undermenypanel kan se ut som en hel meny for seg. Ligger en
+     kandidat inni en annen, er det alltid den ytterste som er skallet – ellers
+     ender vi med å farge en del av menyen og la resten stå. */
+  function pickOutermost(qualified) {
+    const outer = qualified.filter(
+      (q) => !qualified.some((o) => o.el !== q.el && o.el.contains(q.el))
+    );
+    let best = null;
+    let bestScore = -Infinity;
+    outer.forEach((q) => {
+      if (q.score > bestScore) {
+        bestScore = q.score;
+        best = q.el;
       }
     });
     return best;
@@ -202,8 +215,7 @@
   }
 
   function findTopbar() {
-    let best = null;
-    let bestScore = 0;
+    const qualified = [];
     const vw = window.innerWidth;
     document
       .querySelectorAll('header, [role="banner"], [class*="header" i], [class*="toolbar" i], [class*="topbar" i], [class*="navbar" i], [class*="appbar" i]')
@@ -217,13 +229,9 @@
         let score = r.width / vw;
         if (looksLike(el, BAR_RE)) score += 2;
         if (el.tagName === 'HEADER' || el.getAttribute('role') === 'banner') score += 1.5;
-        score -= depthOf(el) * 0.05;
-        if (score > bestScore) {
-          bestScore = score;
-          best = el;
-        }
+        qualified.push({ el: el, score: score });
       });
-    return best;
+    return pickOutermost(qualified);
   }
 
   /* Når hovedflaten ligger i en beholder som også rommer topplinja, går vi ett
@@ -340,6 +348,45 @@
     return false;
   }
 
+  /* Menypunkter er bygd som ikon + etikett + pil. Vi peker ut hvilken del som
+     er etiketten, slik at den alltid får plassen – uten den ville et punkt med
+     ikon fått teksten dyttet mot høyre kant. Appens eget innrykk beholdes, det
+     er som regel det som skiller undermeny fra hovedmeny. */
+  const navPad = new WeakMap();
+
+  function tagNavParts(el) {
+    let pad = navPad.get(el);
+    if (pad === undefined) {
+      pad = parseFloat(window.getComputedStyle(el).paddingLeft) || 0;
+      navPad.set(el, pad);
+    }
+    if (pad >= 14) el.setAttribute('data-klar-indent', '');
+
+    const kids = el.children;
+    if (!kids.length) return;
+    let label = null;
+    let best = 1;
+    for (const k of kids) {
+      const len = textOf(k).length;
+      if (len > best) {
+        best = len;
+        label = k;
+      }
+    }
+    for (const k of kids) {
+      k.removeAttribute('data-klar-label');
+      k.removeAttribute('data-klar-tail');
+    }
+    if (!label) return;
+    label.setAttribute('data-klar-label', '');
+    /* alt som kommer etter etiketten er piler, tellere og lignende */
+    let after = label.nextElementSibling;
+    while (after) {
+      after.setAttribute('data-klar-tail', '');
+      after = after.nextElementSibling;
+    }
+  }
+
   function tagNavItems(nav) {
     const hash = location.hash || '';
     const items = nav.querySelectorAll(
@@ -352,6 +399,8 @@
       if (!t || t.length > 48) return;
       /* hopp over elementer som bare inneholder et annet menypunkt */
       if (el.querySelector('a, button, [role="menuitem"], [role="treeitem"]')) return;
+      /* Måles før elementet merkes – etterpå er det vår egen luft vi leser. */
+      tagNavParts(el);
       el.setAttribute('data-klar-el', 'nav-item');
 
       const href = el.getAttribute('href') || '';

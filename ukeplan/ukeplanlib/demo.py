@@ -36,15 +36,10 @@ TIMEPLAN = {
     },
 }
 
-KLASSEROM = {"8A": "214", "8B": "216", "9A": "301", "10B": "305"}
-FELLESROM = {
-    "Kroppsøving": ("Gymsal", "MR"), "Mat og helse": ("Kjøkken", "IL"),
-    "Kunst og håndverk": ("K&H", "EV"), "Naturfag": ("Naturfagrom", "IL"),
-    "Musikk": ("Musikkrom", "EV"),
-}
 LARER = {
-    "Norsk": "KM", "Matematikk": "AT", "Engelsk": "SB", "Samfunnsfag": "PH",
-    "KRLE": "PH", "Tysk": "SB", "Valgfag": "MR",
+    "Norsk": "KM", "Matematikk": "AT", "Engelsk": "SB", "Samfunnsfag": "PH", "KRLE": "PH",
+    "Tysk": "SB", "Valgfag": "MR", "Kroppsøving": "MR", "Mat og helse": "IL",
+    "Kunst og håndverk": "EV", "Naturfag": "IL", "Musikk": "EV",
 }
 
 # (uke, klasse, dag, fag, tema, lekse, frist, type)
@@ -98,20 +93,16 @@ BESKJEDER = [
 ]
 
 
-def romrader() -> list[list]:
-    rader = [["Alle", fag, rom, laerer] for fag, (rom, laerer) in FELLESROM.items()]
-    for klasse, dager in TIMEPLAN.items():
-        fagene = {f for dag in dager.values() for f in dag if f and f not in FELLESROM}
-        for fag in sorted(fagene):
-            rader.append([klasse, fag, KLASSEROM[klasse], LARER.get(fag, "")])
-    return rader
+def laererrader() -> list[list]:
+    """Alle klassene har de samme lærerne i demoen, så «Alle» holder."""
+    return [["Alle", fag, laerer] for fag, laerer in LARER.items()]
 
 
 def demoinnhold() -> dict:
     return {
         "Uke": [list(r) for r in UKE],
         "Beskjeder": [list(r) for r in BESKJEDER],
-        "Rom og lærer": romrader(),
+        "Lærere": laererrader(),
     }
 
 

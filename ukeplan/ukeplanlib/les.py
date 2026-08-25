@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import datetime as dt
+import re
 from dataclasses import dataclass, field
 
 from openpyxl import load_workbook
@@ -92,8 +93,8 @@ def les(sti) -> Resultat:
         merknader.append(f"{hvor}: faget «{t}» sto ikke i Oppsett. Det er lagt til.")
         return t
 
-    rom_og_laerer = _les_rom(wb, fest_klasse, fest_fag)
-    grunntimeplan = _les_timeplan(wb["Timeplan"], fest_klasse, fest_fag, rom_og_laerer, merknader)
+    laerere = _les_laerere(wb, fest_klasse, fest_fag)
+    grunntimeplan = _les_timeplan(wb["Timeplan"], fest_klasse, fest_fag, laerere, merknader)
     ukeinnhold, beskjeder = _les_innhold(wb, standarduke, fest_klasse, fest_fag, merknader)
 
     ukenumre = sorted({standarduke} | set(ukeinnhold) | set(beskjeder),
@@ -141,21 +142,21 @@ def les(sti) -> Resultat:
     return Resultat(data=data, merknader=merknader)
 
 
-def _les_rom(wb, fest_klasse, fest_fag) -> dict:
-    """(klasse, fag) → rom og lærer. Tom klasse gjelder alle."""
+def _les_laerere(wb, fest_klasse, fest_fag) -> dict:
+    """(klasse, fag) → lærer. Tom klasse gjelder alle."""
     ut = {}
-    if "Rom og lærer" not in wb.sheetnames:
+    if "Lærere" not in wb.sheetnames:
         return ut
-    for nr, (klasse, fag, rom, laerer) in _rader(wb["Rom og lærer"], 4):
-        f = fest_fag(fag, f"Rom og lærer rad {nr}")
+    for nr, (klasse, fag, laerer) in _rader(wb["Lærere"], 3):
+        f = fest_fag(fag, f"Lærere rad {nr}")
         if not f:
             continue
-        k = fest_klasse(klasse, f"Rom og lærer rad {nr}")
-        ut[(nokkel(k), nokkel(f))] = (rens(rom), rens(laerer))
+        k = fest_klasse(klasse, f"Lærere rad {nr}")
+        ut[(nokkel(k), nokkel(f))] = rens(laerer)
     return ut
 
 
-def _les_timeplan(ws, fest_klasse, fest_fag, rom_og_laerer, merknader) -> list[dict]:
+def _les_timeplan(ws, fest_klasse, fest_fag, laerere, merknader) -> list[dict]:
     """Rutenettet: klassenavn og dagnavn på hoderaden, klokkeslett i kolonne A."""
     timer: list[dict] = []
     klasse = ""
@@ -184,11 +185,10 @@ def _les_timeplan(ws, fest_klasse, fest_fag, rom_og_laerer, merknader) -> list[d
             fag = fest_fag(rad[1 + i], f"Timeplan rad {nr}")
             if not fag:
                 continue
-            rom, laerer = rom_og_laerer.get((nokkel(klasse), nokkel(fag))) or \
-                rom_og_laerer.get(("alle", nokkel(fag))) or ("", "")
+            laerer = laerere.get((nokkel(klasse), nokkel(fag))) or laerere.get(("alle", nokkel(fag))) or ""
             timer.append({
                 "klasse": klasse, "dag": dag, "start": start, "slutt": slutt, "fag": fag,
-                "rom": rom, "laerer": laerer, "tema": "", "lekse": "", "type": "",
+                "laerer": laerer, "tema": "", "lekse": "", "type": "",
             })
     return timer
 
@@ -232,14 +232,15 @@ def _les_innhold(wb, standarduke, fest_klasse, fest_fag, merknader):
 
 
 def _tolk_uke(verdi, standarduke: int, hvor: str, merknader) -> int:
+    """Godtar «36», 36 og merkelappen fra nedtrekket: «36 · 31. aug – 4. sep 2026»."""
     tekst = rens(verdi)
     if not tekst:
         return standarduke
-    try:
-        nummer = int(float(tekst))
-    except ValueError:
+    treff = re.match(r"^(\d{1,2})\b", tekst)
+    if not treff:
         merknader.append(f"{hvor}: «{tekst}» er ikke et ukenummer. Raden havner i uke {standarduke}.")
         return standarduke
+    nummer = int(treff.group(1))
     if not 1 <= nummer <= 53:
         merknader.append(f"{hvor}: uke {nummer} finnes ikke. Raden havner i uke {standarduke}.")
         return standarduke
@@ -255,7 +256,7 @@ def _fest_innhold(timer, oppgaver, rad, nr, merknader) -> None:
     if not traff and rad["dag"]:
         timer.append({
             "klasse": rad["klasse"], "dag": rad["dag"], "start": "", "slutt": "",
-            "fag": rad["fag"] or "Info", "rom": "", "laerer": "",
+            "fag": rad["fag"] or "Info", "laerer": "",
             "tema": rad["tema"], "lekse": rad["lekse"], "type": rad["type"],
         })
         if rad["fag"]:

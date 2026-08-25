@@ -231,6 +231,13 @@ h1{
 }
 .daghode .navn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:15px;letter-spacing:-.01em}
 .daghode .dato{font-family:"DM Mono",monospace;font-size:11.5px;color:var(--blekk-svak)}
+.fristmerke{
+  font-family:"DM Mono",monospace;font-size:10.5px;line-height:1;color:var(--ark);background:var(--naa);
+  border:0;border-radius:99px;padding:4px 7px;margin-left:7px;cursor:pointer;
+  transition:transform .16s cubic-bezier(.2,.7,.3,1),filter .16s;
+}
+.fristmerke:hover{transform:scale(1.12)}
+.dag.idag .fristmerke{background:var(--ark);color:var(--blekk)}
 .dag.idag .daghode{background:var(--blekk);border-color:var(--blekk)}
 .dag.idag .daghode .navn{color:var(--ark)}
 .dag.idag .daghode .dato{color:var(--ark);opacity:.75}
@@ -247,15 +254,6 @@ h1{
 .time .klokke{display:flex;justify-content:space-between;gap:8px;font-family:"DM Mono",monospace;font-size:11px;color:var(--blekk-svak);margin-bottom:4px}
 .time .fagnavn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:14.5px;letter-spacing:-.01em;color:var(--fagtekst);line-height:1.15;text-transform:none}
 .time .tema{font-size:15px;line-height:1.45;margin:6px 0 0;color:var(--blekk);font-weight:500}
-.time .lekse{
-  margin:9px 0 0;padding:9px 11px;border-radius:var(--r);
-  background:var(--innhold);font-size:14.5px;line-height:1.45;color:var(--blekk);
-}
-.time .lekse .merkelapp{
-  display:block;font-family:"DM Mono",monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--fagtekst);margin-bottom:3px;
-}
-.time.ferdig{opacity:.5}
 .time.naa{border-color:var(--naa);box-shadow:0 0 0 1.5px var(--naa)}
 .time.naa::after{
   content:"nå";position:absolute;top:-9px;right:9px;
@@ -278,19 +276,28 @@ h1{
 .seksjonstopp{display:flex;align-items:baseline;gap:14px;border-bottom:1.5px solid var(--blekk);padding-bottom:10px}
 .seksjonstopp h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(20px,2.6vw,26px);letter-spacing:-.02em;margin:0}
 .seksjonstopp .antall{font-family:"DM Mono",monospace;font-size:12px;color:var(--blekk-svak)}
-.oppgaveliste{list-style:none;margin:0;padding:0;max-width:1040px}
+.fristbolker{display:flex;flex-direction:column;gap:26px;margin-top:22px;max-width:1040px}
+.fristdag{
+  display:flex;align-items:baseline;gap:10px;margin:0 0 2px;
+  font-family:"DM Mono",monospace;font-weight:500;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--blekk);
+}
+.fristdag .dato{letter-spacing:.1em;color:var(--blekk-svak)}
+.fristdag::after{content:"";flex:1;height:1px;background:var(--linje)}
+.fristbolk.blink .fristdag{color:var(--naa)}
+.fristbolk.blink .fristdag::after{background:var(--naa)}
+.oppgaveliste{list-style:none;margin:0;padding:0}
 .oppgave{
-  display:grid;grid-template-columns:92px 1fr auto;gap:16px;align-items:baseline;
-  padding:15px 4px;border-bottom:1px solid var(--linje-svak);
+  display:grid;grid-template-columns:150px 1fr auto;gap:16px;align-items:baseline;
+  padding:13px 4px;border-bottom:1px solid var(--linje-svak);
   opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s;
 }
 .oppgave.inne{opacity:1;transform:none}
-.oppgave .nar{font-family:"DM Mono",monospace;font-size:12px;color:var(--blekk-svak);white-space:nowrap}
-.oppgave .nar strong{display:block;font-weight:500;font-size:13.5px;color:var(--blekk)}
 .oppgave .hva{min-width:0}
-.oppgave .fagetikett{display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:12.5px;color:var(--fagtekst)}
-.oppgave .fagetikett::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--fag)}
-.oppgave .tekst{display:block;font-size:15.5px;line-height:1.45;margin-top:3px;max-width:68ch}
+.oppgave .fagetikett{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px;color:var(--fagtekst)}
+.oppgave .fagetikett::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--fag);flex:none}
+.oppgave .tekst{display:block;font-size:15.5px;line-height:1.45;max-width:68ch}
+.oppgave .merke{margin-top:0}
 .oppgave.dim{opacity:calc(var(--dempet) + .05);transform:none}
 
 footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--linje-svak);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:"DM Mono",monospace;font-size:11.5px;color:var(--blekk-svak)}
@@ -301,8 +308,9 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--linje-svak);d
 }
 @media (max-width:660px){
   .uke-rutenett{grid-template-columns:1fr;gap:22px}
-  .oppgave{grid-template-columns:1fr;gap:6px}
-  .oppgave .nar{display:flex;gap:8px;align-items:baseline}
+  .oppgave{grid-template-columns:1fr;gap:4px}
+  .oppgave .fagetikett,.oppgave .hva,.oppgave .merke{grid-column:1}
+  .oppgave .merke{justify-self:start;margin-top:2px}
   .topp{position:relative;padding-top:4px}
   .verktoy{position:absolute;top:0;right:0;margin:0}
   .velgere{gap:20px}
@@ -324,7 +332,11 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--linje-svak);d
   body{font-size:11px;background:#fff;color:#000}
   .ramme{max-width:none;padding:0}
   .uke-rutenett{grid-template-columns:repeat(5,1fr);gap:6px}
-  .time,.beskjed,.oppgave{break-inside:avoid;box-shadow:none !important}
+  .time,.beskjed,.oppgave,.fristbolk{break-inside:avoid;box-shadow:none !important}
+  /* På papir er «i dag» uten mening – da er streken nok. */
+  .dag.idag .daghode{background:none}
+  .dag.idag .daghode .navn,.dag.idag .daghode .dato{color:#000}
+  .fristmerke{background:none;color:#000;border:1px solid #000;padding:2px 6px}
   .dag{animation:none}
   .oppgave{opacity:1;transform:none}
   @page{size:A4 landscape;margin:12mm}
@@ -365,7 +377,7 @@ try {
       <div class="klasser" id="klasser" role="group" aria-label="Velg klasse"></div>
     </div>
     <div class="velgergruppe" style="flex:1 1 320px">
-      <p class="velgertittel">Fag <button class="nullstill" id="allefag" type="button">vis alle</button></p>
+      <p class="velgertittel">Fag <button class="nullstill" id="allefag" type="button">skjul alle</button></p>
       <div class="fagfilter" id="fagfilter" role="group" aria-label="Filtrer fag"></div>
     </div>
   </div>
@@ -379,12 +391,12 @@ try {
       <h2>Å gjøre denne uka</h2>
       <span class="antall mono" id="antall"></span>
     </div>
-    <ul class="oppgaveliste" id="oppgaver"></ul>
+    <div class="fristbolker" id="oppgaver"></div>
   </section>
 
   <footer>
     <span id="fotklasse"></span>
-    <span>Oppdatert 25. aug 20:46</span>
+    <span>Oppdatert 25. aug 21:01</span>
   </footer>
 </div>
 
@@ -488,7 +500,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "Oppstart: vi blir kjent med Kontekst",
      "lekse": "Bla gjennom kapittel 1",
@@ -500,7 +511,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "214",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -512,7 +522,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "Sikkerhet på naturfagrommet",
      "lekse": "",
@@ -524,7 +533,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -536,7 +544,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -548,7 +555,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -560,7 +566,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -572,7 +577,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -584,7 +588,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Engelsk",
-     "rom": "214",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -596,7 +599,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Samfunnsfag",
-     "rom": "214",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -608,7 +610,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -620,7 +621,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -632,7 +632,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -644,7 +643,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "KRLE",
-     "rom": "214",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -656,7 +654,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "Repetisjon: de fire regneartene",
      "lekse": "Oppgave 1.1–1.12",
@@ -668,7 +665,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -680,7 +676,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Samfunnsfag",
-     "rom": "214",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -692,7 +687,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -704,7 +698,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -716,7 +709,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -728,7 +720,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "214",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -740,7 +731,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "214",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -752,7 +742,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -764,7 +753,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "Repetisjon: de fire regneartene",
      "lekse": "Oppgave 1.1–1.12",
@@ -776,7 +764,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -788,7 +775,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -800,7 +786,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "216",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -812,7 +797,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Samfunnsfag",
-     "rom": "216",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -824,7 +808,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -836,7 +819,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Engelsk",
-     "rom": "216",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -848,7 +830,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -860,7 +841,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -872,7 +852,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -884,7 +863,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -896,7 +874,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -908,7 +885,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -920,7 +896,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -932,7 +907,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -944,7 +918,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -956,7 +929,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Samfunnsfag",
-     "rom": "216",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -968,7 +940,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -980,7 +951,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "KRLE",
-     "rom": "216",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -992,7 +962,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -1004,7 +973,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "216",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1016,7 +984,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "216",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1028,7 +995,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -1040,7 +1006,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Samfunnsfag",
-     "rom": "301",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -1052,7 +1017,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -1064,7 +1028,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "301",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -1076,7 +1039,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -1088,7 +1050,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -1100,7 +1061,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "301",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -1112,7 +1072,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "Vi starter med elektrisitet",
      "lekse": "Les s. 60–66",
@@ -1124,7 +1083,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1136,7 +1094,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Tysk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -1148,7 +1105,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -1160,7 +1116,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Engelsk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -1172,7 +1127,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -1184,7 +1138,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -1196,7 +1149,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "301",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -1208,7 +1160,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Samfunnsfag",
-     "rom": "301",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -1220,7 +1171,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -1232,7 +1182,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Tysk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -1244,7 +1193,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "KRLE",
-     "rom": "301",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -1256,7 +1204,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -1268,7 +1215,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -1280,7 +1226,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "301",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1292,7 +1237,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "301",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1304,7 +1248,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -1316,7 +1259,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -1328,7 +1270,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "Skriveramme: argumenterende tekst",
      "lekse": "Velg tema til teksten",
@@ -1340,7 +1281,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -1352,7 +1292,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -1364,7 +1303,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -1376,7 +1314,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -1388,7 +1325,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Engelsk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -1400,7 +1336,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -1412,7 +1347,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "KRLE",
-     "rom": "305",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -1424,7 +1358,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Samfunnsfag",
-     "rom": "305",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -1436,7 +1369,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Tysk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -1448,7 +1380,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Samfunnsfag",
-     "rom": "305",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -1460,7 +1391,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1472,7 +1402,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -1484,7 +1413,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -1496,7 +1424,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -1508,7 +1435,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -1520,7 +1446,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -1532,7 +1457,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Tysk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -1544,7 +1468,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -1556,7 +1479,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "305",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1568,7 +1490,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "305",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1663,7 +1584,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "Nynorsk: samansette ord og orddeling",
      "lekse": "Les s. 40–44 i Kontekst. Skriv fem setningar med samansette ord.",
@@ -1675,7 +1595,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "214",
      "laerer": "SB",
      "tema": "Australia: reading and vocabulary",
      "lekse": "Glosetest torsdag – 20 ord fra kapittel 3",
@@ -1687,7 +1606,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "Cellen: bygning og deler",
      "lekse": "Tegn en dyrecelle med navn på delene",
@@ -1699,7 +1617,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -1711,7 +1628,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -1723,7 +1639,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -1735,7 +1650,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -1747,7 +1661,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -1759,7 +1672,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Engelsk",
-     "rom": "214",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -1771,7 +1683,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Samfunnsfag",
-     "rom": "214",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -1783,7 +1694,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "Brøk: utviding og forkorting",
      "lekse": "Oppgave 2.14–2.22",
@@ -1795,7 +1705,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1807,7 +1716,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "Vi baker grovbrød – husk forkle",
      "lekse": "",
@@ -1819,7 +1727,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "KRLE",
-     "rom": "214",
      "laerer": "PH",
      "tema": "Buddhismen: de fire edle sannheter",
      "lekse": "",
@@ -1831,7 +1738,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "Prøve i brøk og prosent",
      "lekse": "Øv på oppgavene fra kapittel 2",
@@ -1843,7 +1749,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -1855,7 +1760,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Samfunnsfag",
-     "rom": "214",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -1867,7 +1771,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -1879,7 +1782,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -1891,7 +1793,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "Vi fortsetter med trearbeid",
      "lekse": "",
@@ -1903,7 +1804,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "214",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1915,7 +1815,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "214",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1927,7 +1826,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -1939,7 +1837,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "Brøk: utviding og forkorting",
      "lekse": "Oppgave 2.14–2.22",
@@ -1951,7 +1848,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "Friidrett ute – kle deg etter været",
      "lekse": "",
@@ -1963,7 +1859,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "Nynorsk: samansette ord",
      "lekse": "Les s. 40–44 i Kontekst",
@@ -1975,7 +1870,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "216",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -1987,7 +1881,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Samfunnsfag",
-     "rom": "216",
      "laerer": "PH",
      "tema": "Innleveringsfrist: kildekritikk",
      "lekse": "Lever oppgaven i Teams før kl. 15",
@@ -1999,7 +1892,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -2011,7 +1903,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Engelsk",
-     "rom": "216",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -2023,7 +1914,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -2035,7 +1925,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -2047,7 +1936,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -2059,7 +1947,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -2071,7 +1958,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -2083,7 +1969,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -2095,7 +1980,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -2107,7 +1991,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -2119,7 +2002,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -2131,7 +2013,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Samfunnsfag",
-     "rom": "216",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -2143,7 +2024,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -2155,7 +2035,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "KRLE",
-     "rom": "216",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -2167,7 +2046,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -2179,7 +2057,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "216",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -2191,7 +2068,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "216",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -2203,7 +2079,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -2215,7 +2090,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Samfunnsfag",
-     "rom": "301",
      "laerer": "PH",
      "tema": "Den industrielle revolusjonen",
      "lekse": "Les s. 88–95 og svar på tre spørsmål",
@@ -2227,7 +2101,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -2239,7 +2112,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "301",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -2251,7 +2123,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -2263,7 +2134,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -2275,7 +2145,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "301",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -2287,7 +2156,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "Forsøk: elektrisitet og kretser",
      "lekse": "Skriv rapport fra forsøket",
@@ -2299,7 +2167,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -2311,7 +2178,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Tysk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -2323,7 +2189,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "Novelleanalyse: virkemidler",
      "lekse": "Les novellen «Karen» og noter virkemidler",
@@ -2335,7 +2200,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Engelsk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -2347,7 +2211,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -2359,7 +2222,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -2371,7 +2233,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "301",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -2383,7 +2244,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Samfunnsfag",
-     "rom": "301",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -2395,7 +2255,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -2407,7 +2266,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Tysk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -2419,7 +2277,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "KRLE",
-     "rom": "301",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -2431,7 +2288,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "Ekskursjon til kunstmuseet – vi går kl. 12.00",
      "lekse": "Ta med matpakke",
@@ -2443,7 +2299,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -2455,7 +2310,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "301",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -2467,7 +2321,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "301",
      "laerer": "MR",
      "tema": "",
      "lekse": "Frist for å melde seg på turneringen",
@@ -2479,7 +2332,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -2491,7 +2343,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "Funksjoner: lineære sammenhenger",
      "lekse": "Oppgave 5.30–5.40",
@@ -2503,7 +2354,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "Skriveøkt: argumenterende tekst",
      "lekse": "Førsteutkast leveres i Teams",
@@ -2515,7 +2365,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -2527,7 +2376,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "Oral presentations: prepare in pairs",
      "lekse": "Øv på framføringen hjemme",
@@ -2539,7 +2387,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -2551,7 +2398,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -2563,7 +2409,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Engelsk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -2575,7 +2420,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -2587,7 +2431,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "KRLE",
-     "rom": "305",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -2599,7 +2442,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Samfunnsfag",
-     "rom": "305",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -2611,7 +2453,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Tysk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -2623,7 +2464,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Samfunnsfag",
-     "rom": "305",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -2635,7 +2475,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -2647,7 +2486,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -2659,7 +2497,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -2671,7 +2508,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -2683,7 +2519,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -2695,7 +2530,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -2707,7 +2541,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Tysk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -2719,7 +2552,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "Repetisjon før tentamen",
      "lekse": "",
@@ -2731,7 +2563,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "305",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -2743,7 +2574,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "305",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -2936,7 +2766,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "Vi skriver forteljing",
      "lekse": "Skriv ferdig utkastet",
@@ -2948,7 +2777,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "214",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -2960,7 +2788,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -2972,7 +2799,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -2984,7 +2810,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -2996,7 +2821,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3008,7 +2832,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3020,7 +2843,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "214",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3032,7 +2854,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Engelsk",
-     "rom": "214",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -3044,7 +2865,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Samfunnsfag",
-     "rom": "214",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3056,7 +2876,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3068,7 +2887,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3080,7 +2898,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3092,7 +2909,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "KRLE",
-     "rom": "214",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3104,7 +2920,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "214",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3116,7 +2931,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3128,7 +2942,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Samfunnsfag",
-     "rom": "214",
      "laerer": "PH",
      "tema": "Demokrati: hvem bestemmer i Norge?",
      "lekse": "Les s. 22–29",
@@ -3140,7 +2953,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3152,7 +2964,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "Vi øver til høstkonserten",
      "lekse": "",
@@ -3164,7 +2975,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -3176,7 +2986,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "214",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3188,7 +2997,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "214",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3200,7 +3008,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -3212,7 +3019,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3224,7 +3030,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3236,7 +3041,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3248,7 +3052,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "216",
      "laerer": "SB",
      "tema": "Presentations: my hometown",
      "lekse": "Framføring torsdag",
@@ -3260,7 +3063,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Samfunnsfag",
-     "rom": "216",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3272,7 +3074,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3284,7 +3085,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Engelsk",
-     "rom": "216",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -3296,7 +3096,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3308,7 +3107,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3320,7 +3118,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3332,7 +3129,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3344,7 +3140,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3356,7 +3151,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -3368,7 +3162,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -3380,7 +3173,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "216",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3392,7 +3184,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Norsk",
-     "rom": "216",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3404,7 +3195,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Samfunnsfag",
-     "rom": "216",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3416,7 +3206,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -3428,7 +3217,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "KRLE",
-     "rom": "216",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3440,7 +3228,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3452,7 +3239,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "216",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3464,7 +3250,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "216",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3476,7 +3261,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Mat og helse",
-     "rom": "Kjøkken",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3488,7 +3272,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Samfunnsfag",
-     "rom": "301",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3500,7 +3283,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3512,7 +3294,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "301",
      "laerer": "AT",
      "tema": "Prøve i likninger",
      "lekse": "Øv på kapittel 3",
@@ -3524,7 +3305,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -3536,7 +3316,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3548,7 +3327,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "301",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3560,7 +3338,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3572,7 +3349,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3584,7 +3360,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Tysk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -3596,7 +3371,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3608,7 +3382,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Engelsk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -3620,7 +3393,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3632,7 +3404,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3644,7 +3415,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Matematikk",
-     "rom": "301",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3656,7 +3426,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Samfunnsfag",
-     "rom": "301",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3668,7 +3437,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Norsk",
-     "rom": "301",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3680,7 +3448,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Tysk",
-     "rom": "301",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -3692,7 +3459,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "KRLE",
-     "rom": "301",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3704,7 +3470,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -3716,7 +3481,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -3728,7 +3492,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "301",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3740,7 +3503,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "301",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3752,7 +3514,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Kunst og håndverk",
-     "rom": "K&H",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -3764,7 +3525,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "Tentamen – hele dagen",
      "lekse": "Ta med kalkulator og linjal",
@@ -3776,7 +3536,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3788,7 +3547,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3800,7 +3558,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Engelsk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -3812,7 +3569,6 @@ const DATA = {
      "start": "08:30",
      "slutt": "09:30",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3824,7 +3580,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3836,7 +3591,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Engelsk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -3848,7 +3602,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3860,7 +3613,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "KRLE",
-     "rom": "305",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3872,7 +3624,6 @@ const DATA = {
      "start": "09:40",
      "slutt": "10:40",
      "fag": "Samfunnsfag",
-     "rom": "305",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3884,7 +3635,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Tysk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -3896,7 +3646,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Samfunnsfag",
-     "rom": "305",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
@@ -3908,7 +3657,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Kroppsøving",
-     "rom": "Gymsal",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3920,7 +3668,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3932,7 +3679,6 @@ const DATA = {
      "start": "11:10",
      "slutt": "12:10",
      "fag": "Musikk",
-     "rom": "Musikkrom",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
@@ -3944,7 +3690,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -3956,7 +3701,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Matematikk",
-     "rom": "305",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
@@ -3968,7 +3712,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Norsk",
-     "rom": "305",
      "laerer": "KM",
      "tema": "",
      "lekse": "",
@@ -3980,7 +3723,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Tysk",
-     "rom": "305",
      "laerer": "SB",
      "tema": "",
      "lekse": "",
@@ -3992,7 +3734,6 @@ const DATA = {
      "start": "12:20",
      "slutt": "13:20",
      "fag": "Naturfag",
-     "rom": "Naturfagrom",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
@@ -4004,7 +3745,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "305",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -4016,7 +3756,6 @@ const DATA = {
      "start": "13:30",
      "slutt": "14:15",
      "fag": "Valgfag",
-     "rom": "305",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -4028,7 +3767,6 @@ const DATA = {
      "start": "",
      "slutt": "",
      "fag": "Info",
-     "rom": "",
      "laerer": "",
      "tema": "",
      "lekse": "Skolen slutter kl. 12.00 – planleggingsdag",
@@ -4192,10 +3930,13 @@ function tegnFagfilter() {
       const f = b.dataset.fag;
       skjulteFag.has(f) ? skjulteFag.delete(f) : skjulteFag.add(f);
       b.setAttribute("aria-pressed", String(!skjulteFag.has(f)));
+      $("allefag").textContent = skjulteFag.size ? "vis alle" : "skjul alle";
+      tegnUke(false);
       dempFag();
     });
   });
   $("allefag").hidden = fag.length === 0;
+  $("allefag").textContent = skjulteFag.size ? "vis alle" : "skjul alle";
 }
 
 function dempFag() {
@@ -4228,32 +3969,41 @@ function tegnUke(animer = true, retning = "") {
         ? dagensTimer.map((t) => timekort(t, erIdag)).join("")
         : `<div class="tom">Ingen timer</div>`;
       return `<section class="dag${erIdag ? " idag" : ""}" style="--i:${i}">
-        <header class="daghode"><span class="navn">${trygg(dag.navn)}</span><span class="dato">${trygg(dag.visning)}</span></header>
+        <header class="daghode"><span class="navn">${trygg(dag.navn)}${fristmerke(dag.navn)}</span><span class="dato">${trygg(dag.visning)}</span></header>
         <div class="timer">${kort}</div>
       </section>`;
     })
     .join("");
   dempFag();
+  rutenett.querySelectorAll(".fristmerke").forEach((b) => {
+    b.addEventListener("click", () => hoppTilFrister(b.dataset.frist));
+  });
+}
+
+function hoppTilFrister(dagnavn) {
+  const bolk = document.getElementById(`frist-${dagnavn}`);
+  if (!bolk) return;
+  bolk.scrollIntoView({ behavior: "smooth", block: "center" });
+  bolk.classList.add("blink");
+  setTimeout(() => bolk.classList.remove("blink"), 1600);
 }
 
 function timekort(t, erIdag) {
   const f = farge(t.fag);
   const start = minutter(t.start), slutt = minutter(t.slutt);
   let tilstand = "";
-  if (erIdag && start != null) {
+  if (erIdag && start != null && slutt != null) {
     const n = naaMin();
-    if (slutt != null && n >= start && n < slutt) tilstand = " naa";
-    else if (slutt != null && n >= slutt) tilstand = " ferdig";
+    if (n >= start && n < slutt) tilstand = " naa";
   }
-  if (t.tema || t.lekse) tilstand += " har-innhold";
+  if (t.tema) tilstand += " har-innhold";
   const klokke = [t.start, t.slutt].filter(Boolean).join("–");
-  const hoyre = [t.rom, t.laerer].filter(Boolean).join(" · ");
+  const hoyre = trygg(t.laerer);
   const merke = t.type ? `<span class="merke ${/prøve|innlevering|frist/i.test(t.type) ? "viktig" : "rolig"}">${trygg(t.type)}</span>` : "";
   return `<article class="time${tilstand}" data-fagrad="${trygg(t.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}">
-    <div class="klokke"><span>${trygg(klokke)}</span><span>${trygg(hoyre)}</span></div>
+    <div class="klokke"><span>${trygg(klokke)}</span><span>${hoyre}</span></div>
     <div class="fagnavn">${trygg(t.fag)}</div>
     ${t.tema ? `<p class="tema">${trygg(t.tema)}</p>` : ""}
-    ${t.lekse ? `<p class="lekse"><span class="merkelapp">Lekse</span>${trygg(t.lekse)}</p>` : ""}
     ${merke}
   </article>`;
 }
@@ -4270,26 +4020,47 @@ function tegnBeskjeder() {
 /* ── Å gjøre ────────────────────────────────────── */
 const dagIndeks = (navn) => uka().dager.findIndex((d) => d.navn === navn);
 
+function fristerPerDag() {
+  const per = new Map(uka().dager.map((d) => [d.navn, []]));
+  uka().oppgaver.filter(gjelder).forEach((o) => {
+    const dag = o.frist || o.dag;
+    if (per.has(dag)) per.get(dag).push(o);
+  });
+  return per;
+}
+
+function fristmerke(dagnavn) {
+  const antall = (fristerPerDag().get(dagnavn) || []).filter((o) => !skjulteFag.has(o.fag)).length;
+  if (!antall) return "";
+  const ord = antall === 1 ? "frist" : "frister";
+  return `<button class="fristmerke" type="button" data-frist="${trygg(dagnavn)}" title="${antall} ${ord} – se «Å gjøre denne uka»">${antall}</button>`;
+}
+
 function tegnOppgaver() {
-  const liste = uka().oppgaver
-    .filter(gjelder)
-    .map((o) => ({ ...o, i: dagIndeks(o.frist || o.dag) }))
-    .sort((a, b) => a.i - b.i);
-  $("antall").textContent = liste.length ? `${liste.length} punkt` : "";
-  $("oppgaver").innerHTML = liste.length
-    ? liste.map((o) => {
-        const dag = uka().dager[o.i];
-        const f = farge(o.fag);
-        const merke = o.type ? `<span class="merke ${/prøve|innlevering|frist/i.test(o.type) ? "viktig" : "rolig"}">${trygg(o.type)}</span>` : "";
-        return `<li class="oppgave" data-fagrad="${trygg(o.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}">
-          <span class="nar"><strong>${trygg(dag ? dag.navn : (o.frist || o.dag || ""))}</strong>${trygg(dag ? dag.visning : "")}</span>
-          <span class="hva">${o.fag ? `<span class="fagetikett">${trygg(o.fag)}</span>` : ""}<span class="tekst">${trygg(o.tekst)}</span></span>
-          ${merke}
-        </li>`;
-      }).join("")
-    : `<li class="oppgave inne"><span class="nar"></span><span class="hva"><span class="tekst">Ingenting å gjøre denne uka.</span></span></li>`;
+  const per = fristerPerDag();
+  const totalt = [...per.values()].reduce((sum, liste) => sum + liste.length, 0);
+  $("antall").textContent = totalt ? `${totalt} punkt` : "";
+  $("oppgaver").innerHTML = totalt
+    ? uka().dager
+        .filter((d) => (per.get(d.navn) || []).length)
+        .map((d) => `<section class="fristbolk" id="frist-${trygg(d.navn)}">
+            <h3 class="fristdag">${trygg(d.navn)} <span class="dato">${trygg(d.visning)}</span></h3>
+            <ul class="oppgaveliste">${per.get(d.navn).map(oppgaverad).join("")}</ul>
+          </section>`)
+        .join("")
+    : `<p class="tom">Ingen lekser eller frister denne uka.</p>`;
   avslor();
   dempFag();
+}
+
+function oppgaverad(o) {
+  const f = farge(o.fag);
+  const merke = o.type ? `<span class="merke ${/prøve|innlevering|frist/i.test(o.type) ? "viktig" : "rolig"}">${trygg(o.type)}</span>` : "";
+  return `<li class="oppgave" data-fagrad="${trygg(o.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}">
+    ${o.fag ? `<span class="fagetikett">${trygg(o.fag)}</span>` : `<span></span>`}
+    <span class="hva"><span class="tekst">${trygg(o.tekst)}</span></span>
+    ${merke}
+  </li>`;
 }
 
 function avslor() {
@@ -4347,7 +4118,12 @@ function start() {
   $("skole").textContent = DATA.skole;
   $("overskrift").textContent = DATA.overskrift || "Ukeplan";
   $("skrivut").addEventListener("click", () => window.print());
-  $("allefag").addEventListener("click", () => { skjulteFag = new Set(); tegnFagfilter(); dempFag(); });
+  $("allefag").addEventListener("click", () => {
+    skjulteFag = skjulteFag.size ? new Set() : new Set(fagIBruk());
+    tegnFagfilter();
+    tegnUke(false);
+    dempFag();
+  });
   $("forrige").addEventListener("click", () => byttUke(-1));
   $("neste").addEventListener("click", () => byttUke(1));
   $("tilbaketilnaa").addEventListener("click", () => {

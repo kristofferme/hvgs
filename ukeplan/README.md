@@ -25,17 +25,20 @@ med klassenavnet i en svart bjelke over hvert rutenett. Du velger fag i
 cellene fra nedtrekkslista, og de farges mens du skriver. Timeplanen fylles ut
 én gang og gjentas i alle uker.
 
-**Rom og lærer** – hvilket rom og hvilken lærer et fag har i en klasse.
-Valgfritt, og fylles ut én gang. Skriv «Alle» i klassefeltet for rom som er
-felles, som gymsalen.
+**Lærere** – hvilken lærer et fag har i en klasse. Valgfritt, og fylles ut én
+gang. «Alle» i klassefeltet gjelder alle klassene.
 
 **Uke** – det som er nytt: tema, lekse, frist og type (prøve, innlevering, tur,
-info). Uke-kolonnen bestemmer hvilken uke raden hører til; står den tom, havner
-raden i uka fra Oppsett. Raden festes til riktig time når klasse, dag og fag
-stemmer med timeplanen. Har klassen to mattetimer på mandag, får de hver sin
-rad. Hver klasse får sin egen tone, og det kommer en strek der klassen bytter.
+info). Første kolonne er et nedtrekk med uke og datoer – «36 · 31. aug – 4. sep
+2026» – så du slipper å telle uker. Står den tom, havner raden i uka fra
+Oppsett. Én arbeidsbok tar hele skoleåret: filtrer på Uke-kolonnen når du vil
+se én uke om gangen. Det er en tykk strek mellom ukene, hver klasse har sin
+egen tone, og en tynn strek der klassen bytter.
 
-**Beskjeder** – korte meldinger hjem, per uke og per klasse. «Alle» går til alle.
+Raden festes til riktig time når klasse, dag og fag stemmer med timeplanen.
+Har klassen to mattetimer på mandag, får de hver sin rad.
+
+**Beskjeder** – korte meldinger hjem, med samme ukevalg. «Alle» går til alle.
 
 Alle nedtrekkslistene godtar at du skriver fritt også – Excel maser ikke. Er
 det noe som ikke henger sammen, sier `python3 ukeplan.py sjekk` fra:
@@ -57,10 +60,14 @@ så siden ser lik ut på skolens nett, på mobilen og uten nett i det hele tatt.
   å sveipe på telefonen. Siden åpner på uka vi er i nå, og «Tilbake til denne
   uka» dukker opp når du har bladd deg vekk.
 - **Lys eller mørk** følger telefonen, men knappen overstyrer og valget huskes.
-- Fagfilteret demper resten i stedet for å fjerne det, så uka beholder formen.
-- Dagen i dag er markert, timen som pågår er ringet inn med «nå», og timer som
-  er ferdige, tones ned. Timer med lekse eller tema veier tyngre enn de tomme.
-- Lekser og frister samles i «Å gjøre denne uka», sortert etter frist.
+- **Fagfilteret** demper resten i stedet for å fjerne det, så uka beholder
+  formen. «Skjul alle» tømmer uka, så du kan hake inn det ene faget du er ute
+  etter.
+- **Timeplanen viser hva som skjer**: klokkeslett, fag, lærer og tema. Dagen i
+  dag er markert, og timen som pågår er ringet inn med «nå».
+- **«Å gjøre denne uka» viser hva som skal gjøres**: alle lekser og frister,
+  gruppert under den dagen de skal være ferdige til. Tallet i daghodet sier hvor
+  mange frister dagen har – klikk på det for å hoppe rett ned til dem.
 - «Skriv ut» gir uka på ett A4-ark i liggende format – klar for kjøleskapet.
 - Bevegelse skrus av for den som har bedt om det.
 

@@ -44,8 +44,8 @@ def kommando_ny(args) -> int:
         forste_dag=forste,
         klasser=demomodul.KLASSER if args.demo else None,
         okter=demomodul.OKTER if args.demo else None,
-        innhold=demomodul.demoinnhold() if args.demo else None,
         timeplan=demomodul.TIMEPLAN if args.demo else None,
+        innhold=demomodul.demoinnhold() if args.demo else None,
     )
     si(f"Arbeidsbok: {fil}")
     si("Åpne den, start på arket «Start her», og kjør så:  python3 ukeplan.py bygg")

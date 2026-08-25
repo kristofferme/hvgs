@@ -19,7 +19,7 @@ sys.path.insert(0, str(HER))
 
 from ukeplanlib import demo as demomodul  # noqa: E402
 from ukeplanlib.bygg import skriv  # noqa: E402
-from ukeplanlib.felles import mandag_i_uke  # noqa: E402
+from ukeplanlib.felles import uke_til_mandag  # noqa: E402
 from ukeplanlib.les import les  # noqa: E402
 from ukeplanlib.regneark import lag_arbeidsbok  # noqa: E402
 
@@ -36,15 +36,16 @@ def kommando_ny(args) -> int:
     if fil.exists() and not args.overskriv:
         si(f"{fil} finnes allerede. Legg til --overskriv om den skal erstattes.")
         return 1
-    forste = mandag_i_uke(dt.date.today().year, args.uke) if args.uke else None
-    innhold = demomodul.demoinnhold() if args.demo else None
+    forste = uke_til_mandag(args.uke, dt.date.today()) if args.uke else None
     lag_arbeidsbok(
         fil,
         skole=args.skole or (demomodul.SKOLE if args.demo else "Skolen"),
         uke=args.uke,
         forste_dag=forste,
         klasser=demomodul.KLASSER if args.demo else None,
-        innhold=innhold,
+        okter=demomodul.OKTER if args.demo else None,
+        innhold=demomodul.demoinnhold() if args.demo else None,
+        timeplan=demomodul.TIMEPLAN if args.demo else None,
     )
     si(f"Arbeidsbok: {fil}")
     si("Åpne den, start på arket «Start her», og kjør så:  python3 ukeplan.py bygg")
@@ -59,9 +60,11 @@ def kommando_bygg(args) -> int:
     resultat = les(fil)
     ut = skriv(resultat.data, Path(args.ut))
     data = resultat.data
-    si(f"Ukeplan uke {data['uke']} · {data['skole']} · {data['datospenn']}")
-    si(f"{len(data['klasser'])} klasser · {len(data['timer'])} timer · "
-       f"{len(data['oppgaver'])} lekser og frister · {len(data['beskjeder'])} beskjeder")
+    uker = data["uker"]
+    si(f"{data['skole']} · {len(uker)} uker: " + ", ".join(str(u["uke"]) for u in uker))
+    si(f"{len(data['klasser'])} klasser · {len(uker[0]['timer']) if uker else 0} timer i timeplanen · "
+       f"{sum(len(u['oppgaver']) for u in uker)} lekser og frister · "
+       f"{sum(len(u['beskjeder']) for u in uker)} beskjeder")
     _merknader(resultat.merknader)
     si(f"Nettside: {ut}")
     return 0

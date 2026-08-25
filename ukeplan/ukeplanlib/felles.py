@@ -130,3 +130,25 @@ def datospenn(fra: dt.date, til: dt.date) -> str:
 
 def mandag_i_uke(aar: int, uke: int) -> dt.date:
     return dt.date.fromisocalendar(aar, uke, 1)
+
+
+def uke_til_mandag(uke: int, referanse: dt.date) -> dt.date:
+    """Uke 2 kan være i januar neste år. Velger året som ligger nærmest referansen."""
+    kandidater = []
+    for aar in (referanse.year - 1, referanse.year, referanse.year + 1):
+        try:
+            kandidater.append(dt.date.fromisocalendar(aar, uke, 1))
+        except ValueError:
+            continue
+    return min(kandidater, key=lambda d: abs((d - referanse).days))
+
+
+def tolk_okt(verdi) -> tuple[str, str]:
+    """'08:30–09:30' → ('08:30', '09:30'). Ett klokkeslett gir tom sluttid."""
+    tekst = rens(verdi).replace("—", "–").replace("−", "–")
+    deler = [d for d in re.split(r"[–\-]", tekst) if d.strip()]
+    if not deler:
+        return "", ""
+    if len(deler) == 1:
+        return tolk_tid(deler[0]), ""
+    return tolk_tid(deler[0]), tolk_tid(deler[1])

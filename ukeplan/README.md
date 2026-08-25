@@ -1,10 +1,10 @@
 # Ukeplan
 
-Lag ukeplanen i Excel. Del den som en nettside.
+Lag ukeplanene i Excel. Del dem som én nettside.
 
 Læreren jobber der læreren allerede jobber – i et regneark med nedtrekkslister
-for klasse, dag og fag. Én kommando gjør regnearket om til én HTML-fil som
-elever og foresatte kan åpne på telefonen, velge klasse i, og skrive ut.
+for klasse, dag og fag. Én kommando gjør regnearket om til én HTML-fil der
+elever og foresatte velger klasse, blar mellom ukene, og skriver ut.
 
 ```
 python3 ukeplan.py ny --demo     # arbeidsbok med et ferdig eksempel
@@ -13,43 +13,56 @@ python3 ukeplan.py bygg          # Ukeplan.xlsx  →  ukeplan.html
 
 Første gang: `pip install -r krav.txt` (openpyxl er det eneste som trengs).
 
-## Slik henger det sammen
+## Arkene
 
-**Oppsett** – skole, ukenummer, mandagsdato. Klassene og fagene dine står i to
-kolonner her, og det er dem nedtrekkslistene i resten av boka henter fra. Legger
-du til et fag, får det farge automatisk.
+**Oppsett** – skole, ukenummer og mandagsdato. Klassene står i én kolonne,
+fagene i en annen, og det er dem nedtrekkslistene i resten av boka henter fra.
+Legger du til et fag, får det farge automatisk. Ukenummeret her er uka
+nettsiden åpner på.
 
-**Timeplan** – den faste timeplanen: klasse, dag, start, slutt, fag, rom, lærer.
-Denne fyller du ut én gang. Den gjelder uke etter uke.
+**Timeplan** – ett rutenett per klasse: klokkeslett nedover, dager bortover,
+med klassenavnet i en svart bjelke over hvert rutenett. Du velger fag i
+cellene fra nedtrekkslista, og de farges mens du skriver. Timeplanen fylles ut
+én gang og gjentas i alle uker.
 
-**Uke** – det som er nytt denne uka: tema, lekse, frist og type (prøve,
-innlevering, tur, info). Raden festes til riktig time når klasse, dag og fag
+**Rom og lærer** – hvilket rom og hvilken lærer et fag har i en klasse.
+Valgfritt, og fylles ut én gang. Skriv «Alle» i klassefeltet for rom som er
+felles, som gymsalen.
+
+**Uke** – det som er nytt: tema, lekse, frist og type (prøve, innlevering, tur,
+info). Uke-kolonnen bestemmer hvilken uke raden hører til; står den tom, havner
+raden i uka fra Oppsett. Raden festes til riktig time når klasse, dag og fag
 stemmer med timeplanen. Har klassen to mattetimer på mandag, får de hver sin
-rad. Står det «Alle» i klassefeltet, gjelder raden hele trinnet.
+rad. Hver klasse får sin egen tone, og det kommer en strek der klassen bytter.
 
-**Beskjeder** – korte meldinger hjem, per klasse eller til alle.
+**Beskjeder** – korte meldinger hjem, per uke og per klasse. «Alle» går til alle.
 
-Alle nedtrekkslistene godtar at du skriver fritt også – Excel maser ikke. Er det
-noe som ikke henger sammen, sier `python3 ukeplan.py sjekk` fra:
+Alle nedtrekkslistene godtar at du skriver fritt også – Excel maser ikke. Er
+det noe som ikke henger sammen, sier `python3 ukeplan.py sjekk` fra:
 
 ```
 Uke rad 12: fant ingen Naturfag-time onsdag for 8A.
             Innholdet vises som eget kort den dagen.
+Uke rad 41: uke 99 finnes ikke. Raden havner i uke 36.
 ```
 
 ## Nettsiden
 
-Én fil, ingenting utenfor den – skriftene ligger inne i fila, så siden ser lik
-ut på skolens nett, på mobilen og uten nett i det hele tatt.
+Én fil med alle ukene, og ingenting utenfor den – skriftene ligger inne i fila,
+så siden ser lik ut på skolens nett, på mobilen og uten nett i det hele tatt.
 
-- Klassen velges med ett klikk, og huskes til neste gang. `ukeplan.html?klasse=8A`
-  åpner rett i riktig klasse – nyttig når du sender lenka til én gruppe.
+- **Klasse** velges med ett klikk og huskes til neste gang.
+  `ukeplan.html?klasse=8A&uke=36` åpner rett i riktig klasse og uke.
+- **Bla mellom ukene** med pilene ved ukenummeret, piltastene ← og →, eller ved
+  å sveipe på telefonen. Siden åpner på uka vi er i nå, og «Tilbake til denne
+  uka» dukker opp når du har bladd deg vekk.
+- **Lys eller mørk** følger telefonen, men knappen overstyrer og valget huskes.
 - Fagfilteret demper resten i stedet for å fjerne det, så uka beholder formen.
 - Dagen i dag er markert, timen som pågår er ringet inn med «nå», og timer som
-  er ferdige, tones ned.
+  er ferdige, tones ned. Timer med lekse eller tema veier tyngre enn de tomme.
 - Lekser og frister samles i «Å gjøre denne uka», sortert etter frist.
 - «Skriv ut» gir uka på ett A4-ark i liggende format – klar for kjøleskapet.
-- Mørk modus følger telefonen. Bevegelse skrus av for den som har bedt om det.
+- Bevegelse skrus av for den som har bedt om det.
 
 ## Legg den ut
 
@@ -57,7 +70,7 @@ HTML-fila er selvstendig, så den kan legges hvor som helst:
 
 ```
 python3 ukeplan.py bygg --ut ../static/ukeplan.html   # publiseres med resten av nettstedet
-python3 ukeplan.py bygg --ut ~/Nettsted/uke36.html    # eller hvor du vil
+python3 ukeplan.py bygg --ut ~/Nettsted/ukeplan.html  # eller hvor du vil
 ```
 
 Legg den i en mappe som allerede publiseres (Netlify, GitHub Pages, skolens
@@ -68,7 +81,7 @@ egen webserver), eller send fila som vedlegg. Den virker like godt begge veier.
 | Kommando | Gjør |
 | --- | --- |
 | `ukeplan.py ny` | ny, tom arbeidsbok |
-| `ukeplan.py ny --demo` | ferdig utfylt eksempel med fire klasser |
+| `ukeplan.py ny --demo` | ferdig utfylt eksempel: fire klasser, tre uker |
 | `ukeplan.py ny --skole "Sjøholt skule" --uke 41` | med skolenavn og uke satt |
 | `ukeplan.py bygg` | leser arbeidsboka, skriver nettsiden |
 | `ukeplan.py bygg --fil X.xlsx --ut Y.html` | andre filnavn |
@@ -77,14 +90,14 @@ egen webserver), eller send fila som vedlegg. Den virker like godt begge veier.
 ## Filene
 
 ```
-ukeplan.py            kommandolinja
-ukeplanlib/felles.py  dager, fagfarger, tolking av det som står i cellene
+ukeplan.py             kommandolinja
+ukeplanlib/felles.py   dager, fagfarger, tolking av det som står i cellene
 ukeplanlib/regneark.py lager arbeidsboka
-ukeplanlib/les.py     leser arbeidsboka og setter sammen uka
-ukeplanlib/bygg.py    fyller malen
-ukeplanlib/demo.py    eksempeldataene
-mal/side.html         nettsiden – utseende og oppførsel
-mal/fonter.css        skriftene, lagt inn som data-URI
+ukeplanlib/les.py      leser arbeidsboka og setter sammen hver uke
+ukeplanlib/bygg.py     fyller malen
+ukeplanlib/demo.py     eksempeldataene
+mal/side.html          nettsiden – utseende og oppførsel
+mal/fonter.css         skriftene, lagt inn som data-URI
 verktoy/hent_fonter.py henter skriftene på nytt hvis skriftvalget endres
-eksempel/             ferdig arbeidsbok og ferdig nettside
+eksempel/              ferdig arbeidsbok og ferdig nettside
 ```

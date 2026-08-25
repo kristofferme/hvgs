@@ -25,7 +25,7 @@ def bygg_html(data: dict, hel_side: bool = True) -> str:
     mal = MAL.read_text(encoding="utf-8")
     # Skriftene legges inn i fila så siden holder seg lik uten nett.
     fonter = FONTER.read_text(encoding="utf-8") if FONTER.exists() else NETTFONTER
-    tittel = f"Uke {data['uke']} · {data['skole']}"
+    tittel = f"Ukeplan {data['skole']}"
     generert = dt.datetime.now().strftime("%-d. %b %H:%M").lower()
     side = (
         mal.replace("__DATA__", json.dumps(data, ensure_ascii=False, indent=1))

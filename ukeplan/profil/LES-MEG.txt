@@ -1,0 +1,5 @@
+Legg logoen til skolen her, som logo.png eller logo.svg.
+
+Filnavnet skriver du i Oppsett-arket, feltet «Logo»: profil/logo.png
+Neste gang du kjører «python3 ukeplan.py bygg», legges logoen inn i
+nettsiden som en del av fila – ingen lenker ut.

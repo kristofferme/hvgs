@@ -1,0 +1,28 @@
+# Byggeoppskrift for Netlify-prosjektet «hvgs-vekeplan».
+#
+# I Netlify: Project configuration → Build & deploy → Link repository
+#   Repository:      kristofferme/hvgs
+#   Base directory:  ukeplan          ← det eneste feltet du må fylle ut
+#   Branch:          claude/ukeplaner-excel-html-w4xmxs (eller master etter fletting)
+#
+# Netlify installerer openpyxl fra requirements.txt, bygger nettsiden fra
+# Ukeplan.xlsx og publiserer mappa «publisert». Ny arbeidsbok i repoet
+# = ny plan på nett omtrent ett minutt seinare.
+
+[build]
+  publish = "publisert"
+  command = "python3 -m pip install --quiet --disable-pip-version-check openpyxl || pip3 install --quiet openpyxl; python3 ukeplan.py bygg --fil Ukeplan.xlsx --ut publisert/index.html"
+
+# Planen endrar seg ofte – nettlesaren skal alltid hente den nyaste.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Kortlenke per klasse: /1ID viser planen med 1ID vald.
+# (Klassar med skråstrek, som 2AKV/FF, bruker ?klasse=2AKV/FF i staden.)
+[[redirects]]
+  from = "/:klasse"
+  to = "/index.html?klasse=:klasse"
+  status = 200
+  force = false

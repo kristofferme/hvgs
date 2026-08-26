@@ -1,0 +1,708 @@
+<title>__TITTEL__</title>
+<style>
+__FONTER__
+
+:root{
+  --ark:#E7EBE8;
+  --kort:#FFFFFF;
+  --blekk:#16212A;
+  --blekk-svak:#5B6A72;
+  --linje:rgba(22,33,42,.16);
+  --linje-svak:rgba(22,33,42,.08);
+  --profil:#0093C9;
+  --naa:color-mix(in oklab,var(--profil) 72%,var(--blekk));
+  --frist:#A93A2C;
+  --skygge:rgba(22,33,42,.9);
+  --felt:#FFFFFF;
+  --innhold:rgba(22,33,42,.05);
+  --dempet:.16;
+  --r:3px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ark:#121A1F;
+    --kort:#1A242B;
+    --blekk:#E8EDEA;
+    --blekk-svak:#93A2A8;
+    --linje:rgba(232,237,234,.22);
+    --linje-svak:rgba(232,237,234,.10);
+    --naa:color-mix(in oklab,var(--profil) 68%,white);
+    --frist:#E88374;
+    --skygge:rgba(0,0,0,.7);
+    --felt:#222E36;
+    --innhold:rgba(232,237,234,.06);
+    --dempet:.2;
+  }
+}
+:root[data-theme="dark"]{
+  --ark:#121A1F;
+  --kort:#1A242B;
+  --blekk:#E8EDEA;
+  --blekk-svak:#93A2A8;
+  --linje:rgba(232,237,234,.22);
+  --linje-svak:rgba(232,237,234,.10);
+  --naa:color-mix(in oklab,var(--profil) 68%,white);
+  --frist:#E88374;
+  --skygge:rgba(0,0,0,.7);
+  --felt:#222E36;
+  --innhold:rgba(232,237,234,.06);
+  --dempet:.2;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ark);color:var(--blekk);
+  font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
+}
+.ramme{max-width:1420px;margin:0 auto;padding:clamp(20px,3vw,44px) clamp(16px,3vw,40px) 96px}
+
+/* ── Toppen ───────────────────────────────────────── */
+.topp{display:flex;flex-wrap:wrap;align-items:flex-end;gap:clamp(16px,3vw,40px);padding-bottom:22px;border-bottom:1.5px solid var(--blekk)}
+.ukeblokk{display:flex;align-items:stretch;gap:6px}
+.uke{display:flex;align-items:baseline;gap:10px;padding:6px 16px 8px;background:var(--blekk);color:var(--ark);border-radius:var(--r) var(--r) 0 0}
+.uke .etikett{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.72}
+.uke .tall{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:800;font-size:clamp(38px,6vw,58px);line-height:.86;letter-spacing:-.03em;display:inline-block}
+.bla{
+  width:32px;align-self:stretch;display:grid;place-items:center;cursor:pointer;
+  background:var(--felt);color:var(--blekk);border:1.5px solid var(--blekk);border-radius:var(--r);
+  font-family:"Bricolage Grotesque",sans-serif;font-size:19px;font-weight:500;line-height:1;
+  transition:background .16s,color .16s,transform .16s,opacity .16s;
+}
+.bla:hover:not(:disabled){background:var(--blekk);color:var(--ark)}
+.bla:active:not(:disabled){transform:scale(.94)}
+.bla:disabled{opacity:.25;cursor:default}
+.tittelblokk{flex:1 1 300px;min-width:0}
+.skole{font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--naa);margin:0 0 5px}
+.stempel{display:inline-block;margin-left:10px;padding:2px 8px;border-radius:99px;border:1px solid var(--linje);color:var(--blekk-svak);letter-spacing:.12em}
+.stempel[hidden]{display:none}
+.logo{display:block;height:clamp(30px,3.4vw,40px);width:auto;max-width:min(340px,72vw);margin:0 0 10px}
+:root[data-theme="dark"] .logo{background:#fff;padding:6px 10px;border-radius:var(--r)}
+h1{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:700;font-size:clamp(26px,3.6vw,40px);line-height:1.02;letter-spacing:-.025em;margin:0;text-wrap:balance}
+.klassemerke{display:inline-block;color:var(--naa)}
+.klassemerke.bytt,.uke .tall.bytt{animation:vend .34s cubic-bezier(.2,.75,.3,1)}
+@keyframes vend{from{opacity:0;transform:translateY(.28em) rotateX(-55deg)}to{opacity:1;transform:none}}
+.datorad{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-top:6px}
+.datospenn{font-family:"DM Mono",monospace;font-size:13px;color:var(--blekk-svak)}
+.tilbaketilnaa{font:500 12px/1 "Instrument Sans",sans-serif;color:var(--naa);background:none;border:0;border-bottom:1px solid currentColor;padding:3px 1px;cursor:pointer}
+.tilbaketilnaa[hidden]{display:none}
+.verktoy{display:flex;gap:8px;align-items:center;margin-left:auto}
+.knapp{font:500 13px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);padding:9px 13px;cursor:pointer;transition:transform .14s cubic-bezier(.2,.7,.3,1),box-shadow .14s}
+.knapp:hover{transform:translate(-1px,-1px);box-shadow:2px 2px 0 var(--blekk)}
+.knapp:active{transform:translate(1px,1px);box-shadow:none}
+
+/* ── Velgere ──────────────────────────────────────── */
+.velgere{display:flex;flex-wrap:wrap;gap:clamp(18px,4vw,56px);padding:22px 0 26px;border-bottom:1px solid var(--linje-svak)}
+.velgertittel{font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--blekk-svak);margin:0 0 10px}
+.klasser{display:flex;flex-wrap:wrap;gap:9px}
+.klasse{
+  font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:700;font-size:17px;letter-spacing:-.01em;
+  color:var(--blekk);background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);
+  padding:8px 15px;cursor:pointer;box-shadow:3px 3px 0 var(--blekk);
+  transition:transform .16s cubic-bezier(.2,.7,.3,1),box-shadow .16s,background .16s,color .16s;
+}
+.klasse:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--blekk)}
+.klasse[aria-pressed="true"]{background:var(--blekk);color:var(--ark);transform:translate(2px,2px);box-shadow:0 0 0 var(--blekk)}
+.fagfilter{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fagknapp{display:inline-flex;align-items:center;gap:7px;font:500 12.5px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:transparent;border:1px solid var(--linje);border-radius:99px;padding:6px 12px 6px 9px;cursor:pointer;transition:border-color .16s,opacity .16s}
+.fagknapp .prikk{width:9px;height:9px;border-radius:2px;background:var(--fag);flex:none;transition:transform .16s}
+.fagknapp:hover{border-color:var(--blekk)}
+.fagknapp[aria-pressed="false"]{opacity:.4}
+.fagknapp[aria-pressed="false"] .prikk{transform:scale(.55)}
+.nullstill{font:500 12px/1 "Instrument Sans",sans-serif;color:var(--blekk-svak);background:none;border:0;border-bottom:1px solid var(--linje);padding:4px 2px;cursor:pointer}
+.nullstill:hover{color:var(--blekk);border-color:var(--blekk)}
+:where(button,input,a):focus-visible{outline:2px solid var(--naa);outline-offset:3px}
+
+/* ── Beskjeder ────────────────────────────────────── */
+.beskjeder{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:26px 0 0}
+.beskjed{background:var(--kort);border:1px solid var(--linje);border-left:4px solid var(--naa);border-radius:var(--r);padding:14px 16px}
+.beskjed h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:15px;margin:0 0 4px;letter-spacing:-.01em}
+.beskjed p{margin:0;font-size:14.5px;color:var(--blekk);line-height:1.5}
+
+/* ── Framdrift og visning ─────────────────────────── */
+.oppsummering{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 0}
+.oppsummering[hidden]{display:none}
+.sammendrag{
+  display:inline-flex;align-items:baseline;gap:8px;padding:7px 13px;border-radius:99px;
+  font:500 12.5px/1 "Instrument Sans",sans-serif;border:1px solid var(--linje);color:var(--blekk);
+}
+.sammendrag b{font-family:"DM Mono",monospace;font-weight:500;font-size:12px}
+.sammendrag.viktig{border-color:color-mix(in oklab,var(--frist) 45%,transparent);color:var(--frist)}
+.sammendrag.timen{background:var(--innhold);border-color:transparent;color:var(--blekk-svak)}
+.styrelinje{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin:26px 0 22px}
+.bytter{display:inline-flex;background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);overflow:hidden}
+.bytter button{
+  font:600 13px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:transparent;border:0;
+  padding:10px 16px;cursor:pointer;transition:background .18s,color .18s;
+}
+.bytter button[aria-pressed="true"]{background:var(--blekk);color:var(--ark)}
+.framdrift{display:flex;align-items:center;gap:12px;min-width:210px;flex:0 1 320px}
+.stolpe{position:relative;flex:1;height:6px;border-radius:99px;background:var(--innhold);overflow:hidden}
+.stolpe i{position:absolute;inset:0 auto 0 0;width:0;background:var(--naa);border-radius:99px;transition:width .45s cubic-bezier(.2,.75,.3,1)}
+.framdrift .tall{font-family:"DM Mono",monospace;font-size:12px;color:var(--blekk-svak);white-space:nowrap}
+.framdrift.ferdig .tall{color:var(--naa)}
+.framdrift[hidden]{display:none}
+
+/* ── Fagkort ──────────────────────────────────────── */
+.fagrutenett{columns:330px;column-gap:14px}
+.fagkort{
+  break-inside:avoid;margin:0 0 14px;
+  background:var(--kort);border:1px solid var(--linje-svak);border-radius:var(--r);overflow:hidden;
+  animation:stig .48s cubic-bezier(.2,.75,.3,1) backwards;animation-delay:calc(var(--i) * 45ms);
+  transition:opacity .3s;
+}
+.fagtopp{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:10px 15px 11px;
+  background:color-mix(in oklab,var(--fag) 13%,var(--kort));
+  border-bottom:1px solid color-mix(in oklab,var(--fag) 26%,transparent);
+}
+.fagtal{font-family:"DM Mono",monospace;font-size:11px;color:var(--fagtekst);opacity:.7}
+.fagkropp{padding:13px 15px 14px}
+.uten-bevegelse .fagkort{animation:none}
+.frem .fagkort{--fra-x:36px}
+.tilbake .fagkort{--fra-x:-36px}
+@keyframes stig{from{opacity:0;transform:translate(var(--fra-x,0px),14px)}to{opacity:1;transform:none}}
+.fagnamn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:16.5px;letter-spacing:-.015em;color:var(--fagtekst);margin:0;line-height:1.15}
+.tema{font-size:15px;line-height:1.45;margin:0;color:var(--blekk)}
+.punkt{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.fagkropp .tema + .punkt{border-top:1px solid var(--linje-svak);margin-top:11px;padding-top:9px}
+.punktrad{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 9px;padding:6px 0}
+.punktrad label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;flex:1 1 auto;min-width:0}
+.punktrad.itimen{display:flex;align-items:flex-start;gap:10px}
+.punktrad.itimen .strek{flex:none;width:19px;height:19px;margin-top:1px;display:grid;place-items:center}
+.punktrad.itimen .strek::before{content:"";width:11px;height:2px;border-radius:2px;background:var(--fag)}
+.punktrad.itimen .punkttekst{color:var(--blekk)}
+.punktrad input{position:absolute;opacity:0;width:1px;height:1px}
+.hake{
+  flex:none;width:19px;height:19px;margin-top:1px;border-radius:4px;
+  border:1.5px solid var(--linje);background:var(--felt);
+  display:grid;place-items:center;transition:border-color .18s,background .18s,transform .18s;
+}
+.hake::after{
+  content:"";width:10px;height:6px;border-left:2px solid var(--ark);border-bottom:2px solid var(--ark);
+  transform:rotate(-45deg) scale(0);transform-origin:center;transition:transform .22s cubic-bezier(.2,.9,.3,1.4);
+  margin-top:-2px;
+}
+.punktrad label:hover .hake{border-color:var(--naa)}
+.punktrad input:checked + .hake{background:var(--naa);border-color:var(--naa)}
+.punktrad input:checked + .hake::after{transform:rotate(-45deg) scale(1)}
+.punktrad input:focus-visible + .hake{outline:2px solid var(--naa);outline-offset:2px}
+.punkttekst{font-size:15px;line-height:1.4;transition:opacity .25s}
+.punktrad.gjort .punkttekst{opacity:.45;text-decoration:line-through;text-decoration-thickness:1px}
+.fristlapp{font-family:"DM Mono",monospace;font-size:11.5px;color:var(--naa);white-space:nowrap}
+.merke{display:inline-block;font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.merke.viktig{color:var(--frist);border:1px solid currentColor}
+.merke.timen{color:var(--blekk-svak);background:var(--innhold)}
+.merke.arbeid{color:var(--blekk-svak);border:1px solid var(--linje)}
+.fristlapp.viktig{color:var(--frist)}
+.dim{opacity:var(--dempet)}
+.tom{border:1px dashed var(--linje);border-radius:var(--r);padding:22px;font-size:14px;color:var(--blekk-svak);text-align:center}
+
+/* ── Fristvisning ─────────────────────────────────── */
+.fristbolker{display:flex;flex-direction:column;gap:26px}
+.fristbolk{animation:stig .48s cubic-bezier(.2,.75,.3,1) backwards;animation-delay:calc(var(--i) * 45ms)}
+.uten-bevegelse .fristbolk{animation:none}
+.fristdag{display:flex;align-items:baseline;gap:10px;margin:0 0 4px;font-family:"DM Mono",monospace;font-weight:500;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--blekk)}
+.fristdag .dato{letter-spacing:.1em;color:var(--blekk-svak)}
+.fristdag::after{content:"";flex:1;height:1px;background:var(--linje)}
+.fristbolk .punktrad{border-bottom:1px solid var(--linje-svak);padding:11px 0}
+.fristbolk .punktrad:last-child{border-bottom:0}
+.meta{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-left:29px}
+.fagkort .meta:empty,.fristbolk .meta:empty{display:none}
+.fagetikett{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13px;color:var(--fagtekst);white-space:nowrap}
+.fagetikett::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--fag);flex:none}
+
+footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--linje-svak);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:"DM Mono",monospace;font-size:11.5px;color:var(--blekk-svak)}
+
+@media (max-width:660px){
+  .topp{position:relative;padding-top:4px}
+  .verktoy{position:absolute;top:0;right:0;margin:0}
+  .velgere{gap:20px}
+  .velgergruppe:has(.fagfilter){width:100%}
+  /* Klassane og faga rullar sidelengs, så uka startar høgt oppe på telefonen. */
+  .fagfilter,.klasser{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-ms-overflow-style:none}
+  .fagfilter::-webkit-scrollbar,.klasser::-webkit-scrollbar{display:none}
+  .fagknapp,.klasse{flex:none}
+  .klasser{padding:4px 4px 10px}
+  .fagrutenett{columns:1}
+  .styrelinje{gap:12px}
+  .fristlapp{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition-duration:.01ms !important}
+}
+
+@media print{
+  :root{--ark:#fff;--kort:#fff;--blekk:#000;--blekk-svak:#444;--linje:#999;--linje-svak:#ddd;--innhold:#F1F3F2}
+  .velgere,.verktoy,.knapp,.bla,.tilbaketilnaa,.bytter,.nullstill,.framdrift{display:none !important}
+  body{font-size:11px;background:#fff;color:#000}
+  .ramme{max-width:none;padding:0}
+  .fagrutenett{columns:3;column-gap:8px}
+  .fagkort,.beskjed,.fristbolk,.punktrad{break-inside:avoid;animation:none;box-shadow:none !important}
+  .hake{border-color:#000}
+  @page{size:A4;margin:12mm}
+}
+</style>
+<script>
+/* Lagret lys/mørk-valg settes før siden tegnes, så den ikke blinker. */
+try {
+  const valgt = localStorage.getItem("ukeplan:tema");
+  if (valgt === "light" || valgt === "dark") document.documentElement.setAttribute("data-theme", valgt);
+} catch (e) {}
+</script>
+
+<div class="ramme">
+  <header class="topp">
+    <div class="ukeblokk">
+      <button class="bla" id="forrige" type="button">←</button>
+      <div class="uke"><span class="etikett" id="uke-etikett">Uke</span><span class="tall" id="ukenr">–</span></div>
+      <button class="bla" id="neste" type="button">→</button>
+    </div>
+    <div class="tittelblokk">
+      <img class="logo" id="logo" alt="" hidden>
+      <p class="skole"><span id="skole"></span><span class="stempel" id="stempel" hidden></span></p>
+      <h1><span id="overskrift">Ukeplan</span> <span class="klassemerke" id="klassemerke"></span></h1>
+      <div class="datorad">
+        <span class="datospenn" id="datospenn"></span>
+        <button class="tilbaketilnaa" id="tilbaketilnaa" type="button" hidden></button>
+      </div>
+    </div>
+    <div class="verktoy">
+      <button class="knapp" id="temaknapp" type="button">Mørk</button>
+      <button class="knapp" id="skrivut" type="button">Skriv ut</button>
+    </div>
+  </header>
+
+  <div class="velgere">
+    <div class="velgergruppe">
+      <p class="velgertittel" id="klasse-tittel">Klasse</p>
+      <div class="klasser" id="klasser" role="group"></div>
+    </div>
+    <div class="velgergruppe" style="flex:1 1 320px">
+      <p class="velgertittel"><span id="fag-tittel">Fag</span> <button class="nullstill" id="allefag" type="button"></button></p>
+      <div class="fagfilter" id="fagfilter" role="group"></div>
+    </div>
+  </div>
+
+  <section class="beskjeder" id="beskjeder"></section>
+  <section class="oppsummering" id="oppsummering" hidden></section>
+
+  <div class="styrelinje">
+    <div class="bytter" role="group">
+      <button id="visfag" type="button" aria-pressed="true"></button>
+      <button id="visfrist" type="button" aria-pressed="false"></button>
+    </div>
+    <div class="framdrift" id="framdrift" hidden>
+      <div class="stolpe"><i id="stolpe"></i></div>
+      <span class="tall" id="framdriftstall"></span>
+      <button class="nullstill" id="fjernhaker" type="button"></button>
+    </div>
+  </div>
+
+  <main id="plan" aria-live="polite"></main>
+
+  <footer>
+    <span id="fotklasse"></span>
+    <span id="fot-oppdatert"></span>
+  </footer>
+</div>
+
+<script>
+const DATA = __DATA__;
+const T = DATA.tekst;
+const GENERERT = "__GENERERT__";
+
+const $ = (id) => document.getElementById(id);
+const tekst = (v) => (v == null ? "" : String(v));
+const trygg = (s) => tekst(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slagFor = (type) => (type ? (DATA.typar[type] || "arbeid") : "arbeid");
+
+const fagFarge = new Map(DATA.fag.map((f) => [f.navn, f.farge]));
+const fagOrden = new Map(DATA.fag.map((f, i) => [f.navn, i]));
+/* Fagene kommer i den rekkefølgen skolen har satt dem opp for klassen. */
+function ordenFor(fag) {
+  const liste = (DATA.fagperklasse || {})[valgtKlasse];
+  const i = liste ? liste.indexOf(fag) : -1;
+  return i >= 0 ? i : 500 + (fagOrden.get(fag) ?? 99);
+}
+const farge = (navn) => fagFarge.get(navn) || "#5B6A72";
+
+/* Fagfargene er valgt for lys bakgrunn; på mørk bakgrunn løftes de opp. */
+const morkModus = () => {
+  const stemplet = document.documentElement.getAttribute("data-theme");
+  if (stemplet) return stemplet === "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+};
+const tekstfarge = (hex) => (morkModus() ? `color-mix(in oklab, ${hex} 58%, white)` : hex);
+
+let ukeIndeks = 0;
+let valgtKlasse = null;
+let skjulteFag = new Set();
+let visning = "fag";
+let gjort = new Set();
+const uka = () => DATA.uker[ukeIndeks] || { dager: [], rader: [], beskjeder: [] };
+
+/* ── Avkryssing ─────────────────────────────────── */
+const LAGER = `ukeplan:gjort:${DATA.skole}`;
+function lesGjort() {
+  try { gjort = new Set(JSON.parse(localStorage.getItem(LAGER) || "[]")); } catch (e) { gjort = new Set(); }
+}
+function lagreGjort() {
+  try { localStorage.setItem(LAGER, JSON.stringify([...gjort])); } catch (e) {}
+}
+/* Id-en følger innholdet, ikke radnummeret, så haken overlever at planen bygges på nytt. */
+function idFor(rad) {
+  const kilde = `${uka().uke}|${rad.klasse}|${rad.fag}|${rad.tekst}`;
+  let h = 5381;
+  for (let i = 0; i < kilde.length; i++) h = ((h << 5) + h + kilde.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+
+/* ── Utvalg ─────────────────────────────────────── */
+const gjelder = (rad) => {
+  const k = tekst(rad.klasse).trim().toLowerCase();
+  return k === "" || k === "alle" || k === tekst(valgtKlasse).toLowerCase();
+};
+const mine = () => uka().rader.filter(gjelder);
+const oppgavene = () => mine().filter((r) => r.tekst);
+/* Framdriften teller bare det eleven faktisk skal gjøre selv. */
+const mineOppgaver = () => oppgavene().filter((r) => slagFor(r.type) !== "timen");
+const fagIBruk = () => {
+  const sett = new Set();
+  mine().forEach((r) => r.fag && sett.add(r.fag));
+  return [...sett].sort((a, b) => ordenFor(a) - ordenFor(b) || a.localeCompare(b, "nb"));
+};
+
+/* ── Klasse og uke ──────────────────────────────── */
+function tegnKlasser() {
+  $("klasser").innerHTML = DATA.klasser
+    .map((k) => `<button class="klasse" type="button" data-klasse="${trygg(k)}" aria-pressed="${k === valgtKlasse}">${trygg(k)}</button>`)
+    .join("");
+  $("klasser").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => velgKlasse(b.dataset.klasse)));
+  const valgt = $("klasser").querySelector('[aria-pressed="true"]');
+  if (valgt) valgt.scrollIntoView({ inline: "center", block: "nearest" });
+}
+
+function velgKlasse(k) {
+  if (k === valgtKlasse) return;
+  valgtKlasse = k;
+  skjulteFag = new Set();
+  try { localStorage.setItem("ukeplan:klasse", k); } catch (e) {}
+  $("klasser").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.klasse === k)));
+  oppdaterUrl();
+  tegnAlt();
+}
+
+function byttUke(steg) {
+  const ny = ukeIndeks + steg;
+  if (ny < 0 || ny >= DATA.uker.length) return;
+  ukeIndeks = ny;
+  oppdaterUrl();
+  tegnAlt(steg > 0 ? "frem" : "tilbake");
+}
+
+function oppdaterUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("klasse", valgtKlasse);
+  url.searchParams.set("uke", uka().uke);
+  history.replaceState(null, "", url);
+}
+
+function tegnTopp(retning) {
+  const tall = $("ukenr");
+  if (tall.textContent !== String(uka().uke)) {
+    tall.textContent = uka().uke;
+    if (retning) { tall.classList.remove("bytt"); void tall.offsetWidth; tall.classList.add("bytt"); }
+  }
+  $("datospenn").textContent = uka().datospenn;
+  $("forrige").disabled = ukeIndeks === 0;
+  $("neste").disabled = ukeIndeks >= DATA.uker.length - 1;
+  $("tilbaketilnaa").hidden = ukeIndeks === startuke();
+}
+
+/* ── Fagfilter ──────────────────────────────────── */
+function tegnFagfilter() {
+  const fag = fagIBruk();
+  $("fagfilter").innerHTML = fag
+    .map((f) => `<button class="fagknapp" type="button" data-fag="${trygg(f)}" aria-pressed="${!skjulteFag.has(f)}" style="--fag:${farge(f)}"><span class="prikk"></span>${trygg(f)}</button>`)
+    .join("");
+  $("fagfilter").querySelectorAll("button").forEach((b) => {
+    b.addEventListener("click", () => {
+      const f = b.dataset.fag;
+      skjulteFag.has(f) ? skjulteFag.delete(f) : skjulteFag.add(f);
+      b.setAttribute("aria-pressed", String(!skjulteFag.has(f)));
+      $("allefag").textContent = skjulteFag.size ? T.vis_alle : T.skjul_alle;
+      dempFag();
+    });
+  });
+  $("allefag").hidden = fag.length === 0;
+  $("allefag").textContent = skjulteFag.size ? T.vis_alle : T.skjul_alle;
+}
+
+function dempFag() {
+  document.querySelectorAll("[data-fagrad]").forEach((el) => {
+    el.classList.toggle("dim", skjulteFag.has(el.dataset.fagrad));
+  });
+}
+
+/* ── Punktene ───────────────────────────────────── */
+function punktrad(rad, hoyre) {
+  const slag = slagFor(rad.type);
+  const merke = rad.type && slag !== "arbeid" ? `<span class="merke ${slag}">${trygg(rad.type)}</span>` : "";
+  const frist = rad.frist ? `<span class="fristlapp${slag === "viktig" ? " viktig" : ""}">${trygg(rad.frist.toLowerCase())}</span>` : "";
+  const meta = `<span class="meta">${hoyre}${frist}${merke}</span>`;
+  /* «I timen» er noko vi gjer i lag – ingen hake å setje. */
+  if (slag === "timen") {
+    return `<li class="punktrad itimen"><span class="strek"></span><span class="punkttekst">${trygg(rad.tekst)}</span>${meta}</li>`;
+  }
+  const id = idFor(rad);
+  const erGjort = gjort.has(id);
+  return `<li class="punktrad${erGjort ? " gjort" : ""}" data-id="${id}">
+    <label><input type="checkbox" data-id="${id}"${erGjort ? " checked" : ""}><span class="hake"></span><span class="punkttekst">${trygg(rad.tekst)}</span></label>
+    ${meta}
+  </li>`;
+}
+
+function tegnFagvisning() {
+  const bolker = new Map();
+  mine().forEach((rad) => {
+    const navn = rad.fag || "";
+    if (!bolker.has(navn)) bolker.set(navn, { fag: navn, tema: [], punkt: [] });
+    const b = bolker.get(navn);
+    if (rad.tema && !b.tema.includes(rad.tema)) b.tema.push(rad.tema);
+    if (rad.tekst) b.punkt.push(rad);
+  });
+  const sortert = [...bolker.values()].sort(
+    (a, b) => ordenFor(a.fag) - ordenFor(b.fag) || a.fag.localeCompare(b.fag, "nb")
+  );
+  return `<div class="fagrutenett">${sortert.map((b, i) => {
+    const f = farge(b.fag);
+    const gjenstar = b.punkt.filter((r) => slagFor(r.type) !== "timen" && !gjort.has(idFor(r))).length;
+    return `<article class="fagkort" data-fagrad="${trygg(b.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)};--i:${i}">
+      <header class="fagtopp">
+        <h3 class="fagnamn">${trygg(b.fag || b.punkt.map((r) => r.type).find(Boolean) || T.anna)}</h3>
+        ${gjenstar ? `<span class="fagtal" title="${gjenstar} ${T.punkt}">${gjenstar}</span>` : ""}
+      </header>
+      <div class="fagkropp">
+        ${b.tema.length ? `<p class="tema">${trygg(b.tema.join(" · "))}</p>` : ""}
+        ${b.punkt.length ? `<ul class="punkt">${b.punkt.map((r) => punktrad(r, "")).join("")}</ul>` : ""}
+      </div>
+    </article>`;
+  }).join("")}</div>`;
+}
+
+function tegnFristvisning() {
+  const dager = uka().dager.map((d) => d.navn);
+  const bolker = new Map(dager.map((d) => [d, []]));
+  bolker.set("", []);
+  oppgavene().forEach((rad) => bolker.get(rad.frist || "").push(rad));
+  const rekkefolge = [...dager, ""];
+  const fylte = rekkefolge.filter((d) => bolker.get(d).length);
+  if (!fylte.length) return `<p class="tom">${trygg(T.ingen_frister)}</p>`;
+  return `<div class="fristbolker">${fylte.map((dagnavn, i) => {
+    const dag = uka().dager.find((d) => d.navn === dagnavn);
+    return `<section class="fristbolk" style="--i:${i}">
+      <h3 class="fristdag">${trygg(dag ? dag.navn : T.gjennom_uka)}${dag ? ` <span class="dato">${trygg(dag.visning)}</span>` : ""}</h3>
+      <ul class="punkt">${bolker.get(dagnavn).map((r) => {
+        const f = farge(r.fag);
+        const etikett = r.fag ? `<span class="fagetikett">${trygg(r.fag)}</span>` : "";
+        return punktrad({ ...r, frist: "" }, etikett)
+          .replace('<li class="punktrad', `<li data-fagrad="${trygg(r.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}" class="punktrad`);
+      }).join("")}</ul>
+    </section>`;
+  }).join("")}</div>`;
+}
+
+function tegnPlan(animer = true, retning = "") {
+  const plan = $("plan");
+  plan.classList.toggle("uten-bevegelse", !animer);
+  plan.classList.remove("frem", "tilbake");
+  if (animer && retning) plan.classList.add(retning);
+  plan.innerHTML = mine().length
+    ? (visning === "fag" ? tegnFagvisning() : tegnFristvisning())
+    : `<p class="tom">${trygg(T.ingenting)}</p>`;
+  plan.querySelectorAll("input[type=checkbox]").forEach((boks) => {
+    boks.addEventListener("change", () => {
+      boks.checked ? gjort.add(boks.dataset.id) : gjort.delete(boks.dataset.id);
+      boks.closest(".punktrad").classList.toggle("gjort", boks.checked);
+      lagreGjort();
+      tegnFramdrift();
+    });
+  });
+  dempFag();
+}
+
+function tegnFramdrift() {
+  const alle = mineOppgaver();
+  const ferdige = alle.filter((r) => gjort.has(idFor(r))).length;
+  $("framdrift").hidden = alle.length === 0;
+  $("framdriftstall").textContent = `${ferdige} ${T.av} ${alle.length} ${T.gjort}`;
+  $("stolpe").style.width = alle.length ? `${(ferdige / alle.length) * 100}%` : "0";
+  $("fjernhaker").hidden = ferdige === 0;
+  const ferdig = alle.length > 0 && ferdige === alle.length;
+  $("framdrift").classList.toggle("ferdig", ferdig);
+  if (ferdig) $("framdriftstall").textContent = T.alt_gjort;
+}
+
+function tegnOppsummering() {
+  const tall = new Map();
+  oppgavene().concat(mine().filter((r) => !r.tekst)).forEach((rad) => {
+    const slag = slagFor(rad.type);
+    if (!rad.type || slag === "arbeid") return;
+    tall.set(rad.type, (tall.get(rad.type) || 0) + 1);
+  });
+  const vekt = (type) => (slagFor(type) === "viktig" ? 0 : 1);
+  const biter = [...tall.entries()].sort(
+    (a, b) => vekt(a[0]) - vekt(b[0]) || b[1] - a[1] || a[0].localeCompare(b[0], "nb")
+  );
+  $("oppsummering").hidden = biter.length === 0;
+  $("oppsummering").innerHTML = biter
+    .map(([type, n]) => `<span class="sammendrag ${slagFor(type)}"><b>${n}</b><span>${trygg(type)}</span></span>`)
+    .join("");
+}
+
+/* ── Beskjeder ──────────────────────────────────── */
+function tegnBeskjeder() {
+  const b = uka().beskjeder.filter(gjelder);
+  $("beskjeder").innerHTML = b
+    .map((x) => `<article class="beskjed"><h3>${trygg(x.tittel || "")}</h3><p>${trygg(x.tekst)}</p></article>`)
+    .join("");
+  $("beskjeder").hidden = b.length === 0;
+}
+
+/* ── Lys og mørk ────────────────────────────────── */
+function settTema(valg) {
+  if (valg) {
+    document.documentElement.setAttribute("data-theme", valg);
+    try { localStorage.setItem("ukeplan:tema", valg); } catch (e) {}
+  }
+  $("temaknapp").textContent = morkModus() ? T.lys : T.mork;
+  tegnPlan(false);
+}
+
+/* ── Kjør ───────────────────────────────────────── */
+function tegnAlt(retning = "") {
+  tegnTopp(retning);
+  tegnFagfilter();
+  tegnBeskjeder();
+  tegnOppsummering();
+  tegnPlan(true, retning);
+  tegnFramdrift();
+  const merke = $("klassemerke");
+  if (merke.textContent !== valgtKlasse) {
+    merke.textContent = valgtKlasse;
+    merke.classList.remove("bytt");
+    void merke.offsetWidth;
+    merke.classList.add("bytt");
+  }
+  $("fotklasse").textContent = `${DATA.skole} · ${valgtKlasse}`;
+  document.title = `${T.uke} ${uka().uke} · ${valgtKlasse} · ${DATA.skole}`;
+}
+
+function byttVisning(ny) {
+  if (ny === visning) return;
+  visning = ny;
+  $("visfag").setAttribute("aria-pressed", String(ny === "fag"));
+  $("visfrist").setAttribute("aria-pressed", String(ny === "frist"));
+  try { localStorage.setItem("ukeplan:visning", ny); } catch (e) {}
+  tegnPlan(true);
+}
+
+const idagISO = new Date().toLocaleDateString("sv-SE");
+function startuke() {
+  const idag = DATA.uker.findIndex((u) => u.dager.some((d) => d.dato === idagISO));
+  if (idag >= 0) return idag;
+  const valgt = DATA.uker.findIndex((u) => u.uke === DATA.standarduke);
+  return valgt >= 0 ? valgt : 0;
+}
+
+function settProfil() {
+  const rot = document.documentElement;
+  if (DATA.profilfarge) rot.style.setProperty("--profil", DATA.profilfarge);
+  if (DATA.merke) { $("stempel").textContent = DATA.merke; $("stempel").hidden = false; }
+  if (DATA.logo) {
+    const logo = $("logo");
+    logo.src = DATA.logo;
+    logo.alt = DATA.skole;
+    logo.hidden = false;
+    $("skole").hidden = true;
+  }
+  $("uke-etikett").textContent = T.uke;
+  $("klasse-tittel").textContent = T.klasse;
+  $("fag-tittel").textContent = T.fag;
+  $("visfag").textContent = T.etter_fag;
+  $("visfrist").textContent = T.etter_frist;
+  $("fjernhaker").textContent = T.fjern_haker;
+  $("tilbaketilnaa").textContent = T.tilbake;
+  $("skrivut").textContent = T.skriv_ut;
+  $("fot-oppdatert").textContent = `${T.oppdatert} ${GENERERT}`;
+  for (const [id, merkelapp] of [["forrige", T.forrige_uke], ["neste", T.neste_uke]]) {
+    $(id).title = merkelapp;
+    $(id).setAttribute("aria-label", merkelapp);
+  }
+}
+
+function start() {
+  settProfil();
+  lesGjort();
+  $("skole").textContent = DATA.skole;
+  $("overskrift").textContent = DATA.overskrift || T.ukeplan;
+  $("skrivut").addEventListener("click", () => window.print());
+  $("forrige").addEventListener("click", () => byttUke(-1));
+  $("neste").addEventListener("click", () => byttUke(1));
+  $("visfag").addEventListener("click", () => byttVisning("fag"));
+  $("visfrist").addEventListener("click", () => byttVisning("frist"));
+  $("temaknapp").addEventListener("click", () => settTema(morkModus() ? "light" : "dark"));
+  $("tilbaketilnaa").addEventListener("click", () => {
+    const steg = startuke() - ukeIndeks;
+    if (steg) byttUke(steg);
+  });
+  $("allefag").addEventListener("click", () => {
+    skjulteFag = skjulteFag.size ? new Set() : new Set(fagIBruk());
+    tegnFagfilter();
+    dempFag();
+  });
+  $("fjernhaker").addEventListener("click", () => {
+    mineOppgaver().forEach((r) => gjort.delete(idFor(r)));
+    lagreGjort();
+    tegnPlan(false);
+    tegnFramdrift();
+  });
+
+  const parametre = new URLSearchParams(location.search);
+  const treff = (k) => DATA.klasser.find((x) => x.toLowerCase() === tekst(k).toLowerCase());
+  let lagret = null;
+  try { lagret = localStorage.getItem("ukeplan:klasse"); } catch (e) {}
+  valgtKlasse = treff(parametre.get("klasse")) || treff(lagret) || DATA.klasser[0] || "";
+  const fraUrl = DATA.uker.findIndex((u) => String(u.uke) === parametre.get("uke"));
+  ukeIndeks = fraUrl >= 0 ? fraUrl : startuke();
+  try { visning = localStorage.getItem("ukeplan:visning") === "frist" ? "frist" : "fag"; } catch (e) {}
+  $("visfag").setAttribute("aria-pressed", String(visning === "fag"));
+  $("visfrist").setAttribute("aria-pressed", String(visning === "frist"));
+
+  $("temaknapp").textContent = morkModus() ? T.lys : T.mork;
+  tegnKlasser();
+  tegnAlt();
+
+  document.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "ArrowLeft") byttUke(-1);
+    if (e.key === "ArrowRight") byttUke(1);
+  });
+
+  /* Sveip mellom ukene på telefon. */
+  let x0 = null, y0 = null;
+  const flate = $("plan");
+  flate.addEventListener("touchstart", (e) => { const t = e.changedTouches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
+  flate.addEventListener("touchend", (e) => {
+    if (x0 == null) return;
+    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 2) byttUke(dx < 0 ? 1 : -1);
+    x0 = null;
+  }, { passive: true });
+
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => settTema(null));
+}
+start();
+</script>

@@ -101,6 +101,39 @@ https://app.netlify.com/projects/hvgs-vekeplan → adressen blir
 **https://hvgs-vekeplan.netlify.app**. Den adressen er den samme hele året; du
 overskriver bare innholdet.
 
+### Arbeidsboka i Teams (slik lærerne jobber)
+
+Arbeidsboka trenger ikke ligge i GitHub. Legg den i klassefellesskapet eller
+et team i Teams, der lærerne allerede er, så redigerer de den rett i Excel –
+flere samtidig, som et hvilket som helst annet dokument.
+
+En jobb i GitHub (`.github/workflows/hent-arbeidsbok.yml`) henter fila hvert
+kvarter på hverdager, kontrollerer at den lar seg lese, og lagrer den bare hvis
+noe er endret. Da bygger Netlify nettsiden på nytt av seg selv.
+
+**Oppsett, én gang:**
+
+1. Legg `Ukeplan.xlsx` i Teams (Filer-fanen i teamet).
+2. Høyreklikk fila → Del → **Alle med lenken** → Kopier lenke.
+   Lenka må være åpen for alle med lenken; en «bare folk i organisasjonen»-lenke
+   gir en innloggingsside i stedet for fila.
+3. Lim inn lenka og legg til `&download=1` bakerst.
+4. I GitHub: Settings → Secrets and variables → Actions → **New repository
+   secret** → navn `ARBEIDSBOK_URL`, verdi = lenka.
+5. Actions-fanen → «Hent arbeidsboka» → **Run workflow** for å prøve med én gang.
+
+Etter det er runden: lærer skriver i Excel → lagres i Teams → siden er
+oppdatert innen et kvarter. Haster det, trykker du «Run workflow».
+
+**Sikkerhetsnettet:** Klarer ikke jobben å lese boka – feil filtype, ødelagt
+fil, manglende ark – blir den ikke lagret, og nettsiden står igjen med forrige
+versjon som virket. Du ser hva som gikk galt i Actions-loggen.
+
+**Får dere ikke lage åpne delingslenker?** Fylket sperrer det noen steder. Da
+er alternativene: en flyt i Power Automate («når en fil endres» → last opp til
+GitHub), eller at én person laster opp arbeidsboka i GitHub slik det står
+under.
+
 ### Koble til GitHub (gjøres én gang)
 
 Dette er den varige løsningen: du laster opp en ny `Ukeplan.xlsx`, og planen
@@ -172,6 +205,7 @@ ukeplanlib/les.py      leser arbeidsboka og setter sammen hver uke
 ukeplanlib/bygg.py     fyller malen og legger inn logoen
 ukeplanlib/demo.py     eksempeldataene
 netlify.toml           byggeoppskrift for Netlify
+../.github/workflows/  jobben som henter arbeidsboka fra Teams
 requirements.txt       openpyxl, så Netlify installerer den selv
 Ukeplan.xlsx           arbeidsboka som ligger til grunn for det som publiseres
 mal/side.html          nettsiden – utseende og oppførsel

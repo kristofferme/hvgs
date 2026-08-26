@@ -52,29 +52,20 @@ __FONTER__
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
-  margin:0;
-  background:var(--ark);
-  color:var(--blekk);
+  margin:0;background:var(--ark);color:var(--blekk);
   font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  font-size:16px;
-  line-height:1.45;
-  -webkit-font-smoothing:antialiased;
+  font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
 }
-.mono{font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
 .ramme{max-width:1420px;margin:0 auto;padding:clamp(20px,3vw,44px) clamp(16px,3vw,40px) 96px}
 
 /* ── Toppen ───────────────────────────────────────── */
 .topp{display:flex;flex-wrap:wrap;align-items:flex-end;gap:clamp(16px,3vw,40px);padding-bottom:22px;border-bottom:1.5px solid var(--blekk)}
 .ukeblokk{display:flex;align-items:stretch;gap:6px}
-.uke{
-  display:flex;align-items:baseline;gap:10px;
-  padding:6px 16px 8px;background:var(--blekk);color:var(--ark);
-  border-radius:var(--r) var(--r) 0 0;
-}
+.uke{display:flex;align-items:baseline;gap:10px;padding:6px 16px 8px;background:var(--blekk);color:var(--ark);border-radius:var(--r) var(--r) 0 0}
 .uke .etikett{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.72}
 .uke .tall{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:800;font-size:clamp(38px,6vw,58px);line-height:.86;letter-spacing:-.03em;display:inline-block}
 .bla{
-  width:30px;align-self:stretch;display:grid;place-items:center;cursor:pointer;
+  width:32px;align-self:stretch;display:grid;place-items:center;cursor:pointer;
   background:var(--felt);color:var(--blekk);border:1.5px solid var(--blekk);border-radius:var(--r);
   font-family:"Bricolage Grotesque",sans-serif;font-size:19px;font-weight:500;line-height:1;
   transition:background .16s,color .16s,transform .16s,opacity .16s;
@@ -84,41 +75,25 @@ body{
 .bla:disabled{opacity:.25;cursor:default}
 .tittelblokk{flex:1 1 300px;min-width:0}
 .skole{font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--naa);margin:0 0 5px}
-.stempel{
-  display:inline-block;margin-left:10px;padding:2px 8px;border-radius:99px;
-  border:1px solid var(--linje);color:var(--blekk-svak);letter-spacing:.12em;
-}
+.stempel{display:inline-block;margin-left:10px;padding:2px 8px;border-radius:99px;border:1px solid var(--linje);color:var(--blekk-svak);letter-spacing:.12em}
 .stempel[hidden]{display:none}
 .logo{display:block;height:clamp(30px,3.4vw,40px);width:auto;max-width:min(340px,72vw);margin:0 0 10px}
-:root[data-theme="dark"] .logo,
-.logo.paa-plate{background:#fff;padding:6px 10px;border-radius:var(--r)}
-h1{
-  font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;
-  font-weight:700;font-size:clamp(26px,3.6vw,40px);line-height:1.02;letter-spacing:-.025em;
-  margin:0;text-wrap:balance;
-}
+:root[data-theme="dark"] .logo{background:#fff;padding:6px 10px;border-radius:var(--r)}
+h1{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:700;font-size:clamp(26px,3.6vw,40px);line-height:1.02;letter-spacing:-.025em;margin:0;text-wrap:balance}
 .klassemerke{display:inline-block;color:var(--naa)}
 .klassemerke.bytt,.uke .tall.bytt{animation:vend .34s cubic-bezier(.2,.75,.3,1)}
 @keyframes vend{from{opacity:0;transform:translateY(.28em) rotateX(-55deg)}to{opacity:1;transform:none}}
 .datorad{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-top:6px}
 .datospenn{font-family:"DM Mono",monospace;font-size:13px;color:var(--blekk-svak)}
-.tilbaketilnaa{
-  font:500 12px/1 "Instrument Sans",sans-serif;color:var(--naa);background:none;border:0;
-  border-bottom:1px solid currentColor;padding:3px 1px;cursor:pointer;
-}
+.tilbaketilnaa{font:500 12px/1 "Instrument Sans",sans-serif;color:var(--naa);background:none;border:0;border-bottom:1px solid currentColor;padding:3px 1px;cursor:pointer}
 .tilbaketilnaa[hidden]{display:none}
 .verktoy{display:flex;gap:8px;align-items:center;margin-left:auto}
-.knapp{
-  font:500 13px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:var(--felt);
-  border:1.5px solid var(--blekk);border-radius:var(--r);padding:9px 13px;cursor:pointer;
-  transition:transform .14s cubic-bezier(.2,.7,.3,1),box-shadow .14s;
-}
+.knapp{font:500 13px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);padding:9px 13px;cursor:pointer;transition:transform .14s cubic-bezier(.2,.7,.3,1),box-shadow .14s}
 .knapp:hover{transform:translate(-1px,-1px);box-shadow:2px 2px 0 var(--blekk)}
 .knapp:active{transform:translate(1px,1px);box-shadow:none}
 
 /* ── Velgere ──────────────────────────────────────── */
 .velgere{display:flex;flex-wrap:wrap;gap:clamp(18px,4vw,56px);padding:22px 0 26px;border-bottom:1px solid var(--linje-svak)}
-.velgergruppe{min-width:0}
 .velgertittel{font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--blekk-svak);margin:0 0 10px}
 .klasser{display:flex;flex-wrap:wrap;gap:9px}
 .klasse{
@@ -130,152 +105,118 @@ h1{
 .klasse:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--blekk)}
 .klasse[aria-pressed="true"]{background:var(--blekk);color:var(--ark);transform:translate(2px,2px);box-shadow:0 0 0 var(--blekk)}
 .fagfilter{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.fagknapp{
-  display:inline-flex;align-items:center;gap:7px;font:500 12.5px/1 "Instrument Sans",sans-serif;
-  color:var(--blekk);background:transparent;border:1px solid var(--linje);border-radius:99px;
-  padding:6px 12px 6px 9px;cursor:pointer;transition:border-color .16s,opacity .16s,background .16s;
-}
+.fagknapp{display:inline-flex;align-items:center;gap:7px;font:500 12.5px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:transparent;border:1px solid var(--linje);border-radius:99px;padding:6px 12px 6px 9px;cursor:pointer;transition:border-color .16s,opacity .16s}
 .fagknapp .prikk{width:9px;height:9px;border-radius:2px;background:var(--fag);flex:none;transition:transform .16s}
 .fagknapp:hover{border-color:var(--blekk)}
 .fagknapp[aria-pressed="false"]{opacity:.4}
 .fagknapp[aria-pressed="false"] .prikk{transform:scale(.55)}
 .nullstill{font:500 12px/1 "Instrument Sans",sans-serif;color:var(--blekk-svak);background:none;border:0;border-bottom:1px solid var(--linje);padding:4px 2px;cursor:pointer}
 .nullstill:hover{color:var(--blekk);border-color:var(--blekk)}
-:where(button):focus-visible{outline:2px solid var(--naa);outline-offset:3px}
+:where(button,input,a):focus-visible{outline:2px solid var(--naa);outline-offset:3px}
 
 /* ── Beskjeder ────────────────────────────────────── */
 .beskjeder{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:26px 0 0}
-.beskjed{
-  background:var(--kort);border:1px solid var(--linje);border-left:4px solid var(--naa);
-  border-radius:var(--r);padding:14px 16px;
-}
+.beskjed{background:var(--kort);border:1px solid var(--linje);border-left:4px solid var(--naa);border-radius:var(--r);padding:14px 16px}
 .beskjed h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:15px;margin:0 0 4px;letter-spacing:-.01em}
 .beskjed p{margin:0;font-size:14.5px;color:var(--blekk);line-height:1.5}
 
-/* ── Ukerutenett ──────────────────────────────────── */
-.uke-rutenett{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:30px;align-items:start}
-.dag{min-width:0;animation:stig .48s cubic-bezier(.2,.75,.3,1) backwards;animation-delay:calc(var(--i) * 55ms)}
-.uten-bevegelse .dag{animation:none}
-.uke-rutenett.frem{--fra-x:36px}
-.uke-rutenett.tilbake{--fra-x:-36px}
-@keyframes stig{from{opacity:0;transform:translate(var(--fra-x,0px),14px)}to{opacity:1;transform:none}}
-.daghode{
-  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
-  padding:7px 10px;border-radius:var(--r);margin-bottom:10px;
-  background:var(--ark);border:1px solid transparent;border-bottom:1.5px solid var(--blekk);
-  position:sticky;top:0;z-index:3;
+/* ── Framdrift og visning ─────────────────────────── */
+.styrelinje{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin:34px 0 22px}
+.bytter{display:inline-flex;background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);overflow:hidden}
+.bytter button{
+  font:600 13px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:transparent;border:0;
+  padding:10px 16px;cursor:pointer;transition:background .18s,color .18s;
 }
-.daghode .navn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:15px;letter-spacing:-.01em}
-.daghode .dato{font-family:"DM Mono",monospace;font-size:11.5px;color:var(--blekk-svak)}
-.fristmerke{
-  font-family:"DM Mono",monospace;font-size:10.5px;line-height:1;color:var(--ark);background:var(--naa);
-  border:0;border-radius:99px;padding:4px 7px;margin-left:7px;cursor:pointer;
-  transition:transform .16s cubic-bezier(.2,.7,.3,1),filter .16s;
-}
-.fristmerke:hover{transform:scale(1.12)}
-.dag.idag .fristmerke{background:var(--ark);color:var(--blekk)}
-.dag.idag .daghode{background:var(--blekk);border-color:var(--blekk)}
-.dag.idag .daghode .navn{color:var(--ark)}
-.dag.idag .daghode .dato{color:var(--ark);opacity:.75}
-.timer{display:flex;flex-direction:column;gap:9px}
+.bytter button[aria-pressed="true"]{background:var(--blekk);color:var(--ark)}
+.framdrift{display:flex;align-items:center;gap:12px;min-width:210px;flex:0 1 320px}
+.stolpe{position:relative;flex:1;height:6px;border-radius:99px;background:var(--innhold);overflow:hidden}
+.stolpe i{position:absolute;inset:0 auto 0 0;width:0;background:var(--naa);border-radius:99px;transition:width .45s cubic-bezier(.2,.75,.3,1)}
+.framdrift .tall{font-family:"DM Mono",monospace;font-size:12px;color:var(--blekk-svak);white-space:nowrap}
+.framdrift[hidden]{display:none}
 
-.time{
-  position:relative;background:var(--kort);border:1px solid var(--linje-svak);border-left:4px solid var(--fag);
-  border-radius:var(--r);padding:11px 13px 12px;
-  transition:opacity .3s,transform .18s cubic-bezier(.2,.7,.3,1),box-shadow .18s;
+/* ── Fagkort ──────────────────────────────────────── */
+.fagrutenett{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start}
+.fagkort{
+  background:var(--kort);border:1px solid var(--linje-svak);border-left:4px solid var(--fag);
+  border-radius:var(--r);padding:15px 17px 16px;
+  animation:stig .48s cubic-bezier(.2,.75,.3,1) backwards;animation-delay:calc(var(--i) * 45ms);
+  transition:opacity .3s;
 }
-.time:not(.har-innhold){background:color-mix(in oklab,var(--kort) 74%,var(--ark))}
-.time.har-innhold{padding-bottom:13px;box-shadow:0 10px 22px -20px var(--skygge)}
-.time:hover{transform:translateY(-1px);box-shadow:0 6px 18px -12px var(--skygge)}
-.time .klokke{display:flex;justify-content:space-between;gap:8px;font-family:"DM Mono",monospace;font-size:11px;color:var(--blekk-svak);margin-bottom:4px}
-.time .fagnavn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:14.5px;letter-spacing:-.01em;color:var(--fagtekst);line-height:1.15;text-transform:none}
-.time .tema{font-size:15px;line-height:1.45;margin:6px 0 0;color:var(--blekk);font-weight:500}
-.time.naa{border-color:var(--naa);box-shadow:0 0 0 1.5px var(--naa)}
-.time.naa::after{
-  content:var(--naa-tekst,"nå");position:absolute;top:-9px;right:9px;
-  font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.14em;
-  background:var(--naa);color:var(--ark);padding:2px 7px;border-radius:99px;
-  animation:puls 2.6s ease-in-out infinite;
+.uten-bevegelse .fagkort{animation:none}
+.frem .fagkort{--fra-x:36px}
+.tilbake .fagkort{--fra-x:-36px}
+@keyframes stig{from{opacity:0;transform:translate(var(--fra-x,0px),14px)}to{opacity:1;transform:none}}
+.fagnamn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:17px;letter-spacing:-.015em;color:var(--fagtekst);margin:0}
+.tema{font-size:15px;line-height:1.45;margin:7px 0 0;color:var(--blekk)}
+.punkt{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.fagkort .punkt{border-top:1px solid var(--linje-svak);padding-top:10px}
+.punktrad{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 9px;padding:6px 0}
+.punktrad label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;flex:1 1 auto;min-width:0}
+.punktrad input{position:absolute;opacity:0;width:1px;height:1px}
+.hake{
+  flex:none;width:19px;height:19px;margin-top:1px;border-radius:4px;
+  border:1.5px solid var(--linje);background:var(--felt);
+  display:grid;place-items:center;transition:border-color .18s,background .18s,transform .18s;
 }
-@keyframes puls{0%,100%{box-shadow:0 0 0 0 color-mix(in oklab,var(--naa) 55%,transparent)}55%{box-shadow:0 0 0 7px transparent}}
-.merke{
-  display:inline-block;margin-top:9px;font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.14em;
-  text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid currentColor;
+.hake::after{
+  content:"";width:10px;height:6px;border-left:2px solid var(--ark);border-bottom:2px solid var(--ark);
+  transform:rotate(-45deg) scale(0);transform-origin:center;transition:transform .22s cubic-bezier(.2,.9,.3,1.4);
+  margin-top:-2px;
 }
+.punktrad label:hover .hake{border-color:var(--naa)}
+.punktrad input:checked + .hake{background:var(--naa);border-color:var(--naa)}
+.punktrad input:checked + .hake::after{transform:rotate(-45deg) scale(1)}
+.punktrad input:focus-visible + .hake{outline:2px solid var(--naa);outline-offset:2px}
+.punkttekst{font-size:15px;line-height:1.4;transition:opacity .25s}
+.punktrad.gjort .punkttekst{opacity:.45;text-decoration:line-through;text-decoration-thickness:1px}
+.fristlapp{font-family:"DM Mono",monospace;font-size:11.5px;color:var(--naa);white-space:nowrap}
+.merke{display:inline-block;font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
 .merke.viktig{color:var(--frist)}
 .merke.rolig{color:var(--blekk-svak)}
-.tom{border:1px dashed var(--linje);border-radius:var(--r);padding:14px;font-size:13px;color:var(--blekk-svak);text-align:center}
 .dim{opacity:var(--dempet)}
+.tom{border:1px dashed var(--linje);border-radius:var(--r);padding:22px;font-size:14px;color:var(--blekk-svak);text-align:center}
 
-/* ── Å gjøre ──────────────────────────────────────── */
-.gjore{margin-top:56px}
-.seksjonstopp{display:flex;align-items:baseline;gap:14px;border-bottom:1.5px solid var(--blekk);padding-bottom:10px}
-.seksjonstopp h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(20px,2.6vw,26px);letter-spacing:-.02em;margin:0}
-.seksjonstopp .antall{font-family:"DM Mono",monospace;font-size:12px;color:var(--blekk-svak)}
-.fristbolker{display:flex;flex-direction:column;gap:26px;margin-top:22px;max-width:1040px}
-.fristdag{
-  display:flex;align-items:baseline;gap:10px;margin:0 0 2px;
-  font-family:"DM Mono",monospace;font-weight:500;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--blekk);
-}
+/* ── Fristvisning ─────────────────────────────────── */
+.fristbolker{display:flex;flex-direction:column;gap:26px}
+.fristbolk{animation:stig .48s cubic-bezier(.2,.75,.3,1) backwards;animation-delay:calc(var(--i) * 45ms)}
+.uten-bevegelse .fristbolk{animation:none}
+.fristdag{display:flex;align-items:baseline;gap:10px;margin:0 0 4px;font-family:"DM Mono",monospace;font-weight:500;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--blekk)}
 .fristdag .dato{letter-spacing:.1em;color:var(--blekk-svak)}
 .fristdag::after{content:"";flex:1;height:1px;background:var(--linje)}
-.fristbolk.blink .fristdag{color:var(--naa)}
-.fristbolk.blink .fristdag::after{background:var(--naa)}
-.oppgaveliste{list-style:none;margin:0;padding:0}
-.oppgave{
-  display:grid;grid-template-columns:150px 1fr auto;gap:16px;align-items:baseline;
-  padding:13px 4px;border-bottom:1px solid var(--linje-svak);
-  opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s;
-}
-.oppgave.inne{opacity:1;transform:none}
-.oppgave .hva{min-width:0}
-.oppgave .fagetikett{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px;color:var(--fagtekst)}
-.oppgave .fagetikett::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--fag);flex:none}
-.oppgave .tekst{display:block;font-size:15.5px;line-height:1.45;max-width:68ch}
-.oppgave .merke{margin-top:0}
-.oppgave.dim{opacity:calc(var(--dempet) + .05);transform:none}
+.fristbolk .punktrad{border-bottom:1px solid var(--linje-svak);padding:11px 0}
+.fristbolk .punktrad:last-child{border-bottom:0}
+.meta{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-left:29px}
+.fagkort .meta:empty,.fristbolk .meta:empty{display:none}
+.fagetikett{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13px;color:var(--fagtekst);white-space:nowrap}
+.fagetikett::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--fag);flex:none}
 
 footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--linje-svak);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:"DM Mono",monospace;font-size:11.5px;color:var(--blekk-svak)}
 
-/* ── Responsivt ───────────────────────────────────── */
-@media (max-width:1080px){
-  .uke-rutenett{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-}
 @media (max-width:660px){
-  .uke-rutenett{grid-template-columns:1fr;gap:22px}
-  .oppgave{grid-template-columns:1fr;gap:4px}
-  .oppgave .fagetikett,.oppgave .hva,.oppgave .merke{grid-column:1}
-  .oppgave .merke{justify-self:start;margin-top:2px}
   .topp{position:relative;padding-top:4px}
   .verktoy{position:absolute;top:0;right:0;margin:0}
   .velgere{gap:20px}
   .velgergruppe:has(.fagfilter){width:100%}
-  /* Fagene skal ikke skyve uka nedover på telefon – de ruller sidelengs. */
   .fagfilter{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-ms-overflow-style:none}
   .fagfilter::-webkit-scrollbar{display:none}
   .fagknapp{flex:none}
+  .fagrutenett{grid-template-columns:1fr}
+  .styrelinje{gap:12px}
+  .fristlapp{margin-left:0}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none !important;transition-duration:.01ms !important}
-  .oppgave{opacity:1;transform:none}
 }
 
-/* ── Utskrift ─────────────────────────────────────── */
 @media print{
-  :root{--ark:#fff;--kort:#fff;--blekk:#000;--blekk-svak:#444;--linje:#bbb;--linje-svak:#ddd;--innhold:#F1F3F2}
-  .velgere,.verktoy,.knapp,.bla,.tilbaketilnaa{display:none !important}
+  :root{--ark:#fff;--kort:#fff;--blekk:#000;--blekk-svak:#444;--linje:#999;--linje-svak:#ddd;--innhold:#F1F3F2}
+  .velgere,.verktoy,.knapp,.bla,.tilbaketilnaa,.bytter,.nullstill,.framdrift{display:none !important}
   body{font-size:11px;background:#fff;color:#000}
   .ramme{max-width:none;padding:0}
-  .uke-rutenett{grid-template-columns:repeat(5,1fr);gap:6px}
-  .time,.beskjed,.oppgave,.fristbolk{break-inside:avoid;box-shadow:none !important}
-  /* På papir er «i dag» uten mening – da er streken nok. */
-  .dag.idag .daghode{background:none}
-  .dag.idag .daghode .navn,.dag.idag .daghode .dato{color:#000}
-  .fristmerke{background:none;color:#000;border:1px solid #000;padding:2px 6px}
-  .dag{animation:none}
-  .oppgave{opacity:1;transform:none}
-  @page{size:A4 landscape;margin:12mm}
+  .fagrutenett{grid-template-columns:repeat(3,1fr);gap:8px}
+  .fagkort,.beskjed,.fristbolk,.punktrad{break-inside:avoid;animation:none;box-shadow:none !important}
+  .hake{border-color:#000}
+  @page{size:A4;margin:12mm}
 }
 </style>
 <script>
@@ -289,9 +230,9 @@ try {
 <div class="ramme">
   <header class="topp">
     <div class="ukeblokk">
-      <button class="bla" id="forrige" type="button" title="Forrige uke" aria-label="Forrige uke">←</button>
+      <button class="bla" id="forrige" type="button">←</button>
       <div class="uke"><span class="etikett" id="uke-etikett">Uke</span><span class="tall" id="ukenr">–</span></div>
-      <button class="bla" id="neste" type="button" title="Neste uke" aria-label="Neste uke">→</button>
+      <button class="bla" id="neste" type="button">→</button>
     </div>
     <div class="tittelblokk">
       <img class="logo" id="logo" alt="" hidden>
@@ -299,7 +240,7 @@ try {
       <h1><span id="overskrift">Ukeplan</span> <span class="klassemerke" id="klassemerke"></span></h1>
       <div class="datorad">
         <span class="datospenn" id="datospenn"></span>
-        <button class="tilbaketilnaa" id="tilbaketilnaa" type="button" hidden>Tilbake til denne uka</button>
+        <button class="tilbaketilnaa" id="tilbaketilnaa" type="button" hidden></button>
       </div>
     </div>
     <div class="verktoy">
@@ -311,25 +252,29 @@ try {
   <div class="velgere">
     <div class="velgergruppe">
       <p class="velgertittel" id="klasse-tittel">Klasse</p>
-      <div class="klasser" id="klasser" role="group" aria-label="Velg klasse"></div>
+      <div class="klasser" id="klasser" role="group"></div>
     </div>
     <div class="velgergruppe" style="flex:1 1 320px">
-      <p class="velgertittel"><span id="fag-tittel">Fag</span> <button class="nullstill" id="allefag" type="button">skjul alle</button></p>
-      <div class="fagfilter" id="fagfilter" role="group" aria-label="Filtrer fag"></div>
+      <p class="velgertittel"><span id="fag-tittel">Fag</span> <button class="nullstill" id="allefag" type="button"></button></p>
+      <div class="fagfilter" id="fagfilter" role="group"></div>
     </div>
   </div>
 
-  <section class="beskjeder" id="beskjeder" aria-label="Beskjeder"></section>
+  <section class="beskjeder" id="beskjeder"></section>
 
-  <main class="uke-rutenett" id="rutenett" aria-live="polite"></main>
-
-  <section class="gjore">
-    <div class="seksjonstopp">
-      <h2 id="gjore-tittel">Å gjøre denne uka</h2>
-      <span class="antall mono" id="antall"></span>
+  <div class="styrelinje">
+    <div class="bytter" role="group">
+      <button id="visfag" type="button" aria-pressed="true"></button>
+      <button id="visfrist" type="button" aria-pressed="false"></button>
     </div>
-    <div class="fristbolker" id="oppgaver"></div>
-  </section>
+    <div class="framdrift" id="framdrift" hidden>
+      <div class="stolpe"><i id="stolpe"></i></div>
+      <span class="tall" id="framdriftstall"></span>
+      <button class="nullstill" id="fjernhaker" type="button"></button>
+    </div>
+  </div>
+
+  <main id="plan" aria-live="polite"></main>
 
   <footer>
     <span id="fotklasse"></span>
@@ -345,10 +290,10 @@ const GENERERT = "__GENERERT__";
 const $ = (id) => document.getElementById(id);
 const tekst = (v) => (v == null ? "" : String(v));
 const trygg = (s) => tekst(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-
 const VIKTIG = /prøve|innlevering|frist|vurdering/i;
-const viktig = (type) => VIKTIG.test(tekst(type));
+
 const fagFarge = new Map(DATA.fag.map((f) => [f.navn, f.farge]));
+const fagOrden = new Map(DATA.fag.map((f, i) => [f.navn, i]));
 const farge = (navn) => fagFarge.get(navn) || "#5B6A72";
 
 /* Fagfargene er valgt for lys bakgrunn; på mørk bakgrunn løftes de opp. */
@@ -362,28 +307,45 @@ const tekstfarge = (hex) => (morkModus() ? `color-mix(in oklab, ${hex} 58%, whit
 let ukeIndeks = 0;
 let valgtKlasse = null;
 let skjulteFag = new Set();
-const uka = () => DATA.uker[ukeIndeks] || { dager: [], timer: [], oppgaver: [], beskjeder: [] };
+let visning = "fag";
+let gjort = new Set();
+const uka = () => DATA.uker[ukeIndeks] || { dager: [], rader: [], beskjeder: [] };
+
+/* ── Avkryssing ─────────────────────────────────── */
+const LAGER = `ukeplan:gjort:${DATA.skole}`;
+function lesGjort() {
+  try { gjort = new Set(JSON.parse(localStorage.getItem(LAGER) || "[]")); } catch (e) { gjort = new Set(); }
+}
+function lagreGjort() {
+  try { localStorage.setItem(LAGER, JSON.stringify([...gjort])); } catch (e) {}
+}
+/* Id-en følger innholdet, ikke radnummeret, så haken overlever at planen bygges på nytt. */
+function idFor(rad) {
+  const kilde = `${uka().uke}|${rad.klasse}|${rad.fag}|${rad.tekst}`;
+  let h = 5381;
+  for (let i = 0; i < kilde.length; i++) h = ((h << 5) + h + kilde.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
 
 /* ── Utvalg ─────────────────────────────────────── */
 const gjelder = (rad) => {
   const k = tekst(rad.klasse).trim().toLowerCase();
   return k === "" || k === "alle" || k === tekst(valgtKlasse).toLowerCase();
 };
+const mine = () => uka().rader.filter(gjelder);
+const oppgavene = () => mine().filter((r) => r.tekst);
 const fagIBruk = () => {
   const sett = new Set();
-  uka().timer.filter(gjelder).forEach((t) => t.fag && sett.add(t.fag));
-  uka().oppgaver.filter(gjelder).forEach((o) => o.fag && sett.add(o.fag));
-  return [...sett].sort((a, b) => a.localeCompare(b, "nb"));
+  mine().forEach((r) => r.fag && sett.add(r.fag));
+  return [...sett].sort((a, b) => (fagOrden.get(a) ?? 99) - (fagOrden.get(b) ?? 99) || a.localeCompare(b, "nb"));
 };
 
-/* ── Klasse ─────────────────────────────────────── */
+/* ── Klasse og uke ──────────────────────────────── */
 function tegnKlasser() {
   $("klasser").innerHTML = DATA.klasser
     .map((k) => `<button class="klasse" type="button" data-klasse="${trygg(k)}" aria-pressed="${k === valgtKlasse}">${trygg(k)}</button>`)
     .join("");
-  $("klasser").querySelectorAll("button").forEach((b) => {
-    b.addEventListener("click", () => velgKlasse(b.dataset.klasse));
-  });
+  $("klasser").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => velgKlasse(b.dataset.klasse)));
 }
 
 function velgKlasse(k) {
@@ -396,7 +358,6 @@ function velgKlasse(k) {
   tegnAlt();
 }
 
-/* ── Uke ────────────────────────────────────────── */
 function byttUke(steg) {
   const ny = ukeIndeks + steg;
   if (ny < 0 || ny >= DATA.uker.length) return;
@@ -436,7 +397,6 @@ function tegnFagfilter() {
       skjulteFag.has(f) ? skjulteFag.delete(f) : skjulteFag.add(f);
       b.setAttribute("aria-pressed", String(!skjulteFag.has(f)));
       $("allefag").textContent = skjulteFag.size ? T.vis_alle : T.skjul_alle;
-      tegnUke(false);
       dempFag();
     });
   });
@@ -450,136 +410,95 @@ function dempFag() {
   });
 }
 
-/* ── Uka ────────────────────────────────────────── */
-const idagISO = new Date().toLocaleDateString("sv-SE");
-const minutter = (t) => {
-  const m = /^(\d{1,2})[:.](\d{2})$/.exec(tekst(t).trim());
-  return m ? +m[1] * 60 + +m[2] : null;
-};
-const naaMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+/* ── Punktene ───────────────────────────────────── */
+function punktrad(rad, hoyre) {
+  const id = idFor(rad);
+  const erGjort = gjort.has(id);
+  const merke = rad.type ? `<span class="merke ${VIKTIG.test(rad.type) ? "viktig" : "rolig"}">${trygg(rad.type)}</span>` : "";
+  return `<li class="punktrad${erGjort ? " gjort" : ""}" data-id="${id}">
+    <label><input type="checkbox" data-id="${id}"${erGjort ? " checked" : ""}><span class="hake"></span><span class="punkttekst">${trygg(rad.tekst)}</span></label>
+    <span class="meta">${hoyre}${merke}</span>
+  </li>`;
+}
 
-function tegnUke(animer = true, retning = "") {
-  const rutenett = $("rutenett");
-  rutenett.classList.toggle("uten-bevegelse", !animer);
-  rutenett.classList.remove("frem", "tilbake");
-  if (animer && retning) rutenett.classList.add(retning);
-  const timer = uka().timer.filter(gjelder);
-  rutenett.innerHTML = uka().dager
-    .map((dag, i) => {
-      const dagensTimer = timer
-        .filter((t) => t.dag === dag.navn)
-        .sort((a, b) => (minutter(a.start) ?? 0) - (minutter(b.start) ?? 0));
-      const erIdag = dag.dato === idagISO;
-      const kort = dagensTimer.length
-        ? dagensTimer.map((t) => timekort(t, erIdag)).join("")
-        : `<div class="tom">${trygg(T.ingen_timer)}</div>`;
-      return `<section class="dag${erIdag ? " idag" : ""}" style="--i:${i}">
-        <header class="daghode"><span class="navn">${trygg(dag.navn)}${fristmerke(dag.navn)}</span><span class="dato">${trygg(dag.visning)}</span></header>
-        <div class="timer">${kort}</div>
-      </section>`;
-    })
-    .join("");
-  dempFag();
-  rutenett.querySelectorAll(".fristmerke").forEach((b) => {
-    b.addEventListener("click", () => hoppTilFrister(b.dataset.frist));
+function tegnFagvisning() {
+  const bolker = new Map();
+  mine().forEach((rad) => {
+    const navn = rad.fag || "";
+    if (!bolker.has(navn)) bolker.set(navn, { fag: navn, tema: [], punkt: [] });
+    const b = bolker.get(navn);
+    if (rad.tema && !b.tema.includes(rad.tema)) b.tema.push(rad.tema);
+    if (rad.tekst) b.punkt.push(rad);
   });
+  const sortert = [...bolker.values()].sort(
+    (a, b) => (fagOrden.get(a.fag) ?? 99) - (fagOrden.get(b.fag) ?? 99) || a.fag.localeCompare(b.fag, "nb")
+  );
+  return `<div class="fagrutenett">${sortert.map((b, i) => {
+    const f = farge(b.fag);
+    return `<article class="fagkort" data-fagrad="${trygg(b.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)};--i:${i}">
+      <h3 class="fagnamn">${trygg(b.fag || b.punkt.map((r) => r.type).find(Boolean) || T.anna)}</h3>
+      ${b.tema.length ? `<p class="tema">${trygg(b.tema.join(" · "))}</p>` : ""}
+      ${b.punkt.length ? `<ul class="punkt">${b.punkt.map((r) => punktrad(r, r.frist ? `<span class="fristlapp">${trygg(r.frist.toLowerCase())}</span>` : "")).join("")}</ul>` : ""}
+    </article>`;
+  }).join("")}</div>`;
 }
 
-function hoppTilFrister(dagnavn) {
-  const bolk = document.getElementById(`frist-${dagnavn}`);
-  if (!bolk) return;
-  bolk.scrollIntoView({ behavior: "smooth", block: "center" });
-  bolk.classList.add("blink");
-  setTimeout(() => bolk.classList.remove("blink"), 1600);
+function tegnFristvisning() {
+  const dager = uka().dager.map((d) => d.navn);
+  const bolker = new Map(dager.map((d) => [d, []]));
+  bolker.set("", []);
+  oppgavene().forEach((rad) => bolker.get(rad.frist || "").push(rad));
+  const rekkefolge = [...dager, ""];
+  const fylte = rekkefolge.filter((d) => bolker.get(d).length);
+  if (!fylte.length) return `<p class="tom">${trygg(T.ingen_frister)}</p>`;
+  return `<div class="fristbolker">${fylte.map((dagnavn, i) => {
+    const dag = uka().dager.find((d) => d.navn === dagnavn);
+    return `<section class="fristbolk" style="--i:${i}">
+      <h3 class="fristdag">${trygg(dag ? dag.navn : T.gjennom_uka)}${dag ? ` <span class="dato">${trygg(dag.visning)}</span>` : ""}</h3>
+      <ul class="punkt">${bolker.get(dagnavn).map((r) => {
+        const f = farge(r.fag);
+        const etikett = r.fag ? `<span class="fagetikett">${trygg(r.fag)}</span>` : "";
+        return punktrad(r, etikett).replace('<li class="punktrad', `<li data-fagrad="${trygg(r.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}" class="punktrad`);
+      }).join("")}</ul>
+    </section>`;
+  }).join("")}</div>`;
 }
 
-function timekort(t, erIdag) {
-  const f = farge(t.fag);
-  const start = minutter(t.start), slutt = minutter(t.slutt);
-  let tilstand = "";
-  if (erIdag && start != null && slutt != null) {
-    const n = naaMin();
-    if (n >= start && n < slutt) tilstand = " naa";
-  }
-  if (t.tema) tilstand += " har-innhold";
-  const klokke = [t.start, t.slutt].filter(Boolean).join("–");
-  const hoyre = trygg(t.laerer);
-  const merke = t.type && t.fag ? `<span class="merke ${viktig(t.type) ? "viktig" : "rolig"}">${trygg(t.type)}</span>` : "";
-  return `<article class="time${tilstand}" data-fagrad="${trygg(t.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}">
-    <div class="klokke"><span>${trygg(klokke)}</span><span>${hoyre}</span></div>
-    <div class="fagnavn">${trygg(t.fag || t.type || T.uke)}</div>
-    ${t.tema ? `<p class="tema">${trygg(t.tema)}</p>` : ""}
-    ${merke}
-  </article>`;
+function tegnPlan(animer = true, retning = "") {
+  const plan = $("plan");
+  plan.classList.toggle("uten-bevegelse", !animer);
+  plan.classList.remove("frem", "tilbake");
+  if (animer && retning) plan.classList.add(retning);
+  plan.innerHTML = mine().length
+    ? (visning === "fag" ? tegnFagvisning() : tegnFristvisning())
+    : `<p class="tom">${trygg(T.ingenting)}</p>`;
+  plan.querySelectorAll("input[type=checkbox]").forEach((boks) => {
+    boks.addEventListener("change", () => {
+      boks.checked ? gjort.add(boks.dataset.id) : gjort.delete(boks.dataset.id);
+      boks.closest(".punktrad").classList.toggle("gjort", boks.checked);
+      lagreGjort();
+      tegnFramdrift();
+    });
+  });
+  dempFag();
+}
+
+function tegnFramdrift() {
+  const alle = oppgavene();
+  const ferdige = alle.filter((r) => gjort.has(idFor(r))).length;
+  $("framdrift").hidden = alle.length === 0;
+  $("framdriftstall").textContent = `${ferdige} ${T.av} ${alle.length} ${T.gjort}`;
+  $("stolpe").style.width = alle.length ? `${(ferdige / alle.length) * 100}%` : "0";
+  $("fjernhaker").hidden = ferdige === 0;
 }
 
 /* ── Beskjeder ──────────────────────────────────── */
 function tegnBeskjeder() {
   const b = uka().beskjeder.filter(gjelder);
   $("beskjeder").innerHTML = b
-    .map((x) => `<article class="beskjed"><h3>${trygg(x.tittel || "Beskjed")}</h3><p>${trygg(x.tekst)}</p></article>`)
+    .map((x) => `<article class="beskjed"><h3>${trygg(x.tittel || "")}</h3><p>${trygg(x.tekst)}</p></article>`)
     .join("");
   $("beskjeder").hidden = b.length === 0;
-}
-
-/* ── Å gjøre ────────────────────────────────────── */
-const dagIndeks = (navn) => uka().dager.findIndex((d) => d.navn === navn);
-
-function fristerPerDag() {
-  const per = new Map(uka().dager.map((d) => [d.navn, []]));
-  uka().oppgaver.filter(gjelder).forEach((o) => {
-    const dag = o.frist || o.dag;
-    if (per.has(dag)) per.get(dag).push(o);
-  });
-  return per;
-}
-
-function fristmerke(dagnavn) {
-  const antall = (fristerPerDag().get(dagnavn) || []).filter((o) => !skjulteFag.has(o.fag)).length;
-  if (!antall) return "";
-  const ord = antall === 1 ? T.frist : T.frister;
-  return `<button class="fristmerke" type="button" data-frist="${trygg(dagnavn)}" title="${antall} ${ord} – ${trygg(T.se_gjore)}">${antall}</button>`;
-}
-
-function tegnOppgaver() {
-  const per = fristerPerDag();
-  const totalt = [...per.values()].reduce((sum, liste) => sum + liste.length, 0);
-  $("antall").textContent = totalt ? `${totalt} ${T.punkt}` : "";
-  $("oppgaver").innerHTML = totalt
-    ? uka().dager
-        .filter((d) => (per.get(d.navn) || []).length)
-        .map((d) => `<section class="fristbolk" id="frist-${trygg(d.navn)}">
-            <h3 class="fristdag">${trygg(d.navn)} <span class="dato">${trygg(d.visning)}</span></h3>
-            <ul class="oppgaveliste">${per.get(d.navn).map(oppgaverad).join("")}</ul>
-          </section>`)
-        .join("")
-    : `<p class="tom">${trygg(T.ingen_frister)}</p>`;
-  avslor();
-  dempFag();
-}
-
-function oppgaverad(o) {
-  const f = farge(o.fag);
-  const merke = o.type ? `<span class="merke ${viktig(o.type) ? "viktig" : "rolig"}">${trygg(o.type)}</span>` : "";
-  return `<li class="oppgave" data-fagrad="${trygg(o.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}">
-    ${o.fag ? `<span class="fagetikett">${trygg(o.fag)}</span>` : `<span></span>`}
-    <span class="hva"><span class="tekst">${trygg(o.tekst)}</span></span>
-    ${merke}
-  </li>`;
-}
-
-function avslor() {
-  const rader = [...document.querySelectorAll(".oppgave")];
-  if (!("IntersectionObserver" in window)) { rader.forEach((r) => r.classList.add("inne")); return; }
-  const io = new IntersectionObserver((poster) => {
-    poster.forEach((p, n) => {
-      if (p.isIntersecting) {
-        setTimeout(() => p.target.classList.add("inne"), n * 45);
-        io.unobserve(p.target);
-      }
-    });
-  }, { rootMargin: "0px 0px -40px 0px" });
-  rader.forEach((r) => io.observe(r));
 }
 
 /* ── Lys og mørk ────────────────────────────────── */
@@ -589,8 +508,7 @@ function settTema(valg) {
     try { localStorage.setItem("ukeplan:tema", valg); } catch (e) {}
   }
   $("temaknapp").textContent = morkModus() ? T.lys : T.mork;
-  tegnUke(false);
-  tegnOppgaver();
+  tegnPlan(false);
 }
 
 /* ── Kjør ───────────────────────────────────────── */
@@ -598,8 +516,8 @@ function tegnAlt(retning = "") {
   tegnTopp(retning);
   tegnFagfilter();
   tegnBeskjeder();
-  tegnUke(true, retning);
-  tegnOppgaver();
+  tegnPlan(true, retning);
+  tegnFramdrift();
   const merke = $("klassemerke");
   if (merke.textContent !== valgtKlasse) {
     merke.textContent = valgtKlasse;
@@ -611,7 +529,16 @@ function tegnAlt(retning = "") {
   document.title = `${T.uke} ${uka().uke} · ${valgtKlasse} · ${DATA.skole}`;
 }
 
-/* Uka siden åpner på: den som er nå, ellers den Oppsett peker på. */
+function byttVisning(ny) {
+  if (ny === visning) return;
+  visning = ny;
+  $("visfag").setAttribute("aria-pressed", String(ny === "fag"));
+  $("visfrist").setAttribute("aria-pressed", String(ny === "frist"));
+  try { localStorage.setItem("ukeplan:visning", ny); } catch (e) {}
+  tegnPlan(true);
+}
+
+const idagISO = new Date().toLocaleDateString("sv-SE");
 function startuke() {
   const idag = DATA.uker.findIndex((u) => u.dager.some((d) => d.dato === idagISO));
   if (idag >= 0) return idag;
@@ -622,11 +549,7 @@ function startuke() {
 function settProfil() {
   const rot = document.documentElement;
   if (DATA.profilfarge) rot.style.setProperty("--profil", DATA.profilfarge);
-  rot.style.setProperty("--naa-tekst", `"${T.naa}"`);
-  if (DATA.merke) {
-    $("stempel").textContent = DATA.merke;
-    $("stempel").hidden = false;
-  }
+  if (DATA.merke) { $("stempel").textContent = DATA.merke; $("stempel").hidden = false; }
   if (DATA.logo) {
     const logo = $("logo");
     logo.src = DATA.logo;
@@ -637,7 +560,9 @@ function settProfil() {
   $("uke-etikett").textContent = T.uke;
   $("klasse-tittel").textContent = T.klasse;
   $("fag-tittel").textContent = T.fag;
-  $("gjore-tittel").textContent = T.gjore;
+  $("visfag").textContent = T.etter_fag;
+  $("visfrist").textContent = T.etter_frist;
+  $("fjernhaker").textContent = T.fjern_haker;
   $("tilbaketilnaa").textContent = T.tilbake;
   $("skrivut").textContent = T.skriv_ut;
   $("fot-oppdatert").textContent = `${T.oppdatert} ${GENERERT}`;
@@ -649,31 +574,41 @@ function settProfil() {
 
 function start() {
   settProfil();
+  lesGjort();
   $("skole").textContent = DATA.skole;
   $("overskrift").textContent = DATA.overskrift || T.ukeplan;
   $("skrivut").addEventListener("click", () => window.print());
-  $("allefag").addEventListener("click", () => {
-    skjulteFag = skjulteFag.size ? new Set() : new Set(fagIBruk());
-    tegnFagfilter();
-    tegnUke(false);
-    dempFag();
-  });
   $("forrige").addEventListener("click", () => byttUke(-1));
   $("neste").addEventListener("click", () => byttUke(1));
+  $("visfag").addEventListener("click", () => byttVisning("fag"));
+  $("visfrist").addEventListener("click", () => byttVisning("frist"));
+  $("temaknapp").addEventListener("click", () => settTema(morkModus() ? "light" : "dark"));
   $("tilbaketilnaa").addEventListener("click", () => {
     const steg = startuke() - ukeIndeks;
     if (steg) byttUke(steg);
   });
-  $("temaknapp").addEventListener("click", () => settTema(morkModus() ? "light" : "dark"));
+  $("allefag").addEventListener("click", () => {
+    skjulteFag = skjulteFag.size ? new Set() : new Set(fagIBruk());
+    tegnFagfilter();
+    dempFag();
+  });
+  $("fjernhaker").addEventListener("click", () => {
+    oppgavene().forEach((r) => gjort.delete(idFor(r)));
+    lagreGjort();
+    tegnPlan(false);
+    tegnFramdrift();
+  });
 
   const parametre = new URLSearchParams(location.search);
   const treff = (k) => DATA.klasser.find((x) => x.toLowerCase() === tekst(k).toLowerCase());
   let lagret = null;
   try { lagret = localStorage.getItem("ukeplan:klasse"); } catch (e) {}
   valgtKlasse = treff(parametre.get("klasse")) || treff(lagret) || DATA.klasser[0] || "";
-
   const fraUrl = DATA.uker.findIndex((u) => String(u.uke) === parametre.get("uke"));
   ukeIndeks = fraUrl >= 0 ? fraUrl : startuke();
+  try { visning = localStorage.getItem("ukeplan:visning") === "frist" ? "frist" : "fag"; } catch (e) {}
+  $("visfag").setAttribute("aria-pressed", String(visning === "fag"));
+  $("visfrist").setAttribute("aria-pressed", String(visning === "frist"));
 
   $("temaknapp").textContent = morkModus() ? T.lys : T.mork;
   tegnKlasser();
@@ -687,7 +622,7 @@ function start() {
 
   /* Sveip mellom ukene på telefon. */
   let x0 = null, y0 = null;
-  const flate = $("rutenett");
+  const flate = $("plan");
   flate.addEventListener("touchstart", (e) => { const t = e.changedTouches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
   flate.addEventListener("touchend", (e) => {
     if (x0 == null) return;
@@ -697,8 +632,6 @@ function start() {
   }, { passive: true });
 
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => settTema(null));
-  // Klokka går: «nå»-merket flyttes hvert minutt, uten å spille av animasjonen på nytt.
-  setInterval(() => tegnUke(false), 60000);
 }
 start();
 </script>

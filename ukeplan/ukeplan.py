@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import sys
+import time
 from pathlib import Path
 
 HER = Path(__file__).resolve().parent
@@ -44,8 +45,6 @@ def kommando_ny(args) -> int:
         forste_dag=forste,
         klasser=demomodul.KLASSER if args.demo else None,
         fag=demomodul.FAG if args.demo else None,
-        okter=demomodul.OKTER if args.demo else None,
-        timeplan=demomodul.TIMEPLAN if args.demo else None,
         innhold=demomodul.demoinnhold() if args.demo else None,
         sprak=args.sprak or (demomodul.SPRAK if args.demo else "bokmal"),
         logo=demomodul.LOGO if args.demo else "",
@@ -64,14 +63,50 @@ def kommando_bygg(args) -> int:
     resultat.merknader += legg_inn_logo(resultat.data, fil.parent)
     ut = skriv(resultat.data, Path(args.ut))
     data = resultat.data
-    uker = data["uker"]
-    si(f"{data['skole']} · {len(uker)} uker: " + ", ".join(str(u["uke"]) for u in uker))
-    si(f"{len(data['klasser'])} klasser · {len(uker[0]['timer']) if uker else 0} timer i timeplanen · "
-       f"{sum(len(u['oppgaver']) for u in uker)} lekser og frister · "
-       f"{sum(len(u['beskjeder']) for u in uker)} beskjeder")
+    _oppsummer(data)
     _merknader(resultat.merknader)
     si(f"Nettside: {ut}")
     return 0
+
+
+def _oppsummer(data) -> None:
+    uker = data["uker"]
+    punkt = sum(len([r for r in u["rader"] if r["tekst"]]) for u in uker)
+    si(f"{data['skole']} · {len(uker)} uker: " + ", ".join(str(u["uke"]) for u in uker))
+    si(f"{len(data['klasser'])} klasser · {sum(len(u['rader']) for u in uker)} rader · "
+       f"{punkt} punkt å gjøre · {sum(len(u['beskjeder']) for u in uker)} beskjeder")
+
+
+def kommando_folg(args) -> int:
+    """Bygger på nytt hver gang arbeidsboka lagres."""
+    fil = Path(args.fil)
+    ut = Path(args.ut)
+    si(f"Ser på {fil.name}. Bygger {ut.name} hver gang du lagrer. Ctrl+C for å stoppe.")
+    sist = None
+    forrige_feil = ""
+    while True:
+        try:
+            stempel = fil.stat().st_mtime
+        except FileNotFoundError:
+            time.sleep(1)
+            continue
+        if stempel != sist:
+            time.sleep(0.5)          # la Excel bli ferdig med å skrive
+            klokke = dt.datetime.now().strftime("%H:%M:%S")
+            try:
+                resultat = les(fil)
+                resultat.merknader += legg_inn_logo(resultat.data, fil.parent)
+                skriv(resultat.data, ut)
+                punkt = sum(len([r for r in u["rader"] if r["tekst"]]) for u in resultat.data["uker"])
+                si(f"{klokke}  bygget · {punkt} punkt å gjøre"
+                   + (f" · {len(resultat.merknader)} merknader" if resultat.merknader else ""))
+                forrige_feil = ""
+            except Exception as feil:                      # noqa: BLE001 – fila kan være halvskrevet
+                if str(feil) != forrige_feil:
+                    si(f"{klokke}  fikk ikke lest fila ennå ({feil}). Prøver igjen ved neste lagring.")
+                    forrige_feil = str(feil)
+            sist = stempel
+        time.sleep(0.8)
 
 
 def kommando_sjekk(args) -> int:
@@ -115,6 +150,12 @@ def main(argv=None) -> int:
     bygg.add_argument("--fil", default=str(STANDARDFIL))
     bygg.add_argument("--ut", default=str(STANDARDUT), help="hvor HTML-fila skal ligge")
     bygg.set_defaults(funksjon=kommando_bygg)
+
+    folg = under.add_parser("følg", aliases=["folg"],
+                            help="bygg automatisk hver gang arbeidsboka lagres")
+    folg.add_argument("--fil", default=str(STANDARDFIL))
+    folg.add_argument("--ut", default=str(STANDARDUT))
+    folg.set_defaults(funksjon=kommando_folg)
 
     sjekk = under.add_parser("sjekk", help="se etter skrivefeil og rader som ikke henger sammen")
     sjekk.add_argument("--fil", default=str(STANDARDFIL))

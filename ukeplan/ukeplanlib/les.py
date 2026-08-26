@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import copy
 import datetime as dt
 import re
 from dataclasses import dataclass, field
@@ -10,7 +9,7 @@ from dataclasses import dataclass, field
 from openpyxl import load_workbook
 
 from .felles import (ARKNAVN, DAGER, PROFILFARGE_STANDARD, datospenn, farge_for, nokkel,
-                     norsk_dato, rens, tekster, tolk_dag, tolk_dato, tolk_farge, tolk_okt,
+                     norsk_dato, rens, tekster, tolk_dag, tolk_dato, tolk_farge,
                      tolk_sprak, tolk_type, uke_til_mandag, vis_dag)
 
 
@@ -18,6 +17,14 @@ from .felles import (ARKNAVN, DAGER, PROFILFARGE_STANDARD, datospenn, farge_for,
 class Resultat:
     data: dict
     merknader: list[str] = field(default_factory=list)
+
+
+def _ark(wb, nokkelnavn: str):
+    """Finner arket enten boka er på bokmål eller nynorsk."""
+    for navn in ARKNAVN[nokkelnavn]:
+        if navn in wb.sheetnames:
+            return wb[navn]
+    return None
 
 
 def _rader(ws, antall_kolonner: int, fra_rad: int = 2):
@@ -37,19 +44,11 @@ def _kolonneverdier(ws, kolonne: int, fra_rad: int) -> list[str]:
     return ut
 
 
-def _ark(wb, nokkelnavn: str):
-    """Finner arket enten boka er på bokmål eller nynorsk."""
-    for navn in ARKNAVN[nokkelnavn]:
-        if navn in wb.sheetnames:
-            return wb[navn]
-    return None
-
-
 def les(sti) -> Resultat:
     wb = load_workbook(sti, data_only=True)
     merknader: list[str] = []
 
-    for nokkelnavn, vist in (("ark_oppsett", "Oppsett"), ("ark_timeplan", "Timeplan"), ("ark_uke", "Uke")):
+    for nokkelnavn, vist in (("ark_oppsett", "Oppsett"), ("ark_uke", "Uke")):
         if _ark(wb, nokkelnavn) is None:
             raise SystemExit(f"Arket «{vist}» mangler i {sti}. Lag en ny arbeidsbok med: ukeplan.py ny")
 
@@ -106,147 +105,23 @@ def les(sti) -> Resultat:
         merknader.append(f"{hvor}: faget «{t}» sto ikke i Oppsett. Det er lagt til.")
         return t
 
-    laerere = _les_laerere(wb, fest_klasse, fest_fag)
-    grunntimeplan = _les_timeplan(_ark(wb, "ark_timeplan"), fest_klasse, fest_fag, laerere, merknader)
-    ukeinnhold, beskjeder = _les_innhold(wb, standarduke, fest_klasse, fest_fag, merknader)
-
-    ukenumre = sorted({standarduke} | set(ukeinnhold) | set(beskjeder),
-                      key=lambda u: uke_til_mandag(u, forste))
-    uker = []
-    for nummer in ukenumre:
-        mandag = uke_til_mandag(nummer, forste)
-        timer = copy.deepcopy(grunntimeplan)
-        oppgaver = []
-        for nr, rad in ukeinnhold.get(nummer, []):
-            _fest_innhold(timer, oppgaver, rad, nr, merknader)
-        uker.append({
-            "uke": nummer,
-            "mandag": mandag.isoformat(),
-            "datospenn": datospenn(mandag, mandag + dt.timedelta(days=4)),
-            "dager": [
-                {
-                    "navn": d,
-                    "dato": (mandag + dt.timedelta(days=i)).isoformat(),
-                    "visning": norsk_dato(mandag + dt.timedelta(days=i)),
-                }
-                for i, d in enumerate(DAGER)
-            ],
-            "timer": timer,
-            "oppgaver": oppgaver,
-            "beskjeder": beskjeder.get(nummer, []),
-        })
-
-    brukte: dict[str, str] = {}
-    fag_ut = [{"navn": f, "farge": egne_farger.get(f) or farge_for(f, brukte)} for f in fagnavn]
-
-    if not grunntimeplan:
-        merknader.append("Timeplanen er tom. Nettsiden viser bare beskjeder og lekser.")
-    if not klasser:
-        merknader.append("Ingen klasser funnet. Legg dem inn i Oppsett.")
-
-    _vis_pa_malform(uker, sprak)
-    data = {
-        "skole": skole,
-        "overskrift": overskrift,
-        "standarduke": standarduke,
-        "sprak": sprak,
-        "tekst": T,
-        "profilfarge": profilfarge,
-        "logofil": logo,
-        "klasser": klasser,
-        "fag": fag_ut,
-        "uker": uker,
-    }
-    return Resultat(data=data, merknader=merknader)
-
-
-def _vis_pa_malform(uker, sprak: str) -> None:
-    """Dagnavnene skrives i den målforma boka bruker."""
-    for uke in uker:
-        for dag in uke["dager"]:
-            dag["navn"] = vis_dag(dag["navn"], sprak)
-        for time in uke["timer"]:
-            time["dag"] = vis_dag(time["dag"], sprak)
-        for oppgave in uke["oppgaver"]:
-            oppgave["dag"] = vis_dag(oppgave["dag"], sprak)
-            oppgave["frist"] = vis_dag(oppgave["frist"], sprak)
-
-
-def _les_laerere(wb, fest_klasse, fest_fag) -> dict:
-    """(klasse, fag) → lærer. Tom klasse gjelder alle."""
-    ut = {}
-    ark = _ark(wb, "ark_larere")
-    if ark is None:
-        return ut
-    for nr, (klasse, fag, laerer) in _rader(ark, 3):
-        f = fest_fag(fag, f"Lærere rad {nr}")
-        if not f:
-            continue
-        k = fest_klasse(klasse, f"Lærere rad {nr}")
-        ut[(nokkel(k), nokkel(f))] = rens(laerer)
-    return ut
-
-
-def _les_timeplan(ws, fest_klasse, fest_fag, laerere, merknader) -> list[dict]:
-    """Rutenettet: klassenavn og dagnavn på hoderaden, klokkeslett i kolonne A."""
-    timer: list[dict] = []
-    klasse = ""
-    for nr, rad in _rader(ws, 6, fra_rad=1):
-        forste_celle = rens(rad[0])
-        if tolk_dag(rad[1]) == "Mandag" and tolk_dag(rad[2]) == "Tirsdag":
-            klasse = fest_klasse(forste_celle, f"Timeplan rad {nr}")
-            continue
-        if not forste_celle:
-            if any(rens(x) for x in rad[1:6]):
-                merknader.append(
-                    f"Timeplan rad {nr}: mangler klokkeslett i kolonne A. Timene der er hoppet over."
-                )
-            continue
-        start, slutt = tolk_okt(forste_celle)
-        if not start:
-            if any(rens(x) for x in rad[1:6]):
-                merknader.append(
-                    f"Timeplan rad {nr}: mangler klokkeslett i kolonne A. Timene der er hoppet over."
-                )
-            continue
-        if not klasse:
-            merknader.append(f"Timeplan rad {nr}: står over den første klassen. Raden er hoppet over.")
-            continue
-        for i, dag in enumerate(DAGER):
-            fag = fest_fag(rad[1 + i], f"Timeplan rad {nr}")
-            if not fag:
-                continue
-            laerer = laerere.get((nokkel(klasse), nokkel(fag))) or laerere.get(("alle", nokkel(fag))) or ""
-            timer.append({
-                "klasse": klasse, "dag": dag, "start": start, "slutt": slutt, "fag": fag,
-                "laerer": laerer, "tema": "", "lekse": "", "type": "",
-            })
-    return timer
-
-
-def _les_innhold(wb, standarduke, fest_klasse, fest_fag, merknader):
-    """Uke- og beskjedradene, sortert i hver sin uke."""
-    ukeinnhold: dict[int, list] = {}
-    for nr, rad in _rader(_ark(wb, "ark_uke"), 8):
-        uke, klasse, dag, fag, tema, lekse, frist, type_ = rad
+    # ── Radene ──────────────────────────────────────────────────
+    per_uke: dict[int, list] = {}
+    for nr, rad in _rader(_ark(wb, "ark_uke"), 7):
+        uke, klasse, fag, tema, tekst, frist, type_ = rad
         nummer = _tolk_uke(uke, standarduke, f"Uke rad {nr}", merknader)
-        d = tolk_dag(dag)
-        if not d and not tolk_dag(frist):
-            sto = rens(dag)
-            merknader.append(
-                f"Uke rad {nr}: «{sto}» er ikke en dag mandag–fredag. Raden er hoppet over."
-                if sto else f"Uke rad {nr}: mangler dag. Raden er hoppet over."
-            )
+        tema, oppgave = rens(tema), rens(tekst)
+        if not tema and not oppgave:
+            merknader.append(f"Uke rad {nr}: verken tema eller oppgave. Raden er hoppet over.")
             continue
-        ukeinnhold.setdefault(nummer, []).append((nr, {
+        per_uke.setdefault(nummer, []).append({
             "klasse": fest_klasse(klasse, f"Uke rad {nr}"),
-            "dag": d,
             "fag": fest_fag(fag, f"Uke rad {nr}"),
-            "tema": rens(tema),
-            "lekse": rens(lekse),
+            "tema": tema,
+            "tekst": oppgave,
             "frist": tolk_dag(frist),
             "type": tolk_type(type_),
-        }))
+        })
 
     beskjeder: dict[int, list] = {}
     beskjedark = _ark(wb, "ark_beskjeder")
@@ -260,7 +135,51 @@ def _les_innhold(wb, standarduke, fest_klasse, fest_fag, merknader):
                 "tittel": rens(tittel),
                 "tekst": rens(tekst),
             })
-    return ukeinnhold, beskjeder
+
+    ukenumre = sorted({standarduke} | set(per_uke) | set(beskjeder),
+                      key=lambda u: uke_til_mandag(u, forste))
+    uker = []
+    for nummer in ukenumre:
+        mandag = uke_til_mandag(nummer, forste)
+        uker.append({
+            "uke": nummer,
+            "mandag": mandag.isoformat(),
+            "datospenn": datospenn(mandag, mandag + dt.timedelta(days=4)),
+            "dager": [
+                {
+                    "navn": vis_dag(d, sprak),
+                    "dato": (mandag + dt.timedelta(days=i)).isoformat(),
+                    "visning": norsk_dato(mandag + dt.timedelta(days=i)),
+                }
+                for i, d in enumerate(DAGER)
+            ],
+            "rader": [
+                {**rad, "frist": vis_dag(rad["frist"], sprak)} for rad in per_uke.get(nummer, [])
+            ],
+            "beskjeder": beskjeder.get(nummer, []),
+        })
+
+    brukte: dict[str, str] = {}
+    fag_ut = [{"navn": f, "farge": egne_farger.get(f) or farge_for(f, brukte)} for f in fagnavn]
+
+    if not any(u["rader"] for u in uker):
+        merknader.append("Ingen rader i Uke-arket ennå. Nettsiden viser bare beskjeder.")
+    if not klasser:
+        merknader.append("Ingen klasser funnet. Legg dem inn i Oppsett.")
+
+    data = {
+        "skole": skole,
+        "overskrift": overskrift,
+        "standarduke": standarduke,
+        "sprak": sprak,
+        "tekst": T,
+        "profilfarge": profilfarge,
+        "logofil": logo,
+        "klasser": klasser,
+        "fag": fag_ut,
+        "uker": uker,
+    }
+    return Resultat(data=data, merknader=merknader)
 
 
 def _tolk_uke(verdi, standarduke: int, hvor: str, merknader) -> int:
@@ -277,61 +196,3 @@ def _tolk_uke(verdi, standarduke: int, hvor: str, merknader) -> int:
         merknader.append(f"{hvor}: uke {nummer} finnes ikke. Raden havner i uke {standarduke}.")
         return standarduke
     return nummer
-
-
-def _fest_innhold(timer, oppgaver, rad, nr, merknader) -> None:
-    traff = _finn_timer(timer, rad["klasse"], rad["dag"], rad["fag"])
-    for treff in traff:
-        treff["tema"] = " · ".join(x for x in (treff["tema"], rad["tema"]) if x)
-        treff["lekse"] = " · ".join(x for x in (treff["lekse"], rad["lekse"]) if x)
-        treff["type"] = rad["type"] or treff["type"]
-    # En rad uten fag som bare er en frist, hører hjemme i fristlista – ikke i timeplanen.
-    eget_kort = rad["tema"] or (rad["type"] and nokkel(rad["type"]) != "frist")
-    if not traff and rad["dag"] and eget_kort:
-        timer.append({
-            "klasse": rad["klasse"], "dag": rad["dag"], "start": "", "slutt": "",
-            "fag": rad["fag"], "laerer": "",
-            "tema": rad["tema"] or rad["lekse"], "lekse": "", "type": rad["type"],
-        })
-        if rad["fag"]:
-            merknader.append(
-                f"Uke rad {nr}: fant ingen {rad['fag']}-time {rad['dag'].lower()} for {rad['klasse']}. "
-                "Innholdet vises som eget kort den dagen."
-            )
-    if rad["lekse"] or rad["type"] in ("Prøve", "Innlevering", "Frist", "Tur"):
-        oppgaver.append({
-            "klasse": rad["klasse"],
-            "fag": rad["fag"],
-            "tekst": rad["lekse"] or rad["tema"] or rad["type"],
-            "dag": rad["dag"] or rad["frist"],
-            "frist": rad["frist"],
-            "type": rad["type"],
-        })
-
-
-def _finn_timer(timer, klasse, dag, fag):
-    """Finner timene uketeksten hører til: samme dag og fag, i riktig klasse.
-
-    Står det «Alle» i klassefeltet, festes innholdet til timen i hver klasse."""
-    if not dag or not fag:
-        return []
-    kandidater = [
-        t for t in timer
-        if t["dag"] == dag and nokkel(t["fag"]) == nokkel(fag)
-        and (nokkel(t["klasse"]) == nokkel(klasse) or nokkel(klasse) == "alle" or nokkel(t["klasse"]) == "alle")
-    ]
-    if not kandidater:
-        return []
-    if nokkel(klasse) == "alle":
-        per_klasse: dict[str, list] = {}
-        for t in kandidater:
-            per_klasse.setdefault(nokkel(t["klasse"]), []).append(t)
-        return [_ledig(gruppe) for gruppe in per_klasse.values()]
-    return [_ledig(kandidater)]
-
-
-def _ledig(kandidater):
-    """Første time uten innhold, ellers den første – to mattetimer samme dag
-    får da hver sin tekst når det står to rader i Uke."""
-    ledige = [t for t in kandidater if not t["tema"] and not t["lekse"]]
-    return (ledige or kandidater)[0]

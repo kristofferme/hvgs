@@ -29,20 +29,16 @@ STANDARDFAG = [
     "Spansk", "Yrkesfagleg fordjuping",
 ]
 STANDARDKLASSER = ["1STA", "1STB", "2STA", "3STA", "1HSA", "1TIA"]
-STANDARDOKTER = ["08:15–09:45", "10:00–11:30", "12:00–13:30", "13:40–15:10"]
 
-OKTRADER = 8            # klokkeslettrader per klasse i Timeplan
 INNHOLDSRADER = 400     # rader til tema og lekser
 BESKJEDRADER = 120
-LARERRADER = 120
 UKER_I_LISTA = 46       # nedtrekket dekker et skoleår
 
 def _kolonner(T):
     return {
-        "uke": [(T["uke"], 26), (T["klasse"], 11), (T["kol_dag"], 12), (T["fag"], 22),
-                (T["kol_tema"], 42), (T["kol_lekse"], 42), (T["kol_frist"], 12), (T["kol_type"], 14)],
+        "uke": [(T["uke"], 26), (T["klasse"], 11), (T["fag"], 24),
+                (T["kol_tema"], 46), (T["kol_lekse"], 46), (T["kol_frist"], 13), (T["kol_type"], 14)],
         "beskjeder": [(T["uke"], 26), (T["klasse"], 11), (T["kol_tittel"], 26), (T["kol_beskjed"], 70)],
-        "larere": [(T["klasse"], 11), (T["fag"], 26), (T["kol_larer"], 16)],
     }
 
 
@@ -147,79 +143,8 @@ def ukeliste(forste_dag: dt.date, antall: int = UKER_I_LISTA) -> list[str]:
 
 
 # ── Ukeark ───────────────────────────────────────────────────────
-def _timeplanrutenett(ws, klasser: list[str], fag: list[str], okter: list[str],
-                      dager: list[str], timeplan: dict | None = None) -> int:
-    """Ett rutenett per klasse: klokkeslett nedover, dager bortover.
-
-    timeplan: {klasse: {dag: [fag per økt]}} fyller rutene. Gir siste rad."""
-    timeplan = timeplan or {}
-    ws.sheet_view.showGridLines = False
-    ws.column_dimensions["A"].width = 16
-    for i in range(2, 7):
-        ws.column_dimensions[get_column_letter(i)].width = 21
-
-    klassefelt = DataValidation(type="list", formula1="Klasser", allow_blank=True, showErrorMessage=False)
-    klassefelt.prompt, klassefelt.promptTitle, klassefelt.showInputMessage = (
-        "Klassen dette rutenettet gjelder.", "Velg fra lista", True)
-    fagfelt = DataValidation(type="list", formula1="Fagliste", allow_blank=True, showErrorMessage=False)
-    fagfelt.prompt, fagfelt.promptTitle, fagfelt.showInputMessage = (
-        "Faget i denne timen. Tomt betyr fri.", "Velg fra lista", True)
-    ws.add_data_validation(klassefelt)
-    ws.add_data_validation(fagfelt)
-
-    rad = 1
-    for klasse in klasser:
-        c = ws.cell(row=rad, column=1, value=klasse)
-        c.font = _skrift(bold=True, size=14, color="FFFFFF")
-        c.fill = PatternFill("solid", fgColor=BLEKK)
-        c.alignment = Alignment(vertical="center", horizontal="center")
-        klassefelt.add(c)
-        for i, dag in enumerate(dager, start=2):
-            d = ws.cell(row=rad, column=i, value=dag)
-            d.font = _skrift(bold=True)
-            d.fill = PatternFill("solid", fgColor=ARK)
-            d.alignment = Alignment(vertical="center", horizontal="center")
-            d.border = Border(bottom=Side(style="medium", color=BLEKK))
-        ws.row_dimensions[rad].height = 28
-
-        for n in range(OKTRADER):
-            r = rad + 1 + n
-            ws.row_dimensions[r].height = 22
-            t = ws.cell(row=r, column=1, value=okter[n] if n < len(okter) else None)
-            t.font = Font(name=SKRIFT, size=10, color=GRA)
-            t.alignment = Alignment(vertical="center", horizontal="center")
-            t.border = Border(right=Side(style="medium", color=BLEKK), bottom=KANT)
-            for i, dag in enumerate(dager, start=2):
-                celle = ws.cell(row=r, column=i)
-                celle.font = _skrift()
-                celle.alignment = Alignment(vertical="center", indent=1)
-                celle.border = Border(bottom=KANT, right=KANT)
-                fylt = timeplan.get(klasse, {}).get(dag, [])
-                if n < len(fylt) and fylt[n]:
-                    celle.value = fylt[n]
-        fagfelt.add(f"B{rad + 1}:F{rad + OKTRADER}")
-        rad += OKTRADER + 2
-    return rad
-
-
-def _fargekoder_rutenett(ws, kolonner: str, rader: int, fag: list[str]) -> None:
-    """Fargelegger hver dagkolonne i timeplanrutenettet for seg."""
-    brukte: dict[str, str] = {}
-    for navn in fag:
-        hex_ = farge_for(navn, brukte)
-        stil = DifferentialStyle(
-            fill=PatternFill("solid", bgColor=_tint(hex_, 0.86)),
-            font=Font(name=SKRIFT, size=11, bold=True, color=hex_.lstrip("#")),
-        )
-        for kol in kolonner:
-            ws.conditional_formatting.add(
-                f"{kol}1:{kol}{rader}",
-                Rule(type="expression", formula=[f'EXACT(${kol}1,"{navn}")'], dxf=stil, stopIfTrue=True),
-            )
-
-
 def lag_arbeidsbok(sti, skole=None, uke=None, forste_dag=None, overskrift=None,
-                   klasser=None, fag=None, okter=None, timeplan=None, innhold=None,
+                   klasser=None, fag=None, innhold=None,
                    sprak="nb", profilfarge=PROFILFARGE_STANDARD, logo="") -> None:
     """Skriver en ferdig arbeidsbok. Uten innhold blir arkene tomme og klare."""
     sprak = tolk_sprak(sprak)
@@ -229,7 +154,6 @@ def lag_arbeidsbok(sti, skole=None, uke=None, forste_dag=None, overskrift=None,
     overskrift = overskrift or T["ukeplan"]
     klasser = klasser or STANDARDKLASSER
     fag = fag or STANDARDFAG
-    okter = okter or STANDARDOKTER
     innhold = innhold or {}
     if forste_dag is None:
         i_dag = dt.date.today()
@@ -251,18 +175,22 @@ def lag_arbeidsbok(sti, skole=None, uke=None, forste_dag=None, overskrift=None,
         ("", "", ""),
         ("steg", "1  Oppsett – skole, ukenummer og datoen for mandagen. Legg inn klassene og fagene dine. Profilfarge og logo hører også hjemme her.",
                  "1  Oppsett – skule, vekenummer og datoen for måndagen. Legg inn klassane og faga dine. Profilfarge og logo høyrer også heime her."),
-        ("steg", "2  Timeplan – ett rutenett per klasse. Fyll det ut én gang; det gjelder alle uker.",
-                 "2  Timeplan – eitt rutenett per klasse. Fyll det ut éin gong; det gjeld alle veker."),
-        ("steg", "3  Lærere – hvilken lærer faget har i hver klasse. Valgfritt.",
-                 "3  Lærarar – kva lærar faget har i kvar klasse. Valfritt."),
-        ("steg", "4  Uke – tema, lekser og frister. Velg uke i nedtrekket i første kolonne.",
-                 "4  Veke – tema, lekser og fristar. Vel veke i nedtrekket i første kolonne."),
-        ("steg", "5  Beskjeder – korte meldinger hjem, med samme ukevalg.",
-                 "5  Meldingar – korte meldingar heim, med same vekeval."),
+        ("steg", "2  Uke – én rad per ting. Velg uke, klasse og fag, skriv hva dere jobber med og hva som skal gjøres.",
+                 "2  Veke – éi rad per ting. Vel veke, klasse og fag, skriv kva de jobbar med og kva som skal gjerast."),
+        ("steg", "3  Beskjeder – korte meldinger hjem, med samme ukevalg.",
+                 "3  Meldingar – korte meldingar heim, med same vekeval."),
         ("", "", ""),
-        ("steg", "Så kjører du:  python3 ukeplan.py bygg", "Så køyrer du:  python3 ukeplan.py bygg"),
-        ("brod", "Du får én nettside med alle ukene. Elevene blar mellom dem med pilene eller piltastene.",
-                 "Du får éi nettside med alle vekene. Elevane blar mellom dei med pilene eller piltastane."),
+        ("steg", "Så kjører du:  python3 ukeplan.py følg", "Så køyrer du:  python3 ukeplan.py følg"),
+        ("brod", "Da bygges nettsiden på nytt hver gang du lagrer arbeidsboka. Du trenger ikke gjøre noe mer.",
+                 "Då blir nettsida bygd på nytt kvar gong du lagrar arbeidsboka. Du treng ikkje gjere noko meir."),
+        ("", "", ""),
+        ("mellom", "Slik blir det på nettsiden", "Slik blir det på nettsida"),
+        ("brod", "Hvert fag blir ett kort: «Vi jobber med» øverst, og under det punktene som skal gjøres. Skriver du to rader i samme fag, havner begge på samme kort.",
+                 "Kvart fag blir eitt kort: «Vi jobbar med» øvst, og under det punkta som skal gjerast. Skriv du to rader i same fag, hamnar begge på same kortet."),
+        ("brod", "Elevene kan huke av punktene etter hvert som de blir gjort. Haken ligger på elevens egen enhet.",
+                 "Elevane kan hake av punkta etter kvart som dei blir gjorde. Haken ligg på eleven si eiga eining."),
+        ("brod", "Frist er valgfri. Setter du en, kan eleven også se uka sortert etter frist i stedet for etter fag.",
+                 "Frist er valfri. Set du ein, kan eleven også sjå veka sortert etter frist i staden for etter fag."),
         ("", "", ""),
         ("mellom", "Når det blir mange uker", "Når det blir mange veker"),
         ("brod", "Uke-nedtrekket viser både ukenummer og datoer, så du slipper å telle. Én arbeidsbok tar hele skoleåret.",
@@ -273,16 +201,12 @@ def lag_arbeidsbok(sti, skole=None, uke=None, forste_dag=None, overskrift=None,
                  "Skal du gjenta noko frå førre veke: merk radene, kopier, lim inn nedst og byt veke i nedtrekket."),
         ("", "", ""),
         ("mellom", "Godt å vite", "Godt å vite"),
-        ("brod", "Timeplanen gjentas i alle uker. Du fyller den ut én gang, ikke én gang per uke.",
-                 "Timeplanen blir gjenteken i alle veker. Du fyller han ut éin gong, ikkje éin gong per veke."),
-        ("brod", "Klasse, Dag, Fag, Frist og Type har nedtrekkslister. Klikk i cella og velg.",
-                 "Klasse, Dag, Fag, Frist og Type har nedtrekkslister. Klikk i cella og vel."),
+        ("brod", "Klasse, Fag, Frist og Type har nedtrekkslister. Klikk i cella og velg.",
+                 "Klasse, Fag, Frist og Type har nedtrekkslister. Klikk i cella og vel."),
         ("brod", "Skriv «Alle» i Klasse-feltet når noe gjelder alle klassene.",
                  "Skriv «Alle» i Klasse-feltet når noko gjeld alle klassane."),
-        ("brod", "Hver klasse får sin egen tone på ukearket, og det kommer en strek der klassen bytter.",
-                 "Kvar klasse får sin eigen tone på vekearket, og det kjem ein strek der klassen byter."),
-        ("brod", "Lekser og frister havner i «Å gjøre denne uka» på nettsiden, sortert etter frist.",
-                 "Lekser og fristar hamnar i «Å gjere denne veka» på nettsida, sorterte etter frist."),
+        ("brod", "Hver klasse får sin egen tone, og det kommer en strek der klassen bytter.",
+                 "Kvar klasse får sin eigen tone, og det kjem ein strek der klassen byter."),
         ("brod", "Rader du ikke bruker, lar du stå tomme. Rekkefølgen spiller ingen rolle.",
                  "Rader du ikkje bruker, lèt du stå tomme. Rekkjefølgja spelar inga rolle."),
     ]
@@ -393,42 +317,21 @@ def lag_arbeidsbok(sti, skole=None, uke=None, forste_dag=None, overskrift=None,
     for n, formel in navn.items():
         wb.defined_names.add(DefinedName(n, attr_text=formel))
 
-    # ── Timeplan ─────────────────────────────────────────────────
-    tp = wb.create_sheet(T["ark_timeplan"])
-    siste = _timeplanrutenett(tp, klasser, fag, okter, dager, timeplan)
-    _fargekoder_rutenett(tp, "BCDEF", siste, fag)
-
-    # ── Lærere ───────────────────────────────────────────────────
-    lr = wb.create_sheet(T["ark_larere"])
-    lr.sheet_view.showGridLines = False
-    _tabell(lr, KOL["larere"], 1, LARERRADER)
-    lr.freeze_panes = "A2"
-    lr.auto_filter.ref = f"A1:C{LARERRADER}"
-    _liste(lr, f"A2:A{LARERRADER}", "Klasser", "Klassen. «Alle» gjelder alle klasser.")
-    _liste(lr, f"B2:B{LARERRADER}", "Fagliste", "Faget.")
-    _fargekoder(lr, f"B2:B{LARERRADER}", "B", 2, fag)
-    _klasseskille(lr, f"A2:C{LARERRADER}", "A", 2)
-    for r, rad in enumerate(innhold.get("Lærere", []), start=2):
-        for k, verdi in enumerate(rad, start=1):
-            if verdi not in (None, ""):
-                lr.cell(row=r, column=k, value=verdi)
-
     # ── Uke ──────────────────────────────────────────────────────
     uk = wb.create_sheet(T["ark_uke"])
     uk.sheet_view.showGridLines = False
     _tabell(uk, KOL["uke"], 1, INNHOLDSRADER)
     uk.freeze_panes = "B2"
-    uk.auto_filter.ref = f"A1:H{1 + INNHOLDSRADER}"
+    uk.auto_filter.ref = f"A1:G{1 + INNHOLDSRADER}"
     sist = 1 + INNHOLDSRADER
     _liste(uk, f"A2:A{sist}", "Uker", "Velg uke. Lista viser ukenummer og datoer.")
     _liste(uk, f"B2:B{sist}", "Klasser", "Klassen dette gjelder. Velg «Alle» for alle klasser.")
-    _liste(uk, f"C2:C{sist}", "Dager", "Dagen innholdet hører til.")
-    _liste(uk, f"D2:D{sist}", "Fagliste", "Faget. Må stemme med timeplanen for å havne i riktig time.")
-    _liste(uk, f"G2:G{sist}", "Dager", "Når må det være gjort? La stå tomt om det ikke har frist.")
-    _liste(uk, f"H2:H{sist}", "Typer", "Merk prøver, innleveringer og turer.")
-    _fargekoder(uk, f"D2:D{sist}", "D", 2, fag)
-    _klasseskille(uk, f"A2:H{sist}", "B", 2)
-    _ukeskille(uk, f"A2:H{sist}", 2)
+    _liste(uk, f"C2:C{sist}", "Fagliste", "Faget. Ett kort per fag på nettsiden.")
+    _liste(uk, f"F2:F{sist}", "Dager", "Når må det være ferdig? La stå tomt om det gjelder hele uka.")
+    _liste(uk, f"G2:G{sist}", "Typer", "Merk prøver, innleveringer og turer.")
+    _fargekoder(uk, f"C2:C{sist}", "C", 2, fag)
+    _klasseskille(uk, f"A2:G{sist}", "B", 2)
+    _ukeskille(uk, f"A2:G{sist}", 2)
 
     # ── Beskjeder ────────────────────────────────────────────────
     be = wb.create_sheet(T["ark_beskjeder"])

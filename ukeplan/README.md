@@ -96,45 +96,59 @@ så siden ser lik ut på skolens nett, på mobilen og uten nett i det hele tatt.
 
 ## Legg den ut
 
-Planen ligger på **https://hvgs-vekeplan.netlify.app** – Netlify-prosjektet
-`hvgs-vekeplan`. Adressen er den samme hele året; du overskriver bare innholdet.
+Netlify-prosjektet **`hvgs-vekeplan`** er opprettet og venter på første deploy:
+https://app.netlify.com/projects/hvgs-vekeplan → adressen blir
+**https://hvgs-vekeplan.netlify.app**. Den adressen er den samme hele året; du
+overskriver bare innholdet.
 
-Kortlenke per klasse, klar til å limes inn som **Nettsted-fane** i klasseteamet
-i Teams:
+### Koble til GitHub (gjøres én gang)
 
-```
-https://hvgs-vekeplan.netlify.app/1ID
-https://hvgs-vekeplan.netlify.app/1HO
-https://hvgs-vekeplan.netlify.app/2AKV%2FFF     ← skråstrek skrives %2F
-```
+Dette er den varige løsningen: du laster opp en ny `Ukeplan.xlsx`, og planen
+oppdaterer seg selv.
 
-Fanen åpner rett i riktig klasse og på uka vi er i nå.
+1. Åpne https://app.netlify.com/projects/hvgs-vekeplan
+2. Project configuration → Build & deploy → **Link repository** →
+   `kristofferme/hvgs`
+3. **Base directory: `ukeplan`** – det eneste feltet du må fylle ut.
+   Byggekommando og publiseringsmappe leses fra `ukeplan/netlify.toml`.
+4. **Branch to deploy:** `claude/ukeplaner-excel-html-w4xmxs`, eller `master`
+   når greina er flettet inn.
 
-### Tre måter å oppdatere på
+Netlify installerer openpyxl, kjører `ukeplan.py bygg` på `Ukeplan.xlsx` og
+publiserer mappa `publisert`. Etterpå holder det å legge en ny arbeidsbok i
+repoet – i GitHub: Add file → Upload files → dra inn `Ukeplan.xlsx` → Commit.
+Planen er ute omtrent ett minutt seinere. Ingen terminal.
 
-**1. Fra terminalen** – bygger og legger ut i én kommando:
+### Eller fra terminalen
 
 ```
 python3 ukeplan.py publiser
 ```
 
-Første gang: `npx netlify-cli login`.
+Bygger og legger ut i én kommando. Første gang: `npx netlify-cli login`.
 
-**2. Automatisk fra GitHub** – legg `Ukeplan.xlsx` i repoet, så bygger Netlify
-selv. Slik kobles det opp én gang, i Netlify:
+### Eller dra og slipp
 
-- Project configuration → Build & deploy → Link repository → `kristofferme/hvgs`
-- **Base directory:** `ukeplan`
-- **Branch to deploy:** `claude/ukeplaner-excel-html-w4xmxs` (eller `master` når
-  greina er flettet inn)
-- Resten leses fra `ukeplan/netlify.toml`: Netlify installerer openpyxl, kjører
-  `ukeplan.py bygg` og publiserer mappa `publisert`.
+`python3 ukeplan.py bygg --ut publisert/index.html` og dra mappa `publisert`
+inn i Deploys-fanen på Netlify.
 
-Etterpå holder det å laste opp en ny `Ukeplan.xlsx` i GitHub
-(Add file → Upload files) for å oppdatere planen. Ingen terminal.
+### Lenker til Teams
 
-**3. Mens du jobber** – `python3 ukeplan.py følg` bygger `ukeplan.html` lokalt
-hvert lagre, så du ser resultatet før du legger det ut.
+Kortlenke per klasse, klar til å limes inn som **Nettsted-fane** i
+klasseteamet:
+
+```
+https://hvgs-vekeplan.netlify.app/1ID
+https://hvgs-vekeplan.netlify.app/1HO
+https://hvgs-vekeplan.netlify.app/?klasse=2AKV/FF    ← klasser med skråstrek
+```
+
+Fanen åpner rett i riktig klasse og på uka vi er i nå.
+
+### Mens du jobber
+
+`python3 ukeplan.py følg` bygger `ukeplan.html` lokalt hvert lagre, så du ser
+resultatet før du legger det ut.
 
 ## Kommandoer
 
@@ -158,6 +172,7 @@ ukeplanlib/les.py      leser arbeidsboka og setter sammen hver uke
 ukeplanlib/bygg.py     fyller malen og legger inn logoen
 ukeplanlib/demo.py     eksempeldataene
 netlify.toml           byggeoppskrift for Netlify
+requirements.txt       openpyxl, så Netlify installerer den selv
 Ukeplan.xlsx           arbeidsboka som ligger til grunn for det som publiseres
 mal/side.html          nettsiden – utseende og oppførsel
 mal/fonter.css         skriftene, lagt inn som data-URI

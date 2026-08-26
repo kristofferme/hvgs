@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import base64
 import datetime as dt
 import json
 from pathlib import Path
+
+BILDETYPER = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+              ".svg": "image/svg+xml", ".webp": "image/webp", ".gif": "image/gif"}
 
 MAPPE = Path(__file__).resolve().parent.parent / "mal"
 MAL = MAPPE / "side.html"
@@ -19,6 +23,31 @@ SKALL = (
     '<!doctype html>\n<html lang="nb">\n<meta charset="utf-8">\n'
     '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
 )
+
+
+def legg_inn_logo(data: dict, *mapper: Path) -> list[str]:
+    """Leser logofila og legger den inn i dataene som data-URI.
+
+    Letes etter ved siden av arbeidsboka først, så i verktøymappa."""
+    data["logo"] = ""
+    fil = (data.get("logofil") or "").strip()
+    if not fil:
+        return []
+    sti = Path(fil)
+    if not sti.is_absolute():
+        for mappe in list(mapper) + [MAPPE.parent]:
+            if (Path(mappe) / fil).exists():
+                sti = Path(mappe) / fil
+                break
+    if not sti.exists():
+        steder = " eller ".join(str(Path(m) / fil) for m in list(mapper) + [MAPPE.parent])
+        return [f"Fant ingen logo på {steder}. Nettsiden bruker skolenavnet i stedet."]
+    type_ = BILDETYPER.get(sti.suffix.lower())
+    if not type_:
+        return [f"Logoen «{sti.name}» er av en type nettleseren ikke viser. "
+                "Bruk png, jpg, svg eller webp."]
+    data["logo"] = f"data:{type_};base64," + base64.b64encode(sti.read_bytes()).decode("ascii")
+    return []
 
 
 def bygg_html(data: dict, hel_side: bool = True) -> str:

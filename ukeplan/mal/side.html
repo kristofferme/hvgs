@@ -9,7 +9,8 @@ __FONTER__
   --blekk-svak:#5B6A72;
   --linje:rgba(22,33,42,.16);
   --linje-svak:rgba(22,33,42,.08);
-  --naa:#0F5D5A;
+  --profil:#0093C9;
+  --naa:color-mix(in oklab,var(--profil) 72%,var(--blekk));
   --frist:#A93A2C;
   --skygge:rgba(22,33,42,.9);
   --felt:#FFFFFF;
@@ -25,7 +26,7 @@ __FONTER__
     --blekk-svak:#93A2A8;
     --linje:rgba(232,237,234,.22);
     --linje-svak:rgba(232,237,234,.10);
-    --naa:#5CC7B8;
+    --naa:color-mix(in oklab,var(--profil) 68%,white);
     --frist:#E88374;
     --skygge:rgba(0,0,0,.7);
     --felt:#222E36;
@@ -40,7 +41,7 @@ __FONTER__
   --blekk-svak:#93A2A8;
   --linje:rgba(232,237,234,.22);
   --linje-svak:rgba(232,237,234,.10);
-  --naa:#5CC7B8;
+  --naa:color-mix(in oklab,var(--profil) 68%,white);
   --frist:#E88374;
   --skygge:rgba(0,0,0,.7);
   --felt:#222E36;
@@ -82,7 +83,15 @@ body{
 .bla:active:not(:disabled){transform:scale(.94)}
 .bla:disabled{opacity:.25;cursor:default}
 .tittelblokk{flex:1 1 300px;min-width:0}
-.skole{font-family:"DM Mono",monospace;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--blekk-svak);margin:0 0 4px}
+.skole{font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--naa);margin:0 0 5px}
+.stempel{
+  display:inline-block;margin-left:10px;padding:2px 8px;border-radius:99px;
+  border:1px solid var(--linje);color:var(--blekk-svak);letter-spacing:.12em;
+}
+.stempel[hidden]{display:none}
+.logo{display:block;height:clamp(30px,3.4vw,40px);width:auto;max-width:min(340px,72vw);margin:0 0 10px}
+:root[data-theme="dark"] .logo,
+.logo.paa-plate{background:#fff;padding:6px 10px;border-radius:var(--r)}
 h1{
   font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;
   font-weight:700;font-size:clamp(26px,3.6vw,40px);line-height:1.02;letter-spacing:-.025em;
@@ -183,8 +192,8 @@ h1{
 .time .tema{font-size:15px;line-height:1.45;margin:6px 0 0;color:var(--blekk);font-weight:500}
 .time.naa{border-color:var(--naa);box-shadow:0 0 0 1.5px var(--naa)}
 .time.naa::after{
-  content:"nå";position:absolute;top:-9px;right:9px;
-  font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  content:var(--naa-tekst,"nå");position:absolute;top:-9px;right:9px;
+  font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.14em;
   background:var(--naa);color:var(--ark);padding:2px 7px;border-radius:99px;
   animation:puls 2.6s ease-in-out infinite;
 }
@@ -281,11 +290,12 @@ try {
   <header class="topp">
     <div class="ukeblokk">
       <button class="bla" id="forrige" type="button" title="Forrige uke" aria-label="Forrige uke">←</button>
-      <div class="uke"><span class="etikett">Uke</span><span class="tall" id="ukenr">–</span></div>
+      <div class="uke"><span class="etikett" id="uke-etikett">Uke</span><span class="tall" id="ukenr">–</span></div>
       <button class="bla" id="neste" type="button" title="Neste uke" aria-label="Neste uke">→</button>
     </div>
     <div class="tittelblokk">
-      <p class="skole" id="skole"></p>
+      <img class="logo" id="logo" alt="" hidden>
+      <p class="skole"><span id="skole"></span><span class="stempel" id="stempel" hidden></span></p>
       <h1><span id="overskrift">Ukeplan</span> <span class="klassemerke" id="klassemerke"></span></h1>
       <div class="datorad">
         <span class="datospenn" id="datospenn"></span>
@@ -300,11 +310,11 @@ try {
 
   <div class="velgere">
     <div class="velgergruppe">
-      <p class="velgertittel">Klasse</p>
+      <p class="velgertittel" id="klasse-tittel">Klasse</p>
       <div class="klasser" id="klasser" role="group" aria-label="Velg klasse"></div>
     </div>
     <div class="velgergruppe" style="flex:1 1 320px">
-      <p class="velgertittel">Fag <button class="nullstill" id="allefag" type="button">skjul alle</button></p>
+      <p class="velgertittel"><span id="fag-tittel">Fag</span> <button class="nullstill" id="allefag" type="button">skjul alle</button></p>
       <div class="fagfilter" id="fagfilter" role="group" aria-label="Filtrer fag"></div>
     </div>
   </div>
@@ -315,7 +325,7 @@ try {
 
   <section class="gjore">
     <div class="seksjonstopp">
-      <h2>Å gjøre denne uka</h2>
+      <h2 id="gjore-tittel">Å gjøre denne uka</h2>
       <span class="antall mono" id="antall"></span>
     </div>
     <div class="fristbolker" id="oppgaver"></div>
@@ -323,17 +333,21 @@ try {
 
   <footer>
     <span id="fotklasse"></span>
-    <span>Oppdatert __GENERERT__</span>
+    <span id="fot-oppdatert"></span>
   </footer>
 </div>
 
 <script>
 const DATA = __DATA__;
+const T = DATA.tekst;
+const GENERERT = "__GENERERT__";
 
 const $ = (id) => document.getElementById(id);
 const tekst = (v) => (v == null ? "" : String(v));
 const trygg = (s) => tekst(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
+const VIKTIG = /prøve|innlevering|frist|vurdering/i;
+const viktig = (type) => VIKTIG.test(tekst(type));
 const fagFarge = new Map(DATA.fag.map((f) => [f.navn, f.farge]));
 const farge = (navn) => fagFarge.get(navn) || "#5B6A72";
 
@@ -421,13 +435,13 @@ function tegnFagfilter() {
       const f = b.dataset.fag;
       skjulteFag.has(f) ? skjulteFag.delete(f) : skjulteFag.add(f);
       b.setAttribute("aria-pressed", String(!skjulteFag.has(f)));
-      $("allefag").textContent = skjulteFag.size ? "vis alle" : "skjul alle";
+      $("allefag").textContent = skjulteFag.size ? T.vis_alle : T.skjul_alle;
       tegnUke(false);
       dempFag();
     });
   });
   $("allefag").hidden = fag.length === 0;
-  $("allefag").textContent = skjulteFag.size ? "vis alle" : "skjul alle";
+  $("allefag").textContent = skjulteFag.size ? T.vis_alle : T.skjul_alle;
 }
 
 function dempFag() {
@@ -458,7 +472,7 @@ function tegnUke(animer = true, retning = "") {
       const erIdag = dag.dato === idagISO;
       const kort = dagensTimer.length
         ? dagensTimer.map((t) => timekort(t, erIdag)).join("")
-        : `<div class="tom">Ingen timer</div>`;
+        : `<div class="tom">${trygg(T.ingen_timer)}</div>`;
       return `<section class="dag${erIdag ? " idag" : ""}" style="--i:${i}">
         <header class="daghode"><span class="navn">${trygg(dag.navn)}${fristmerke(dag.navn)}</span><span class="dato">${trygg(dag.visning)}</span></header>
         <div class="timer">${kort}</div>
@@ -490,10 +504,10 @@ function timekort(t, erIdag) {
   if (t.tema) tilstand += " har-innhold";
   const klokke = [t.start, t.slutt].filter(Boolean).join("–");
   const hoyre = trygg(t.laerer);
-  const merke = t.type ? `<span class="merke ${/prøve|innlevering|frist/i.test(t.type) ? "viktig" : "rolig"}">${trygg(t.type)}</span>` : "";
+  const merke = t.type && t.fag ? `<span class="merke ${viktig(t.type) ? "viktig" : "rolig"}">${trygg(t.type)}</span>` : "";
   return `<article class="time${tilstand}" data-fagrad="${trygg(t.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}">
     <div class="klokke"><span>${trygg(klokke)}</span><span>${hoyre}</span></div>
-    <div class="fagnavn">${trygg(t.fag)}</div>
+    <div class="fagnavn">${trygg(t.fag || t.type || T.uke)}</div>
     ${t.tema ? `<p class="tema">${trygg(t.tema)}</p>` : ""}
     ${merke}
   </article>`;
@@ -523,14 +537,14 @@ function fristerPerDag() {
 function fristmerke(dagnavn) {
   const antall = (fristerPerDag().get(dagnavn) || []).filter((o) => !skjulteFag.has(o.fag)).length;
   if (!antall) return "";
-  const ord = antall === 1 ? "frist" : "frister";
-  return `<button class="fristmerke" type="button" data-frist="${trygg(dagnavn)}" title="${antall} ${ord} – se «Å gjøre denne uka»">${antall}</button>`;
+  const ord = antall === 1 ? T.frist : T.frister;
+  return `<button class="fristmerke" type="button" data-frist="${trygg(dagnavn)}" title="${antall} ${ord} – ${trygg(T.se_gjore)}">${antall}</button>`;
 }
 
 function tegnOppgaver() {
   const per = fristerPerDag();
   const totalt = [...per.values()].reduce((sum, liste) => sum + liste.length, 0);
-  $("antall").textContent = totalt ? `${totalt} punkt` : "";
+  $("antall").textContent = totalt ? `${totalt} ${T.punkt}` : "";
   $("oppgaver").innerHTML = totalt
     ? uka().dager
         .filter((d) => (per.get(d.navn) || []).length)
@@ -539,14 +553,14 @@ function tegnOppgaver() {
             <ul class="oppgaveliste">${per.get(d.navn).map(oppgaverad).join("")}</ul>
           </section>`)
         .join("")
-    : `<p class="tom">Ingen lekser eller frister denne uka.</p>`;
+    : `<p class="tom">${trygg(T.ingen_frister)}</p>`;
   avslor();
   dempFag();
 }
 
 function oppgaverad(o) {
   const f = farge(o.fag);
-  const merke = o.type ? `<span class="merke ${/prøve|innlevering|frist/i.test(o.type) ? "viktig" : "rolig"}">${trygg(o.type)}</span>` : "";
+  const merke = o.type ? `<span class="merke ${viktig(o.type) ? "viktig" : "rolig"}">${trygg(o.type)}</span>` : "";
   return `<li class="oppgave" data-fagrad="${trygg(o.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}">
     ${o.fag ? `<span class="fagetikett">${trygg(o.fag)}</span>` : `<span></span>`}
     <span class="hva"><span class="tekst">${trygg(o.tekst)}</span></span>
@@ -574,7 +588,7 @@ function settTema(valg) {
     document.documentElement.setAttribute("data-theme", valg);
     try { localStorage.setItem("ukeplan:tema", valg); } catch (e) {}
   }
-  $("temaknapp").textContent = morkModus() ? "Lys" : "Mørk";
+  $("temaknapp").textContent = morkModus() ? T.lys : T.mork;
   tegnUke(false);
   tegnOppgaver();
 }
@@ -594,7 +608,7 @@ function tegnAlt(retning = "") {
     merke.classList.add("bytt");
   }
   $("fotklasse").textContent = `${DATA.skole} · ${valgtKlasse}`;
-  document.title = `Uke ${uka().uke} · ${valgtKlasse} · ${DATA.skole}`;
+  document.title = `${T.uke} ${uka().uke} · ${valgtKlasse} · ${DATA.skole}`;
 }
 
 /* Uka siden åpner på: den som er nå, ellers den Oppsett peker på. */
@@ -605,9 +619,38 @@ function startuke() {
   return valgt >= 0 ? valgt : 0;
 }
 
+function settProfil() {
+  const rot = document.documentElement;
+  if (DATA.profilfarge) rot.style.setProperty("--profil", DATA.profilfarge);
+  rot.style.setProperty("--naa-tekst", `"${T.naa}"`);
+  if (DATA.merke) {
+    $("stempel").textContent = DATA.merke;
+    $("stempel").hidden = false;
+  }
+  if (DATA.logo) {
+    const logo = $("logo");
+    logo.src = DATA.logo;
+    logo.alt = DATA.skole;
+    logo.hidden = false;
+    $("skole").hidden = true;
+  }
+  $("uke-etikett").textContent = T.uke;
+  $("klasse-tittel").textContent = T.klasse;
+  $("fag-tittel").textContent = T.fag;
+  $("gjore-tittel").textContent = T.gjore;
+  $("tilbaketilnaa").textContent = T.tilbake;
+  $("skrivut").textContent = T.skriv_ut;
+  $("fot-oppdatert").textContent = `${T.oppdatert} ${GENERERT}`;
+  for (const [id, merkelapp] of [["forrige", T.forrige_uke], ["neste", T.neste_uke]]) {
+    $(id).title = merkelapp;
+    $(id).setAttribute("aria-label", merkelapp);
+  }
+}
+
 function start() {
+  settProfil();
   $("skole").textContent = DATA.skole;
-  $("overskrift").textContent = DATA.overskrift || "Ukeplan";
+  $("overskrift").textContent = DATA.overskrift || T.ukeplan;
   $("skrivut").addEventListener("click", () => window.print());
   $("allefag").addEventListener("click", () => {
     skjulteFag = skjulteFag.size ? new Set() : new Set(fagIBruk());
@@ -632,7 +675,7 @@ function start() {
   const fraUrl = DATA.uker.findIndex((u) => String(u.uke) === parametre.get("uke"));
   ukeIndeks = fraUrl >= 0 ? fraUrl : startuke();
 
-  $("temaknapp").textContent = morkModus() ? "Lys" : "Mørk";
+  $("temaknapp").textContent = morkModus() ? T.lys : T.mork;
   tegnKlasser();
   tegnAlt();
 

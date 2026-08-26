@@ -18,7 +18,7 @@ HER = Path(__file__).resolve().parent
 sys.path.insert(0, str(HER))
 
 from ukeplanlib import demo as demomodul  # noqa: E402
-from ukeplanlib.bygg import skriv  # noqa: E402
+from ukeplanlib.bygg import legg_inn_logo, skriv  # noqa: E402
 from ukeplanlib.felles import uke_til_mandag  # noqa: E402
 from ukeplanlib.les import les  # noqa: E402
 from ukeplanlib.regneark import lag_arbeidsbok  # noqa: E402
@@ -39,13 +39,16 @@ def kommando_ny(args) -> int:
     forste = uke_til_mandag(args.uke, dt.date.today()) if args.uke else None
     lag_arbeidsbok(
         fil,
-        skole=args.skole or (demomodul.SKOLE if args.demo else "Skolen"),
+        skole=args.skole or (demomodul.SKOLE if args.demo else None),
         uke=args.uke,
         forste_dag=forste,
         klasser=demomodul.KLASSER if args.demo else None,
+        fag=demomodul.FAG if args.demo else None,
         okter=demomodul.OKTER if args.demo else None,
         timeplan=demomodul.TIMEPLAN if args.demo else None,
         innhold=demomodul.demoinnhold() if args.demo else None,
+        sprak=args.sprak or (demomodul.SPRAK if args.demo else "bokmal"),
+        logo=demomodul.LOGO if args.demo else "",
     )
     si(f"Arbeidsbok: {fil}")
     si("Åpne den, start på arket «Start her», og kjør så:  python3 ukeplan.py bygg")
@@ -58,6 +61,7 @@ def kommando_bygg(args) -> int:
         si(f"Fant ikke {fil}. Lag den først med:  python3 ukeplan.py ny")
         return 1
     resultat = les(fil)
+    resultat.merknader += legg_inn_logo(resultat.data, fil.parent)
     ut = skriv(resultat.data, Path(args.ut))
     data = resultat.data
     uker = data["uker"]
@@ -102,6 +106,8 @@ def main(argv=None) -> int:
     ny.add_argument("--skole", default=None)
     ny.add_argument("--uke", type=int, default=None, help="ukenummer, f.eks. 36")
     ny.add_argument("--demo", action="store_true", help="fyll den med et ferdig eksempel")
+    ny.add_argument("--sprak", choices=["bokmal", "nynorsk"], default=None,
+                    help="målform i arbeidsboka og på nettsiden")
     ny.add_argument("--overskriv", action="store_true")
     ny.set_defaults(funksjon=kommando_ny)
 

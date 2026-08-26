@@ -1,110 +1,154 @@
-"""Et ferdig utfylt eksempel: fire klasser og tre uker på en oppdiktet ungdomsskole."""
+"""Eit ferdig utfylt døme: seks klassar og tre veker på Hustadvika vidaregåande skole.
+
+Klassekodane og timeplanen er sett opp slik ein kombinert vidaregåande skule
+gjerne har det – studiespesialisering og yrkesfag side om side. Byt dei ut i
+Oppsett og Timeplan når du set opp skulen din på ekte.
+"""
 
 from __future__ import annotations
 
-OKTER = ["08:30–09:30", "09:40–10:40", "11:10–12:10", "12:20–13:20", "13:30–14:15"]
+SKOLE = "Hustadvika vidaregåande skole"
+SPRAK = "nynorsk"
+LOGO = "profil/logo.png"
 
-# Fast timeplan per klasse: fem dager à fem økter. Tom streng = fri økt.
+OKTER = ["08:15–09:45", "10:00–11:30", "12:00–13:30", "13:40–15:10"]
+
+# Fast timeplan per klasse: fem dagar à fire økter. Tom streng = fri økt.
 TIMEPLAN = {
-    "8A": {
-        "Mandag":  ["Norsk", "Norsk", "Matematikk", "Naturfag", "Valgfag"],
-        "Tirsdag": ["Engelsk", "Matematikk", "Kroppsøving", "Samfunnsfag", ""],
-        "Onsdag":  ["Naturfag", "Norsk", "Mat og helse", "Mat og helse", ""],
-        "Torsdag": ["Matematikk", "Engelsk", "KRLE", "Musikk", "Valgfag"],
-        "Fredag":  ["Norsk", "Samfunnsfag", "Matematikk", "Kunst og håndverk", "Kunst og håndverk"],
+    "1STA": {
+        "Måndag":  ["Norsk", "Matematikk 1T", "Engelsk", ""],
+        "Tysdag":  ["Naturfag", "Naturfag", "Kroppsøving", "Spansk"],
+        "Onsdag":  ["Engelsk", "Norsk", "Samfunnskunnskap", ""],
+        "Torsdag": ["Matematikk 1T", "Matematikk 1T", "Geografi", "Spansk"],
+        "Fredag":  ["Norsk", "Engelsk", "Samfunnskunnskap", ""],
     },
-    "8B": {
-        "Mandag":  ["Matematikk", "Naturfag", "Norsk", "Norsk", "Valgfag"],
-        "Tirsdag": ["Kroppsøving", "Engelsk", "Matematikk", "Samfunnsfag", ""],
-        "Onsdag":  ["Norsk", "Naturfag", "Kunst og håndverk", "Kunst og håndverk", ""],
-        "Torsdag": ["Engelsk", "Matematikk", "Musikk", "KRLE", "Valgfag"],
-        "Fredag":  ["Samfunnsfag", "Norsk", "Matematikk", "Mat og helse", "Mat og helse"],
+    "2STA": {
+        "Måndag":  ["Historie", "Matematikk S1", "Kroppsøving", "Sosiologi og sosialantropologi"],
+        "Tysdag":  ["Norsk", "Norsk", "Biologi 1", ""],
+        "Onsdag":  ["Matematikk S1", "Historie", "Spansk", "Biologi 1"],
+        "Torsdag": ["Sosiologi og sosialantropologi", "Norsk", "Spansk", ""],
+        "Fredag":  ["Biologi 1", "Matematikk S1", "Kroppsøving", ""],
     },
-    "9A": {
-        "Mandag":  ["Samfunnsfag", "Matematikk", "Engelsk", "Norsk", "Valgfag"],
-        "Tirsdag": ["Norsk", "Naturfag", "Naturfag", "Tysk", ""],
-        "Onsdag":  ["Matematikk", "Kroppsøving", "Norsk", "KRLE", "Valgfag"],
-        "Torsdag": ["Engelsk", "Tysk", "Matematikk", "Kunst og håndverk", "Kunst og håndverk"],
-        "Fredag":  ["Naturfag", "Norsk", "Samfunnsfag", "Musikk", ""],
+    "3STA": {
+        "Måndag":  ["Norsk", "Religion og etikk", "Biologi 2", ""],
+        "Tysdag":  ["Historie", "Historie", "Sosialkunnskap", "Matematikk R2"],
+        "Onsdag":  ["Norsk", "Norsk", "Kroppsøving", "Biologi 2"],
+        "Torsdag": ["Matematikk R2", "Sosialkunnskap", "Religion og etikk", ""],
+        "Fredag":  ["Biologi 2", "Historie", "Matematikk R2", ""],
     },
-    "10B": {
-        "Mandag":  ["Matematikk", "Norsk", "Tysk", "Naturfag", ""],
-        "Tirsdag": ["Norsk", "Engelsk", "Samfunnsfag", "Matematikk", "Valgfag"],
-        "Onsdag":  ["Naturfag", "Matematikk", "Kroppsøving", "Norsk", ""],
-        "Torsdag": ["Engelsk", "KRLE", "Norsk", "Tysk", "Valgfag"],
-        "Fredag":  ["Matematikk", "Samfunnsfag", "Musikk", "Naturfag", ""],
+    "1HSA": {
+        "Måndag":  ["Helsefremjande arbeid", "Helsefremjande arbeid", "Norsk", ""],
+        "Tysdag":  ["Yrkesfagleg fordjuping", "Yrkesfagleg fordjuping", "Matematikk 1P-Y", "Kroppsøving"],
+        "Onsdag":  ["Kommunikasjon og samhandling", "Kommunikasjon og samhandling", "Engelsk", ""],
+        "Torsdag": ["Yrkesliv i helse- og oppvekstfag", "Naturfag", "Norsk", ""],
+        "Fredag":  ["Helsefremjande arbeid", "Matematikk 1P-Y", "Kroppsøving", ""],
+    },
+    "1TIA": {
+        "Måndag":  ["Produksjon og tenester", "Produksjon og tenester", "Matematikk 1P-Y", ""],
+        "Tysdag":  ["Konstruksjons- og styringsteknikk", "Konstruksjons- og styringsteknikk", "Norsk", "Kroppsøving"],
+        "Onsdag":  ["Yrkesfagleg fordjuping", "Yrkesfagleg fordjuping", "Yrkesfagleg fordjuping", ""],
+        "Torsdag": ["Produksjon og tenester", "Naturfag", "Engelsk", ""],
+        "Fredag":  ["Konstruksjons- og styringsteknikk", "Matematikk 1P-Y", "Kroppsøving", ""],
+    },
+    "1RMA": {
+        "Måndag":  ["Råvare, produksjon og kvalitet", "Råvare, produksjon og kvalitet", "Norsk", ""],
+        "Tysdag":  ["Bransje og arbeidsliv", "Bransje og arbeidsliv", "Engelsk", "Kroppsøving"],
+        "Onsdag":  ["Yrkesfagleg fordjuping", "Yrkesfagleg fordjuping", "Matematikk 1P-Y", ""],
+        "Torsdag": ["Råvare, produksjon og kvalitet", "Råvare, produksjon og kvalitet", "Naturfag", ""],
+        "Fredag":  ["Norsk", "Matematikk 1P-Y", "Kroppsøving", ""],
     },
 }
 
-LARER = {
-    "Norsk": "KM", "Matematikk": "AT", "Engelsk": "SB", "Samfunnsfag": "PH", "KRLE": "PH",
-    "Tysk": "SB", "Valgfag": "MR", "Kroppsøving": "MR", "Mat og helse": "IL",
-    "Kunst og håndverk": "EV", "Naturfag": "IL", "Musikk": "EV",
+LARAR = {
+    "Norsk": "KM", "Matematikk 1T": "AT", "Matematikk 1P-Y": "AT", "Matematikk S1": "AT",
+    "Matematikk R2": "AT", "Engelsk": "SB", "Naturfag": "IL", "Samfunnskunnskap": "PH",
+    "Geografi": "PH", "Historie": "PH", "Religion og etikk": "PH", "Spansk": "MG",
+    "Kroppsøving": "MR", "Biologi 1": "IL", "Biologi 2": "IL",
+    "Sosiologi og sosialantropologi": "EV", "Sosialkunnskap": "EV",
+    "Helsefremjande arbeid": "TB", "Kommunikasjon og samhandling": "TB",
+    "Yrkesliv i helse- og oppvekstfag": "TB", "Produksjon og tenester": "JH",
+    "Konstruksjons- og styringsteknikk": "JH", "Råvare, produksjon og kvalitet": "AN",
+    "Bransje og arbeidsliv": "AN", "Yrkesfagleg fordjuping": "AN",
 }
 
-# (uke, klasse, dag, fag, tema, lekse, frist, type)
-UKE = [
-    (35, "8A", "Mandag", "Norsk", "Oppstart: vi blir kjent med Kontekst", "Bla gjennom kapittel 1", "Onsdag", ""),
-    (35, "8A", "Onsdag", "Naturfag", "Sikkerhet på naturfagrommet", "", "", "Info"),
-    (35, "8A", "Fredag", "Matematikk", "Repetisjon: de fire regneartene", "Oppgave 1.1–1.12", "Fredag", ""),
-    (35, "8B", "Mandag", "Matematikk", "Repetisjon: de fire regneartene", "Oppgave 1.1–1.12", "Onsdag", ""),
-    (35, "9A", "Tirsdag", "Naturfag", "Vi starter med elektrisitet", "Les s. 60–66", "Torsdag", ""),
-    (35, "10B", "Tirsdag", "Norsk", "Skriveramme: argumenterende tekst", "Velg tema til teksten", "Torsdag", ""),
+# (veke, klasse, dag, fag, tema, lekse, frist, type)
+VEKE = [
+    (35, "1STA", "Måndag", "Norsk", "Oppstart: kva er ein sakprosatekst?", "Les s. 12–19 i Panorama", "Onsdag", ""),
+    (35, "1STA", "Tysdag", "Naturfag", "HMS og tryggleik på naturfagrommet", "", "", "Info"),
+    (35, "1STA", "Torsdag", "Matematikk 1T", "Repetisjon: tal og algebra", "Oppgåve 1.20–1.34", "Fredag", ""),
+    (35, "2STA", "Tysdag", "Norsk", "Retorikk: etos, patos, logos", "Les kapittel 2 og noter tre døme", "Torsdag", ""),
+    (35, "3STA", "Måndag", "Biologi 2", "Kva skal vi gjennom i år? Årsplan og vurderingar", "", "", "Info"),
+    (35, "1HSA", "Måndag", "Helsefremjande arbeid", "Bli kjend med faget og programområdet", "", "", "Info"),
+    (35, "1TIA", "Onsdag", "Yrkesfagleg fordjuping", "Verkstadkurs: tryggleik, verneutstyr og orden", "", "", "Info"),
+    (35, "1RMA", "Måndag", "Råvare, produksjon og kvalitet", "Hygiene og reinhald på kjøkkenet", "Les hygieneheftet", "Torsdag", ""),
 
-    (36, "8A", "Mandag", "Norsk", "Nynorsk: samansette ord og orddeling", "Les s. 40–44 i Kontekst. Skriv fem setningar med samansette ord.", "Onsdag", ""),
-    (36, "8A", "Mandag", "Matematikk", "Brøk: utviding og forkorting", "Oppgave 2.14–2.22", "Tirsdag", ""),
-    (36, "8A", "Tirsdag", "Engelsk", "Australia: reading and vocabulary", "Glosetest torsdag – 20 ord fra kapittel 3", "Torsdag", "Prøve"),
-    (36, "8A", "Onsdag", "Naturfag", "Cellen: bygning og deler", "Tegn en dyrecelle med navn på delene", "Fredag", ""),
-    (36, "8A", "Onsdag", "Mat og helse", "Vi baker grovbrød – husk forkle", "", "", "Info"),
-    (36, "8A", "Torsdag", "KRLE", "Buddhismen: de fire edle sannheter", "", "", ""),
-    (36, "8A", "Fredag", "Matematikk", "Prøve i brøk og prosent", "Øv på oppgavene fra kapittel 2", "Fredag", "Prøve"),
-    (36, "8A", "Fredag", "Kunst og håndverk", "Vi fortsetter med trearbeid", "", "", ""),
-    (36, "8B", "Mandag", "Matematikk", "Brøk: utviding og forkorting", "Oppgave 2.14–2.22", "Tirsdag", ""),
-    (36, "8B", "Tirsdag", "Kroppsøving", "Friidrett ute – kle deg etter været", "", "", "Info"),
-    (36, "8B", "Onsdag", "Norsk", "Nynorsk: samansette ord", "Les s. 40–44 i Kontekst", "Fredag", ""),
-    (36, "8B", "Fredag", "Samfunnsfag", "Innleveringsfrist: kildekritikk", "Lever oppgaven i Teams før kl. 15", "Fredag", "Innlevering"),
-    (36, "9A", "Mandag", "Samfunnsfag", "Den industrielle revolusjonen", "Les s. 88–95 og svar på tre spørsmål", "Onsdag", ""),
-    (36, "9A", "Tirsdag", "Naturfag", "Forsøk: elektrisitet og kretser", "Skriv rapport fra forsøket", "Torsdag", ""),
-    (36, "9A", "Torsdag", "Kunst og håndverk", "Ekskursjon til kunstmuseet – vi går kl. 12.00", "Ta med matpakke", "Torsdag", "Tur"),
-    (36, "9A", "Fredag", "Norsk", "Novelleanalyse: virkemidler", "Les novellen «Karen» og noter virkemidler", "Fredag", ""),
-    (36, "10B", "Mandag", "Matematikk", "Funksjoner: lineære sammenhenger", "Oppgave 5.30–5.40", "Onsdag", ""),
-    (36, "10B", "Tirsdag", "Norsk", "Skriveøkt: argumenterende tekst", "Førsteutkast leveres i Teams", "Torsdag", "Innlevering"),
-    (36, "10B", "Torsdag", "Engelsk", "Oral presentations: prepare in pairs", "Øv på framføringen hjemme", "Fredag", ""),
-    (36, "10B", "Fredag", "Naturfag", "Repetisjon før tentamen", "", "", ""),
-    (36, "Alle", "Onsdag", "Valgfag", "", "Frist for å melde seg på turneringen", "Onsdag", "Frist"),
+    (36, "1STA", "Måndag", "Norsk", "Argumenterande tekst: oppbygging og kjeldebruk",
+     "Skriv utkast til argumenterande tekst i Teams", "Torsdag", ""),
+    (36, "1STA", "Måndag", "Matematikk 1T", "Potensar og røter", "Oppgåve 2.14–2.28", "Tysdag", ""),
+    (36, "1STA", "Tysdag", "Naturfag", "Cella: oppbygging og funksjon", "Teikn ei dyrecelle med namn på delane", "Fredag", ""),
+    (36, "1STA", "Onsdag", "Engelsk", "Australia: reading and vocabulary",
+     "Glosetest torsdag – 20 ord frå kapittel 3", "Torsdag", "Vurdering"),
+    (36, "1STA", "Torsdag", "Geografi", "Naturressursar på Nordvestlandet", "", "", ""),
+    (36, "1STA", "Fredag", "Norsk", "Innlevering: argumenterande tekst",
+     "Lever teksten i Teams før kl. 15.00", "Fredag", "Innlevering"),
+    (36, "2STA", "Måndag", "Historie", "Den industrielle revolusjonen", "Les s. 88–95 og svar på tre spørsmål", "Onsdag", ""),
+    (36, "2STA", "Tysdag", "Biologi 1", "Feltarbeid i fjøra – vi bruker skulebåten",
+     "Ta med regntøy og støvlar", "Tysdag", "Tur"),
+    (36, "2STA", "Fredag", "Matematikk S1", "Heildagsprøve i funksjonar", "Øv på kapittel 3", "Fredag", "Prøve"),
+    (36, "3STA", "Tysdag", "Historie", "Den kalde krigen: kjeldegransking", "Les utdraga i klasserommet", "Torsdag", ""),
+    (36, "3STA", "Torsdag", "Matematikk R2", "Integrasjon: delvis integrasjon", "Oppgåve 5.30–5.44", "Fredag", ""),
+    (36, "1HSA", "Tysdag", "Yrkesfagleg fordjuping", "Utplassering på sjukeheimen – oppmøte kl. 08.00",
+     "Ta med arbeidstøy og namneskilt", "Tysdag", "Utplassering"),
+    (36, "1HSA", "Onsdag", "Kommunikasjon og samhandling", "Aktiv lytting og brukarmedverknad",
+     "Skriv logg frå utplasseringa", "Torsdag", ""),
+    (36, "1TIA", "Måndag", "Produksjon og tenester", "Måling og toleransar", "Oppgåvehefte s. 4–7", "Torsdag", ""),
+    (36, "1TIA", "Tysdag", "Konstruksjons- og styringsteknikk", "Pneumatikk: enkle kretsar",
+     "Teikn kretsen frå timen på nytt", "Fredag", ""),
+    (36, "1RMA", "Torsdag", "Råvare, produksjon og kvalitet", "Fisk: filetering og kvalitet",
+     "Sjå instruksjonsvideoen før timen", "Torsdag", ""),
+    (36, "Alle", "Onsdag", "", "", "Frist for å melde seg på fagdagen om psykisk helse", "Onsdag", "Frist"),
 
-    (37, "8A", "Mandag", "Norsk", "Vi skriver forteljing", "Skriv ferdig utkastet", "Torsdag", ""),
-    (37, "8A", "Tirsdag", "Samfunnsfag", "Demokrati: hvem bestemmer i Norge?", "Les s. 22–29", "Torsdag", ""),
-    (37, "8A", "Torsdag", "Musikk", "Vi øver til høstkonserten", "", "", "Info"),
-    (37, "8B", "Torsdag", "Engelsk", "Presentations: my hometown", "Framføring torsdag", "Torsdag", "Vurdering"),
-    (37, "9A", "Onsdag", "Matematikk", "Prøve i likninger", "Øv på kapittel 3", "Onsdag", "Prøve"),
-    (37, "10B", "Mandag", "Matematikk", "Tentamen – hele dagen", "Ta med kalkulator og linjal", "Mandag", "Prøve"),
-    (37, "Alle", "Fredag", "", "", "Skolen slutter kl. 12.00 – planleggingsdag", "Fredag", "Info"),
+    (37, "1STA", "Tysdag", "Naturfag", "Arv og miljø", "Les s. 52–60", "Torsdag", ""),
+    (37, "1STA", "Torsdag", "Matematikk 1T", "Prøve i tal og algebra", "Øv på kapittel 1 og 2", "Torsdag", "Prøve"),
+    (37, "2STA", "Onsdag", "Spansk", "Presentación: mi pueblo", "Øv på framføringa heime", "Onsdag", "Vurdering"),
+    (37, "3STA", "Måndag", "Norsk", "Tentamen i norsk hovudmål – heile dagen",
+     "Ta med lading til PC-en", "Måndag", "Prøve"),
+    (37, "1HSA", "Torsdag", "Yrkesliv i helse- og oppvekstfag", "Yrkesetikk og teieplikt", "", "", ""),
+    (37, "1TIA", "Onsdag", "Yrkesfagleg fordjuping", "Utplassering i bedrift heile onsdagen",
+     "Meld frå til kontaktlærar om oppmøtestad", "Onsdag", "Utplassering"),
+    (37, "1RMA", "Tysdag", "Bransje og arbeidsliv", "Vi lagar lunsj til personalrommet", "", "", ""),
+    (37, "Alle", "Fredag", "", "", "Fagdag om psykisk helse – vanleg timeplan går ut", "Fredag", "Fagdag"),
 ]
 
-# (uke, klasse, overskrift, beskjed)
-BESKJEDER = [
-    (35, "Alle", "Velkommen til et nytt skoleår", "Første skoledag er mandag kl. 08.30. Ta med skrivesaker og matpakke."),
-    (36, "Alle", "Foreldremøte torsdag", "Foreldremøte for hele trinnet torsdag kl. 18.00 i aulaen. Meld fra i Vigilo om dere kommer."),
-    (36, "8A", "Ny mattelærer fra mandag", "Anders tar over mattetimene ut skoleåret. Han treffes på e-post og i Vigilo."),
-    (36, "9A", "Museumstur torsdag", "Vi går fra skolen kl. 12.00 og er tilbake til siste time. Ta med matpakke og drikke."),
-    (37, "Alle", "Planleggingsdag fredag", "Skolen slutter kl. 12.00 på fredag. SFO holder åpent som vanlig."),
-    (37, "10B", "Tentamen mandag", "Norsktentamen mandag. Møt opp kl. 08.15 utenfor rom 305."),
+# (veke, klasse, overskrift, melding)
+MELDINGAR = [
+    (35, "Alle", "Velkommen til eit nytt skuleår",
+     "Første skuledag er måndag kl. 08.15. Ta med PC og ladar. Skulebussane går som vanleg."),
+    (36, "Alle", "Foreldremøte for Vg1 torsdag",
+     "Foreldremøte for alle Vg1-klassane torsdag kl. 18.00 i auditoriet. Meld frå i Visma InSchool."),
+    (36, "1HSA", "Utplassering tysdag",
+     "Oppmøte direkte på sjukeheimen kl. 08.00. Hugs arbeidstøy, namneskilt og matpakke."),
+    (36, "2STA", "Feltarbeid med skulebåten",
+     "Vi går frå kaia kl. 10.00 tysdag. Kle deg etter vêret – det blir vått."),
+    (37, "Alle", "Fagdag fredag",
+     "Fredag er det fagdag om psykisk helse for heile skulen. Vanleg timeplan går ut."),
+    (37, "3STA", "Tentamen måndag",
+     "Norsktentamen måndag. Møt opp kl. 08.00 utanfor auditoriet."),
 ]
 
 
-def laererrader() -> list[list]:
-    """Alle klassene har de samme lærerne i demoen, så «Alle» holder."""
-    return [["Alle", fag, laerer] for fag, laerer in LARER.items()]
+def lararrader() -> list[list]:
+    """Same læraren i alle klassane i dømet, så «Alle» held."""
+    return [["Alle", fag, larar] for fag, larar in LARAR.items()]
 
 
 def demoinnhold() -> dict:
     return {
-        "Uke": [list(r) for r in UKE],
-        "Beskjeder": [list(r) for r in BESKJEDER],
-        "Lærere": laererrader(),
+        "Uke": [list(r) for r in VEKE],
+        "Beskjeder": [list(r) for r in MELDINGAR],
+        "Lærere": lararrader(),
     }
 
 
 KLASSER = list(TIMEPLAN.keys())
-SKOLE = "Bjørkeli ungdomsskole"
+FAG = sorted({fag for dager in TIMEPLAN.values() for dag in dager.values() for fag in dag if fag})

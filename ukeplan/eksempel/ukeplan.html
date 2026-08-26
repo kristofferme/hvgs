@@ -2,7 +2,7 @@
 <html lang="nb">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ukeplan Bjørkeli ungdomsskole</title>
+<title>Ukeplan Hustadvika vidaregåande skole</title>
 <style>
 /* Skriftene ligger inne i fila, så siden virker uten nett. */
 @font-face {
@@ -82,7 +82,8 @@
   --blekk-svak:#5B6A72;
   --linje:rgba(22,33,42,.16);
   --linje-svak:rgba(22,33,42,.08);
-  --naa:#0F5D5A;
+  --profil:#0093C9;
+  --naa:color-mix(in oklab,var(--profil) 72%,var(--blekk));
   --frist:#A93A2C;
   --skygge:rgba(22,33,42,.9);
   --felt:#FFFFFF;
@@ -98,7 +99,7 @@
     --blekk-svak:#93A2A8;
     --linje:rgba(232,237,234,.22);
     --linje-svak:rgba(232,237,234,.10);
-    --naa:#5CC7B8;
+    --naa:color-mix(in oklab,var(--profil) 68%,white);
     --frist:#E88374;
     --skygge:rgba(0,0,0,.7);
     --felt:#222E36;
@@ -113,7 +114,7 @@
   --blekk-svak:#93A2A8;
   --linje:rgba(232,237,234,.22);
   --linje-svak:rgba(232,237,234,.10);
-  --naa:#5CC7B8;
+  --naa:color-mix(in oklab,var(--profil) 68%,white);
   --frist:#E88374;
   --skygge:rgba(0,0,0,.7);
   --felt:#222E36;
@@ -155,7 +156,15 @@ body{
 .bla:active:not(:disabled){transform:scale(.94)}
 .bla:disabled{opacity:.25;cursor:default}
 .tittelblokk{flex:1 1 300px;min-width:0}
-.skole{font-family:"DM Mono",monospace;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--blekk-svak);margin:0 0 4px}
+.skole{font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--naa);margin:0 0 5px}
+.stempel{
+  display:inline-block;margin-left:10px;padding:2px 8px;border-radius:99px;
+  border:1px solid var(--linje);color:var(--blekk-svak);letter-spacing:.12em;
+}
+.stempel[hidden]{display:none}
+.logo{display:block;height:clamp(30px,3.4vw,40px);width:auto;max-width:min(340px,72vw);margin:0 0 10px}
+:root[data-theme="dark"] .logo,
+.logo.paa-plate{background:#fff;padding:6px 10px;border-radius:var(--r)}
 h1{
   font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;
   font-weight:700;font-size:clamp(26px,3.6vw,40px);line-height:1.02;letter-spacing:-.025em;
@@ -256,8 +265,8 @@ h1{
 .time .tema{font-size:15px;line-height:1.45;margin:6px 0 0;color:var(--blekk);font-weight:500}
 .time.naa{border-color:var(--naa);box-shadow:0 0 0 1.5px var(--naa)}
 .time.naa::after{
-  content:"nå";position:absolute;top:-9px;right:9px;
-  font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  content:var(--naa-tekst,"nå");position:absolute;top:-9px;right:9px;
+  font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.14em;
   background:var(--naa);color:var(--ark);padding:2px 7px;border-radius:99px;
   animation:puls 2.6s ease-in-out infinite;
 }
@@ -354,11 +363,12 @@ try {
   <header class="topp">
     <div class="ukeblokk">
       <button class="bla" id="forrige" type="button" title="Forrige uke" aria-label="Forrige uke">←</button>
-      <div class="uke"><span class="etikett">Uke</span><span class="tall" id="ukenr">–</span></div>
+      <div class="uke"><span class="etikett" id="uke-etikett">Uke</span><span class="tall" id="ukenr">–</span></div>
       <button class="bla" id="neste" type="button" title="Neste uke" aria-label="Neste uke">→</button>
     </div>
     <div class="tittelblokk">
-      <p class="skole" id="skole"></p>
+      <img class="logo" id="logo" alt="" hidden>
+      <p class="skole"><span id="skole"></span><span class="stempel" id="stempel" hidden></span></p>
       <h1><span id="overskrift">Ukeplan</span> <span class="klassemerke" id="klassemerke"></span></h1>
       <div class="datorad">
         <span class="datospenn" id="datospenn"></span>
@@ -373,11 +383,11 @@ try {
 
   <div class="velgere">
     <div class="velgergruppe">
-      <p class="velgertittel">Klasse</p>
+      <p class="velgertittel" id="klasse-tittel">Klasse</p>
       <div class="klasser" id="klasser" role="group" aria-label="Velg klasse"></div>
     </div>
     <div class="velgergruppe" style="flex:1 1 320px">
-      <p class="velgertittel">Fag <button class="nullstill" id="allefag" type="button">skjul alle</button></p>
+      <p class="velgertittel"><span id="fag-tittel">Fag</span> <button class="nullstill" id="allefag" type="button">skjul alle</button></p>
       <div class="fagfilter" id="fagfilter" role="group" aria-label="Filtrer fag"></div>
     </div>
   </div>
@@ -388,7 +398,7 @@ try {
 
   <section class="gjore">
     <div class="seksjonstopp">
-      <h2>Å gjøre denne uka</h2>
+      <h2 id="gjore-tittel">Å gjøre denne uka</h2>
       <span class="antall mono" id="antall"></span>
     </div>
     <div class="fristbolker" id="oppgaver"></div>
@@ -396,69 +406,177 @@ try {
 
   <footer>
     <span id="fotklasse"></span>
-    <span>Oppdatert 25. aug 21:01</span>
+    <span id="fot-oppdatert"></span>
   </footer>
 </div>
 
 <script>
 const DATA = {
- "skole": "Bjørkeli ungdomsskole",
- "overskrift": "Ukeplan",
+ "skole": "Hustadvika vidaregåande skole",
+ "overskrift": "Vekeplan",
  "standarduke": 36,
+ "sprak": "nn",
+ "tekst": {
+  "sprak": "nynorsk",
+  "uke": "Veke",
+  "uker": "veker",
+  "veke_stor": "VEKE",
+  "ukeplan": "Vekeplan",
+  "klasse": "Klasse",
+  "klasser": "Klassar",
+  "alle": "Alle",
+  "fag": "Fag",
+  "farge": "Farge",
+  "vis_alle": "vis alle",
+  "skjul_alle": "skjul alle",
+  "skriv_ut": "Skriv ut",
+  "lys": "Lys",
+  "mork": "Mørk",
+  "forrige_uke": "Førre veke",
+  "neste_uke": "Neste veke",
+  "tilbake": "Tilbake til denne veka",
+  "gjore": "Å gjere denne veka",
+  "punkt": "punkt",
+  "ingen_timer": "Ingen timar",
+  "ingen_frister": "Ingen lekser eller fristar denne veka.",
+  "frist": "frist",
+  "frister": "fristar",
+  "se_gjore": "sjå «Å gjere denne veka»",
+  "naa": "no",
+  "oppdatert": "Oppdatert",
+  "ark_start": "Start her",
+  "ark_oppsett": "Oppsett",
+  "ark_timeplan": "Timeplan",
+  "ark_larere": "Lærarar",
+  "ark_uke": "Veke",
+  "ark_beskjeder": "Meldingar",
+  "ark_lister": "Lister",
+  "skole": "Skule",
+  "ukenummer": "Vekenummer",
+  "mandag_i_uka": "Måndag i den veka",
+  "overskrift": "Overskrift",
+  "sprakfelt": "Språk",
+  "profilfarge": "Profilfarge",
+  "logo": "Logo (filnamn)",
+  "kol_dag": "Dag",
+  "kol_tema": "Tema – det vi jobbar med",
+  "kol_lekse": "Lekse / oppgåve",
+  "kol_frist": "Frist",
+  "kol_type": "Type",
+  "kol_larer": "Lærar",
+  "kol_tittel": "Overskrift",
+  "kol_beskjed": "Melding"
+ },
+ "profilfarge": "#0093C9",
+ "logofil": "profil/logo.png",
  "klasser": [
-  "8A",
-  "8B",
-  "9A",
-  "10B"
+  "1STA",
+  "2STA",
+  "3STA",
+  "1HSA",
+  "1TIA",
+  "1RMA"
  ],
  "fag": [
   {
-   "navn": "Norsk",
-   "farge": "#2F4B7C"
+   "navn": "Biologi 1",
+   "farge": "#4F7020"
   },
   {
-   "navn": "Matematikk",
-   "farge": "#A6432C"
+   "navn": "Biologi 2",
+   "farge": "#4F7020"
+  },
+  {
+   "navn": "Bransje og arbeidsliv",
+   "farge": "#8A5A2B"
   },
   {
    "navn": "Engelsk",
    "farge": "#1F6E5B"
   },
   {
-   "navn": "Naturfag",
-   "farge": "#4F7020"
+   "navn": "Geografi",
+   "farge": "#2A6B57"
   },
   {
-   "navn": "Samfunnsfag",
-   "farge": "#6B3A63"
+   "navn": "Helsefremjande arbeid",
+   "farge": "#8C3A52"
   },
   {
-   "navn": "KRLE",
-   "farge": "#8A6A17"
+   "navn": "Historie",
+   "farge": "#7A4B2A"
+  },
+  {
+   "navn": "Kommunikasjon og samhandling",
+   "farge": "#7A3F6B"
+  },
+  {
+   "navn": "Konstruksjons- og styringsteknikk",
+   "farge": "#3B5E8C"
   },
   {
    "navn": "Kroppsøving",
    "farge": "#1D6D82"
   },
   {
-   "navn": "Musikk",
-   "farge": "#A03A5E"
+   "navn": "Matematikk 1P-Y",
+   "farge": "#A6432C"
   },
   {
-   "navn": "Kunst og håndverk",
-   "farge": "#B0651B"
+   "navn": "Matematikk 1T",
+   "farge": "#A6432C"
   },
   {
-   "navn": "Mat og helse",
-   "farge": "#7C5230"
+   "navn": "Matematikk R2",
+   "farge": "#A6432C"
   },
   {
-   "navn": "Tysk",
-   "farge": "#365E7A"
+   "navn": "Matematikk S1",
+   "farge": "#A6432C"
   },
   {
-   "navn": "Valgfag",
-   "farge": "#5E6B4A"
+   "navn": "Naturfag",
+   "farge": "#4F7020"
+  },
+  {
+   "navn": "Norsk",
+   "farge": "#2F4B7C"
+  },
+  {
+   "navn": "Produksjon og tenester",
+   "farge": "#8A5A2B"
+  },
+  {
+   "navn": "Religion og etikk",
+   "farge": "#8A6A17"
+  },
+  {
+   "navn": "Råvare, produksjon og kvalitet",
+   "farge": "#3B5E8C"
+  },
+  {
+   "navn": "Samfunnskunnskap",
+   "farge": "#6B3A63"
+  },
+  {
+   "navn": "Sosialkunnskap",
+   "farge": "#6B3A63"
+  },
+  {
+   "navn": "Sosiologi og sosialantropologi",
+   "farge": "#6B3A63"
+  },
+  {
+   "navn": "Spansk",
+   "farge": "#8C4A2F"
+  },
+  {
+   "navn": "Yrkesfagleg fordjuping",
+   "farge": "#55606B"
+  },
+  {
+   "navn": "Yrkesliv i helse- og oppvekstfag",
+   "farge": "#55606B"
   }
  ],
  "uker": [
@@ -468,12 +586,12 @@ const DATA = {
    "datospenn": "24.–28. aug 2026",
    "dager": [
     {
-     "navn": "Mandag",
+     "navn": "Måndag",
      "dato": "2026-08-24",
      "visning": "24. aug"
     },
     {
-     "navn": "Tirsdag",
+     "navn": "Tysdag",
      "dato": "2026-08-25",
      "visning": "25. aug"
     },
@@ -495,98 +613,32 @@ const DATA = {
    ],
    "timer": [
     {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "1STA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
-     "tema": "Oppstart: vi blir kjent med Kontekst",
-     "lekse": "Bla gjennom kapittel 1",
+     "tema": "Oppstart: kva er ein sakprosatekst?",
+     "lekse": "Les s. 12–19 i Panorama",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Naturfag",
      "laerer": "IL",
-     "tema": "Sikkerhet på naturfagrommet",
+     "tema": "HMS og tryggleik på naturfagrommet",
      "lekse": "",
      "type": "Info"
     },
     {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
+     "klasse": "1STA",
      "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Engelsk",
      "laerer": "SB",
      "tema": "",
@@ -594,32 +646,98 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8A",
+     "klasse": "1STA",
+     "dag": "Torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Matematikk 1T",
+     "laerer": "AT",
+     "tema": "Repetisjon: tal og algebra",
+     "lekse": "Oppgåve 1.20–1.34",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
      "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Norsk",
+     "laerer": "KM",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
+     "klasse": "1STA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1T",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Naturfag",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1T",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
      "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
@@ -627,142 +745,175 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8A",
+     "klasse": "1STA",
      "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Mat og helse",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "KRLE",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Samfunnskunnskap",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "Repetisjon: de fire regneartene",
-     "lekse": "Oppgave 1.1–1.12",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Samfunnsfag",
+     "klasse": "1STA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Geografi",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
+     "klasse": "1STA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Samfunnskunnskap",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Spansk",
+     "laerer": "MG",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Torsdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Spansk",
+     "laerer": "MG",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Historie",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "Retorikk: etos, patos, logos",
+     "lekse": "Les kapittel 2 og noter tre døme",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
      "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Mat og helse",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Matematikk S1",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Sosiologi og sosialantropologi",
+     "laerer": "EV",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Biologi 1",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk S1",
      "laerer": "AT",
-     "tema": "Repetisjon: de fire regneartene",
-     "lekse": "Oppgave 1.1–1.12",
+     "tema": "",
+     "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "2STA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Historie",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk S1",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
      "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
@@ -770,318 +921,43 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Naturfag",
+     "klasse": "2STA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Biologi 1",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
+     "klasse": "2STA",
      "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Naturfag",
-     "laerer": "IL",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Spansk",
+     "laerer": "MG",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8B",
+     "klasse": "2STA",
      "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Spansk",
+     "laerer": "MG",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8B",
+     "klasse": "2STA",
      "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "KRLE",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Mat og helse",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Mat og helse",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "Vi starter med elektrisitet",
-     "lekse": "Les s. 60–66",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
+     "start": "12:00",
+     "slutt": "13:30",
      "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
@@ -1089,54 +965,32 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Tysk",
-     "laerer": "SB",
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Sosiologi og sosialantropologi",
+     "laerer": "EV",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Naturfag",
+     "klasse": "2STA",
+     "dag": "Onsdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Biologi 1",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
+     "klasse": "3STA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
      "tema": "",
@@ -1144,32 +998,21 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Samfunnsfag",
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Historie",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
+     "klasse": "3STA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
      "tema": "",
@@ -1177,142 +1020,54 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Tysk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "KRLE",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
+     "klasse": "3STA",
      "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Matematikk R2",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "Skriveramme: argumenterende tekst",
-     "lekse": "Velg tema til teksten",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Naturfag",
+     "klasse": "3STA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Biologi 2",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Engelsk",
-     "laerer": "SB",
+     "klasse": "3STA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Religion og etikk",
+     "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Historie",
+     "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
+     "klasse": "3STA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
      "fag": "Norsk",
      "laerer": "KM",
      "tema": "",
@@ -1320,76 +1075,54 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "KRLE",
-     "laerer": "PH",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Sosialkunnskap",
+     "laerer": "EV",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Samfunnsfag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Historie",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Tysk",
-     "laerer": "SB",
+     "klasse": "3STA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Biologi 2",
+     "laerer": "IL",
+     "tema": "Kva skal vi gjennom i år? Årsplan og vurderingar",
+     "lekse": "",
+     "type": "Info"
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Sosialkunnskap",
+     "laerer": "EV",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
+     "start": "12:00",
+     "slutt": "13:30",
      "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
@@ -1397,76 +1130,142 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Norsk",
-     "laerer": "KM",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Religion og etikk",
+     "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Matematikk",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk R2",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Matematikk R2",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
      "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Norsk",
-     "laerer": "KM",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Biologi 2",
+     "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "1HSA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Helsefremjande arbeid",
+     "laerer": "TB",
+     "tema": "Bli kjend med faget og programområdet",
+     "lekse": "",
+     "type": "Info"
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Kommunikasjon og samhandling",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
      "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Tysk",
-     "laerer": "SB",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesliv i helse- og oppvekstfag",
+     "laerer": "TB",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "1HSA",
      "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Helsefremjande arbeid",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Helsefremjande arbeid",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Kommunikasjon og samhandling",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
      "fag": "Naturfag",
      "laerer": "IL",
      "tema": "",
@@ -1474,22 +1273,429 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
+     "klasse": "1HSA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Produksjon og tenester",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "Verkstadkurs: tryggleik, verneutstyr og orden",
+     "lekse": "",
+     "type": "Info"
+    },
+    {
+     "klasse": "1TIA",
      "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Produksjon og tenester",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Produksjon og tenester",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Naturfag",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "Hygiene og reinhald på kjøkkenet",
+     "lekse": "Les hygieneheftet",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Bransje og arbeidsliv",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Bransje og arbeidsliv",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Naturfag",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -1498,42 +1704,34 @@ const DATA = {
    ],
    "oppgaver": [
     {
-     "klasse": "8A",
+     "klasse": "1STA",
      "fag": "Norsk",
-     "tekst": "Bla gjennom kapittel 1",
-     "dag": "Mandag",
+     "tekst": "Les s. 12–19 i Panorama",
+     "dag": "Måndag",
      "frist": "Onsdag",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "fag": "Matematikk",
-     "tekst": "Oppgave 1.1–1.12",
-     "dag": "Fredag",
+     "klasse": "1STA",
+     "fag": "Matematikk 1T",
+     "tekst": "Oppgåve 1.20–1.34",
+     "dag": "Torsdag",
      "frist": "Fredag",
      "type": ""
     },
     {
-     "klasse": "8B",
-     "fag": "Matematikk",
-     "tekst": "Oppgave 1.1–1.12",
-     "dag": "Mandag",
-     "frist": "Onsdag",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "fag": "Naturfag",
-     "tekst": "Les s. 60–66",
-     "dag": "Tirsdag",
+     "klasse": "2STA",
+     "fag": "Norsk",
+     "tekst": "Les kapittel 2 og noter tre døme",
+     "dag": "Tysdag",
      "frist": "Torsdag",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "fag": "Norsk",
-     "tekst": "Velg tema til teksten",
-     "dag": "Tirsdag",
+     "klasse": "1RMA",
+     "fag": "Råvare, produksjon og kvalitet",
+     "tekst": "Les hygieneheftet",
+     "dag": "Måndag",
      "frist": "Torsdag",
      "type": ""
     }
@@ -1541,8 +1739,8 @@ const DATA = {
    "beskjeder": [
     {
      "klasse": "Alle",
-     "tittel": "Velkommen til et nytt skoleår",
-     "tekst": "Første skoledag er mandag kl. 08.30. Ta med skrivesaker og matpakke."
+     "tittel": "Velkommen til eit nytt skuleår",
+     "tekst": "Første skuledag er måndag kl. 08.15. Ta med PC og ladar. Skulebussane går som vanleg."
     }
    ]
   },
@@ -1552,12 +1750,12 @@ const DATA = {
    "datospenn": "31. aug – 4. sep 2026",
    "dager": [
     {
-     "navn": "Mandag",
+     "navn": "Måndag",
      "dato": "2026-08-31",
      "visning": "31. aug"
     },
     {
-     "navn": "Tirsdag",
+     "navn": "Tysdag",
      "dato": "2026-09-01",
      "visning": "1. sep"
     },
@@ -1579,318 +1777,76 @@ const DATA = {
    ],
    "timer": [
     {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "1STA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
-     "tema": "Nynorsk: samansette ord og orddeling",
-     "lekse": "Les s. 40–44 i Kontekst. Skriv fem setningar med samansette ord.",
+     "tema": "Argumenterande tekst: oppbygging og kjeldebruk",
+     "lekse": "Skriv utkast til argumenterande tekst i Teams",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Naturfag",
+     "laerer": "IL",
+     "tema": "Cella: oppbygging og funksjon",
+     "lekse": "Teikn ei dyrecelle med namn på delane",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Engelsk",
      "laerer": "SB",
      "tema": "Australia: reading and vocabulary",
-     "lekse": "Glosetest torsdag – 20 ord fra kapittel 3",
-     "type": "Prøve"
+     "lekse": "Glosetest torsdag – 20 ord frå kapittel 3",
+     "type": "Vurdering"
     },
     {
-     "klasse": "8A",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "Cellen: bygning og deler",
-     "lekse": "Tegn en dyrecelle med navn på delene",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
+     "klasse": "1STA",
      "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Matematikk 1T",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
+     "klasse": "1STA",
      "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "Brøk: utviding og forkorting",
-     "lekse": "Oppgave 2.14–2.22",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Kroppsøving",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Mat og helse",
-     "laerer": "IL",
-     "tema": "Vi baker grovbrød – husk forkle",
-     "lekse": "",
-     "type": "Info"
-    },
-    {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "KRLE",
-     "laerer": "PH",
-     "tema": "Buddhismen: de fire edle sannheter",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "Prøve i brøk og prosent",
-     "lekse": "Øv på oppgavene fra kapittel 2",
-     "type": "Prøve"
-    },
-    {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Mat og helse",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "Vi fortsetter med trearbeid",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "Brøk: utviding og forkorting",
-     "lekse": "Oppgave 2.14–2.22",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Kroppsøving",
-     "laerer": "MR",
-     "tema": "Friidrett ute – kle deg etter været",
-     "lekse": "",
-     "type": "Info"
-    },
-    {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "Nynorsk: samansette ord",
-     "lekse": "Les s. 40–44 i Kontekst",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "Innleveringsfrist: kildekritikk",
-     "lekse": "Lever oppgaven i Teams før kl. 15",
+     "tema": "Innlevering: argumenterande tekst",
+     "lekse": "Lever teksten i Teams før kl. 15.00",
      "type": "Innlevering"
     },
     {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
+     "klasse": "1STA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1T",
+     "laerer": "AT",
+     "tema": "Potensar og røter",
+     "lekse": "Oppgåve 2.14–2.28",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
      "fag": "Naturfag",
      "laerer": "IL",
      "tema": "",
@@ -1898,10 +1854,32 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
+     "klasse": "1STA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1T",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
      "fag": "Engelsk",
      "laerer": "SB",
      "tema": "",
@@ -1909,197 +1887,98 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Naturfag",
-     "laerer": "IL",
+     "klasse": "1STA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "KRLE",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Mat og helse",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8B",
+     "klasse": "1STA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Samfunnskunnskap",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
      "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Geografi",
+     "laerer": "PH",
+     "tema": "Naturressursar på Nordvestlandet",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8B",
+     "klasse": "1STA",
      "dag": "Fredag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Mat og helse",
-     "laerer": "IL",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Samfunnskunnskap",
+     "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Samfunnsfag",
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Spansk",
+     "laerer": "MG",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Torsdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Spansk",
+     "laerer": "MG",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Historie",
      "laerer": "PH",
      "tema": "Den industrielle revolusjonen",
      "lekse": "Les s. 88–95 og svar på tre spørsmål",
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "2STA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
      "tema": "",
@@ -2107,65 +1986,98 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "9A",
+     "klasse": "2STA",
      "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Matematikk S1",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
+     "klasse": "2STA",
      "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Engelsk",
-     "laerer": "SB",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Sosiologi og sosialantropologi",
+     "laerer": "EV",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
+     "klasse": "2STA",
      "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Naturfag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Biologi 1",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk S1",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "Forsøk: elektrisitet og kretser",
-     "lekse": "Skriv rapport fra forsøket",
+     "klasse": "2STA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
+     "klasse": "2STA",
      "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Historie",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk S1",
+     "laerer": "AT",
+     "tema": "Heildagsprøve i funksjonar",
+     "lekse": "Øv på kapittel 3",
+     "type": "Prøve"
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
      "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
@@ -2173,307 +2085,43 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Tysk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "Novelleanalyse: virkemidler",
-     "lekse": "Les novellen «Karen» og noter virkemidler",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Naturfag",
+     "klasse": "2STA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Biologi 1",
      "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Tysk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "KRLE",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "Ekskursjon til kunstmuseet – vi går kl. 12.00",
-     "lekse": "Ta med matpakke",
+     "tema": "Feltarbeid i fjøra – vi bruker skulebåten",
+     "lekse": "Ta med regntøy og støvlar",
      "type": "Tur"
     },
     {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
+     "klasse": "2STA",
      "dag": "Onsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Spansk",
+     "laerer": "MG",
      "tema": "",
-     "lekse": "Frist for å melde seg på turneringen",
-     "type": "Frist"
+     "lekse": "",
+     "type": ""
     },
     {
-     "klasse": "9A",
+     "klasse": "2STA",
      "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Spansk",
+     "laerer": "MG",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "Funksjoner: lineære sammenhenger",
-     "lekse": "Oppgave 5.30–5.40",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "Skriveøkt: argumenterende tekst",
-     "lekse": "Førsteutkast leveres i Teams",
-     "type": "Innlevering"
-    },
-    {
-     "klasse": "10B",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "Oral presentations: prepare in pairs",
-     "lekse": "Øv på framføringen hjemme",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
+     "klasse": "2STA",
      "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "KRLE",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Tysk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
+     "start": "12:00",
+     "slutt": "13:30",
      "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
@@ -2481,54 +2129,32 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Musikk",
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Sosiologi og sosialantropologi",
      "laerer": "EV",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Naturfag",
+     "klasse": "2STA",
+     "dag": "Onsdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Biologi 1",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
+     "klasse": "3STA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
      "tema": "",
@@ -2536,44 +2162,704 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Tysk",
-     "laerer": "SB",
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Historie",
+     "laerer": "PH",
+     "tema": "Den kalde krigen: kjeldegransking",
+     "lekse": "Les utdraga i klasserommet",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Norsk",
+     "laerer": "KM",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
+     "dag": "Torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Matematikk R2",
+     "laerer": "AT",
+     "tema": "Integrasjon: delvis integrasjon",
+     "lekse": "Oppgåve 5.30–5.44",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
      "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Naturfag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Biologi 2",
      "laerer": "IL",
-     "tema": "Repetisjon før tentamen",
+     "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
+     "klasse": "3STA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Religion og etikk",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Historie",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Sosialkunnskap",
+     "laerer": "EV",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Historie",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Biologi 2",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Sosialkunnskap",
+     "laerer": "EV",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Religion og etikk",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk R2",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Matematikk R2",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Onsdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Biologi 2",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Helsefremjande arbeid",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "Utplassering på sjukeheimen – oppmøte kl. 08.00",
+     "lekse": "Ta med arbeidstøy og namneskilt",
+     "type": "Utplassering"
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Kommunikasjon og samhandling",
+     "laerer": "TB",
+     "tema": "Aktiv lytting og brukarmedverknad",
+     "lekse": "Skriv logg frå utplasseringa",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesliv i helse- og oppvekstfag",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Helsefremjande arbeid",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Helsefremjande arbeid",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Kommunikasjon og samhandling",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Naturfag",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Produksjon og tenester",
+     "laerer": "JH",
+     "tema": "Måling og toleransar",
+     "lekse": "Oppgåvehefte s. 4–7",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "laerer": "JH",
+     "tema": "Pneumatikk: enkle kretsar",
+     "lekse": "Teikn kretsen frå timen på nytt",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Produksjon og tenester",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Produksjon og tenester",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Naturfag",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Bransje og arbeidsliv",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "Fisk: filetering og kvalitet",
+     "lekse": "Sjå instruksjonsvideoen før timen",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Bransje og arbeidsliv",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Naturfag",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -2582,129 +2868,129 @@ const DATA = {
    ],
    "oppgaver": [
     {
-     "klasse": "8A",
+     "klasse": "1STA",
      "fag": "Norsk",
-     "tekst": "Les s. 40–44 i Kontekst. Skriv fem setningar med samansette ord.",
-     "dag": "Mandag",
-     "frist": "Onsdag",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "fag": "Matematikk",
-     "tekst": "Oppgave 2.14–2.22",
-     "dag": "Mandag",
-     "frist": "Tirsdag",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "fag": "Engelsk",
-     "tekst": "Glosetest torsdag – 20 ord fra kapittel 3",
-     "dag": "Tirsdag",
+     "tekst": "Skriv utkast til argumenterande tekst i Teams",
+     "dag": "Måndag",
      "frist": "Torsdag",
-     "type": "Prøve"
+     "type": ""
     },
     {
-     "klasse": "8A",
+     "klasse": "1STA",
+     "fag": "Matematikk 1T",
+     "tekst": "Oppgåve 2.14–2.28",
+     "dag": "Måndag",
+     "frist": "Tysdag",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
      "fag": "Naturfag",
-     "tekst": "Tegn en dyrecelle med navn på delene",
+     "tekst": "Teikn ei dyrecelle med namn på delane",
+     "dag": "Tysdag",
+     "frist": "Fredag",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "fag": "Engelsk",
+     "tekst": "Glosetest torsdag – 20 ord frå kapittel 3",
      "dag": "Onsdag",
-     "frist": "Fredag",
-     "type": ""
+     "frist": "Torsdag",
+     "type": "Vurdering"
     },
     {
-     "klasse": "8A",
-     "fag": "Matematikk",
-     "tekst": "Øv på oppgavene fra kapittel 2",
-     "dag": "Fredag",
-     "frist": "Fredag",
-     "type": "Prøve"
-    },
-    {
-     "klasse": "8B",
-     "fag": "Matematikk",
-     "tekst": "Oppgave 2.14–2.22",
-     "dag": "Mandag",
-     "frist": "Tirsdag",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
+     "klasse": "1STA",
      "fag": "Norsk",
-     "tekst": "Les s. 40–44 i Kontekst",
-     "dag": "Onsdag",
-     "frist": "Fredag",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "fag": "Samfunnsfag",
-     "tekst": "Lever oppgaven i Teams før kl. 15",
+     "tekst": "Lever teksten i Teams før kl. 15.00",
      "dag": "Fredag",
      "frist": "Fredag",
      "type": "Innlevering"
     },
     {
-     "klasse": "9A",
-     "fag": "Samfunnsfag",
+     "klasse": "2STA",
+     "fag": "Historie",
      "tekst": "Les s. 88–95 og svar på tre spørsmål",
-     "dag": "Mandag",
+     "dag": "Måndag",
      "frist": "Onsdag",
      "type": ""
     },
     {
-     "klasse": "9A",
-     "fag": "Naturfag",
-     "tekst": "Skriv rapport fra forsøket",
-     "dag": "Tirsdag",
-     "frist": "Torsdag",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "fag": "Kunst og håndverk",
-     "tekst": "Ta med matpakke",
-     "dag": "Torsdag",
-     "frist": "Torsdag",
+     "klasse": "2STA",
+     "fag": "Biologi 1",
+     "tekst": "Ta med regntøy og støvlar",
+     "dag": "Tysdag",
+     "frist": "Tysdag",
      "type": "Tur"
     },
     {
-     "klasse": "9A",
-     "fag": "Norsk",
-     "tekst": "Les novellen «Karen» og noter virkemidler",
+     "klasse": "2STA",
+     "fag": "Matematikk S1",
+     "tekst": "Øv på kapittel 3",
      "dag": "Fredag",
      "frist": "Fredag",
-     "type": ""
+     "type": "Prøve"
     },
     {
-     "klasse": "10B",
-     "fag": "Matematikk",
-     "tekst": "Oppgave 5.30–5.40",
-     "dag": "Mandag",
-     "frist": "Onsdag",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "fag": "Norsk",
-     "tekst": "Førsteutkast leveres i Teams",
-     "dag": "Tirsdag",
+     "klasse": "3STA",
+     "fag": "Historie",
+     "tekst": "Les utdraga i klasserommet",
+     "dag": "Tysdag",
      "frist": "Torsdag",
-     "type": "Innlevering"
+     "type": ""
     },
     {
-     "klasse": "10B",
-     "fag": "Engelsk",
-     "tekst": "Øv på framføringen hjemme",
+     "klasse": "3STA",
+     "fag": "Matematikk R2",
+     "tekst": "Oppgåve 5.30–5.44",
      "dag": "Torsdag",
      "frist": "Fredag",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "fag": "Yrkesfagleg fordjuping",
+     "tekst": "Ta med arbeidstøy og namneskilt",
+     "dag": "Tysdag",
+     "frist": "Tysdag",
+     "type": "Utplassering"
+    },
+    {
+     "klasse": "1HSA",
+     "fag": "Kommunikasjon og samhandling",
+     "tekst": "Skriv logg frå utplasseringa",
+     "dag": "Onsdag",
+     "frist": "Torsdag",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "fag": "Produksjon og tenester",
+     "tekst": "Oppgåvehefte s. 4–7",
+     "dag": "Måndag",
+     "frist": "Torsdag",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "tekst": "Teikn kretsen frå timen på nytt",
+     "dag": "Tysdag",
+     "frist": "Fredag",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "fag": "Råvare, produksjon og kvalitet",
+     "tekst": "Sjå instruksjonsvideoen før timen",
+     "dag": "Torsdag",
+     "frist": "Torsdag",
      "type": ""
     },
     {
      "klasse": "Alle",
-     "fag": "Valgfag",
-     "tekst": "Frist for å melde seg på turneringen",
+     "fag": "",
+     "tekst": "Frist for å melde seg på fagdagen om psykisk helse",
      "dag": "Onsdag",
      "frist": "Onsdag",
      "type": "Frist"
@@ -2713,18 +2999,18 @@ const DATA = {
    "beskjeder": [
     {
      "klasse": "Alle",
-     "tittel": "Foreldremøte torsdag",
-     "tekst": "Foreldremøte for hele trinnet torsdag kl. 18.00 i aulaen. Meld fra i Vigilo om dere kommer."
+     "tittel": "Foreldremøte for Vg1 torsdag",
+     "tekst": "Foreldremøte for alle Vg1-klassane torsdag kl. 18.00 i auditoriet. Meld frå i Visma InSchool."
     },
     {
-     "klasse": "8A",
-     "tittel": "Ny mattelærer fra mandag",
-     "tekst": "Anders tar over mattetimene ut skoleåret. Han treffes på e-post og i Vigilo."
+     "klasse": "1HSA",
+     "tittel": "Utplassering tysdag",
+     "tekst": "Oppmøte direkte på sjukeheimen kl. 08.00. Hugs arbeidstøy, namneskilt og matpakke."
     },
     {
-     "klasse": "9A",
-     "tittel": "Museumstur torsdag",
-     "tekst": "Vi går fra skolen kl. 12.00 og er tilbake til siste time. Ta med matpakke og drikke."
+     "klasse": "2STA",
+     "tittel": "Feltarbeid med skulebåten",
+     "tekst": "Vi går frå kaia kl. 10.00 tysdag. Kle deg etter vêret – det blir vått."
     }
    ]
   },
@@ -2734,12 +3020,12 @@ const DATA = {
    "datospenn": "7.–11. sep 2026",
    "dager": [
     {
-     "navn": "Mandag",
+     "navn": "Måndag",
      "dato": "2026-09-07",
      "visning": "7. sep"
     },
     {
-     "navn": "Tirsdag",
+     "navn": "Tysdag",
      "dato": "2026-09-08",
      "visning": "8. sep"
     },
@@ -2761,21 +3047,32 @@ const DATA = {
    ],
    "timer": [
     {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "1STA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
-     "tema": "Vi skriver forteljing",
-     "lekse": "Skriv ferdig utkastet",
+     "tema": "",
+     "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Naturfag",
+     "laerer": "IL",
+     "tema": "Arv og miljø",
+     "lekse": "Les s. 52–60",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Engelsk",
      "laerer": "SB",
      "tema": "",
@@ -2783,10 +3080,43 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "1STA",
+     "dag": "Torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Matematikk 1T",
+     "laerer": "AT",
+     "tema": "Prøve i tal og algebra",
+     "lekse": "Øv på kapittel 1 og 2",
+     "type": "Prøve"
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1T",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
      "fag": "Naturfag",
      "laerer": "IL",
      "tema": "",
@@ -2794,54 +3124,10 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
+     "klasse": "1STA",
      "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
+     "start": "10:00",
+     "slutt": "11:30",
      "fag": "Norsk",
      "laerer": "KM",
      "tema": "",
@@ -2849,10 +3135,21 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8A",
+     "klasse": "1STA",
      "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1T",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1STA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
      "fag": "Engelsk",
      "laerer": "SB",
      "tema": "",
@@ -2860,32 +3157,21 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
+     "klasse": "1STA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
      "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
@@ -2893,153 +3179,76 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8A",
+     "klasse": "1STA",
      "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Mat og helse",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "KRLE",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Samfunnskunnskap",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Samfunnsfag",
+     "klasse": "1STA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Geografi",
      "laerer": "PH",
-     "tema": "Demokrati: hvem bestemmer i Norge?",
-     "lekse": "Les s. 22–29",
-     "type": ""
-    },
-    {
-     "klasse": "8A",
-     "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Mat og helse",
-     "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "Vi øver til høstkonserten",
-     "lekse": "",
-     "type": "Info"
-    },
-    {
-     "klasse": "8A",
+     "klasse": "1STA",
      "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Samfunnskunnskap",
+     "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Mandag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
+     "klasse": "1STA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Spansk",
+     "laerer": "MG",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
+     "klasse": "1STA",
      "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Spansk",
+     "laerer": "MG",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "dag": "Fredag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Historie",
+     "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Kroppsøving",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "2STA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
      "tema": "",
@@ -3047,307 +3256,142 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "8B",
+     "klasse": "2STA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Matematikk S1",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
      "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "Presentations: my hometown",
-     "lekse": "Framføring torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Sosiologi og sosialantropologi",
+     "laerer": "EV",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Biologi 1",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk S1",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Historie",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk S1",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Biologi 1",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "2STA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Spansk",
+     "laerer": "MG",
+     "tema": "Presentación: mi pueblo",
+     "lekse": "Øv på framføringa heime",
      "type": "Vurdering"
     },
     {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
+     "klasse": "2STA",
      "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Spansk",
+     "laerer": "MG",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "8B",
+     "klasse": "2STA",
      "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "KRLE",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Mat og helse",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Mandag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "dag": "Fredag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Mat og helse",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "Prøve i likninger",
-     "lekse": "Øv på kapittel 3",
-     "type": "Prøve"
-    },
-    {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
+     "start": "12:00",
+     "slutt": "13:30",
      "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
@@ -3355,186 +3399,54 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Tysk",
-     "laerer": "SB",
+     "klasse": "2STA",
+     "dag": "Måndag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Sosiologi og sosialantropologi",
+     "laerer": "EV",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Naturfag",
+     "klasse": "2STA",
+     "dag": "Onsdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Biologi 1",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
+     "klasse": "3STA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Norsk",
-     "laerer": "KM",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Tysk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "KRLE",
-     "laerer": "PH",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Mandag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Onsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
-     "laerer": "MR",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "9A",
-     "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Kunst og håndverk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "Tentamen – hele dagen",
-     "lekse": "Ta med kalkulator og linjal",
+     "tema": "Tentamen i norsk hovudmål – heile dagen",
+     "lekse": "Ta med lading til PC-en",
      "type": "Prøve"
     },
     {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "08:30",
-     "slutt": "09:30",
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Historie",
+     "laerer": "PH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
      "fag": "Norsk",
      "laerer": "KM",
      "tema": "",
@@ -3542,43 +3454,54 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Onsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Naturfag",
+     "klasse": "3STA",
+     "dag": "Torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Matematikk R2",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Biologi 2",
      "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Torsdag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Engelsk",
-     "laerer": "SB",
+     "klasse": "3STA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Religion og etikk",
+     "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Fredag",
-     "start": "08:30",
-     "slutt": "09:30",
-     "fag": "Matematikk",
-     "laerer": "AT",
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Historie",
+     "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "09:40",
-     "slutt": "10:40",
+     "klasse": "3STA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
      "fag": "Norsk",
      "laerer": "KM",
      "tema": "",
@@ -3586,76 +3509,54 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Engelsk",
-     "laerer": "SB",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Onsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Matematikk",
-     "laerer": "AT",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Torsdag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "KRLE",
-     "laerer": "PH",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Sosialkunnskap",
+     "laerer": "EV",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Fredag",
-     "start": "09:40",
-     "slutt": "10:40",
-     "fag": "Samfunnsfag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Historie",
      "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Tysk",
-     "laerer": "SB",
+     "klasse": "3STA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Biologi 2",
+     "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Samfunnsfag",
-     "laerer": "PH",
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Sosialkunnskap",
+     "laerer": "EV",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Onsdag",
-     "start": "11:10",
-     "slutt": "12:10",
+     "start": "12:00",
+     "slutt": "13:30",
      "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
@@ -3663,76 +3564,142 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Torsdag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Norsk",
-     "laerer": "KM",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Religion og etikk",
+     "laerer": "PH",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
      "dag": "Fredag",
-     "start": "11:10",
-     "slutt": "12:10",
-     "fag": "Musikk",
-     "laerer": "EV",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Mandag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Naturfag",
-     "laerer": "IL",
-     "tema": "",
-     "lekse": "",
-     "type": ""
-    },
-    {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Matematikk",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk R2",
      "laerer": "AT",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "3STA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Matematikk R2",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "3STA",
      "dag": "Onsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Norsk",
-     "laerer": "KM",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Biologi 2",
+     "laerer": "IL",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "1HSA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Helsefremjande arbeid",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Kommunikasjon og samhandling",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
      "dag": "Torsdag",
-     "start": "12:20",
-     "slutt": "13:20",
-     "fag": "Tysk",
-     "laerer": "SB",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesliv i helse- og oppvekstfag",
+     "laerer": "TB",
+     "tema": "Yrkesetikk og teieplikt",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Helsefremjande arbeid",
+     "laerer": "TB",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Fredag",
-     "start": "12:20",
-     "slutt": "13:20",
+     "klasse": "1HSA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Helsefremjande arbeid",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Kommunikasjon og samhandling",
+     "laerer": "TB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
      "fag": "Naturfag",
      "laerer": "IL",
      "tema": "",
@@ -3740,22 +3707,429 @@ const DATA = {
      "type": ""
     },
     {
-     "klasse": "10B",
-     "dag": "Tirsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
+     "klasse": "1HSA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1HSA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
      "type": ""
     },
     {
-     "klasse": "10B",
+     "klasse": "1HSA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Produksjon og tenester",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "Utplassering i bedrift heile onsdagen",
+     "lekse": "Meld frå til kontaktlærar om oppmøtestad",
+     "type": "Utplassering"
+    },
+    {
+     "klasse": "1TIA",
      "dag": "Torsdag",
-     "start": "13:30",
-     "slutt": "14:15",
-     "fag": "Valgfag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Produksjon og tenester",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Produksjon og tenester",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "laerer": "JH",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Naturfag",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1TIA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Måndag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Bransje og arbeidsliv",
+     "laerer": "AN",
+     "tema": "Vi lagar lunsj til personalrommet",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Onsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Torsdag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Fredag",
+     "start": "08:15",
+     "slutt": "09:45",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Måndag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Bransje og arbeidsliv",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Onsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Yrkesfagleg fordjuping",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Torsdag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Råvare, produksjon og kvalitet",
+     "laerer": "AN",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Fredag",
+     "start": "10:00",
+     "slutt": "11:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Måndag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Norsk",
+     "laerer": "KM",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Engelsk",
+     "laerer": "SB",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Onsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Matematikk 1P-Y",
+     "laerer": "AT",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Torsdag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Naturfag",
+     "laerer": "IL",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Fredag",
+     "start": "12:00",
+     "slutt": "13:30",
+     "fag": "Kroppsøving",
+     "laerer": "MR",
+     "tema": "",
+     "lekse": "",
+     "type": ""
+    },
+    {
+     "klasse": "1RMA",
+     "dag": "Tysdag",
+     "start": "13:40",
+     "slutt": "15:10",
+     "fag": "Kroppsøving",
      "laerer": "MR",
      "tema": "",
      "lekse": "",
@@ -3766,83 +4140,88 @@ const DATA = {
      "dag": "Fredag",
      "start": "",
      "slutt": "",
-     "fag": "Info",
+     "fag": "",
      "laerer": "",
-     "tema": "",
-     "lekse": "Skolen slutter kl. 12.00 – planleggingsdag",
-     "type": "Info"
+     "tema": "Fagdag om psykisk helse – vanleg timeplan går ut",
+     "lekse": "",
+     "type": "Fagdag"
     }
    ],
    "oppgaver": [
     {
-     "klasse": "8A",
-     "fag": "Norsk",
-     "tekst": "Skriv ferdig utkastet",
-     "dag": "Mandag",
+     "klasse": "1STA",
+     "fag": "Naturfag",
+     "tekst": "Les s. 52–60",
+     "dag": "Tysdag",
      "frist": "Torsdag",
      "type": ""
     },
     {
-     "klasse": "8A",
-     "fag": "Samfunnsfag",
-     "tekst": "Les s. 22–29",
-     "dag": "Tirsdag",
-     "frist": "Torsdag",
-     "type": ""
-    },
-    {
-     "klasse": "8B",
-     "fag": "Engelsk",
-     "tekst": "Framføring torsdag",
+     "klasse": "1STA",
+     "fag": "Matematikk 1T",
+     "tekst": "Øv på kapittel 1 og 2",
      "dag": "Torsdag",
      "frist": "Torsdag",
+     "type": "Prøve"
+    },
+    {
+     "klasse": "2STA",
+     "fag": "Spansk",
+     "tekst": "Øv på framføringa heime",
+     "dag": "Onsdag",
+     "frist": "Onsdag",
      "type": "Vurdering"
     },
     {
-     "klasse": "9A",
-     "fag": "Matematikk",
-     "tekst": "Øv på kapittel 3",
-     "dag": "Onsdag",
-     "frist": "Onsdag",
+     "klasse": "3STA",
+     "fag": "Norsk",
+     "tekst": "Ta med lading til PC-en",
+     "dag": "Måndag",
+     "frist": "Måndag",
      "type": "Prøve"
     },
     {
-     "klasse": "10B",
-     "fag": "Matematikk",
-     "tekst": "Ta med kalkulator og linjal",
-     "dag": "Mandag",
-     "frist": "Mandag",
-     "type": "Prøve"
+     "klasse": "1TIA",
+     "fag": "Yrkesfagleg fordjuping",
+     "tekst": "Meld frå til kontaktlærar om oppmøtestad",
+     "dag": "Onsdag",
+     "frist": "Onsdag",
+     "type": "Utplassering"
     },
     {
      "klasse": "Alle",
      "fag": "",
-     "tekst": "Skolen slutter kl. 12.00 – planleggingsdag",
+     "tekst": "Fagdag om psykisk helse – vanleg timeplan går ut",
      "dag": "Fredag",
      "frist": "Fredag",
-     "type": "Info"
+     "type": "Fagdag"
     }
    ],
    "beskjeder": [
     {
      "klasse": "Alle",
-     "tittel": "Planleggingsdag fredag",
-     "tekst": "Skolen slutter kl. 12.00 på fredag. SFO holder åpent som vanlig."
+     "tittel": "Fagdag fredag",
+     "tekst": "Fredag er det fagdag om psykisk helse for heile skulen. Vanleg timeplan går ut."
     },
     {
-     "klasse": "10B",
-     "tittel": "Tentamen mandag",
-     "tekst": "Norsktentamen mandag. Møt opp kl. 08.15 utenfor rom 305."
+     "klasse": "3STA",
+     "tittel": "Tentamen måndag",
+     "tekst": "Norsktentamen måndag. Møt opp kl. 08.00 utanfor auditoriet."
     }
    ]
   }
- ]
+ ],
+ "logo": ""
 };
+const T = DATA.tekst;
+const GENERERT = "26. aug 11:03";
 
 const $ = (id) => document.getElementById(id);
 const tekst = (v) => (v == null ? "" : String(v));
 const trygg = (s) => tekst(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
+const VIKTIG = /prøve|innlevering|frist|vurdering/i;
+const viktig = (type) => VIKTIG.test(tekst(type));
 const fagFarge = new Map(DATA.fag.map((f) => [f.navn, f.farge]));
 const farge = (navn) => fagFarge.get(navn) || "#5B6A72";
 
@@ -3930,13 +4309,13 @@ function tegnFagfilter() {
       const f = b.dataset.fag;
       skjulteFag.has(f) ? skjulteFag.delete(f) : skjulteFag.add(f);
       b.setAttribute("aria-pressed", String(!skjulteFag.has(f)));
-      $("allefag").textContent = skjulteFag.size ? "vis alle" : "skjul alle";
+      $("allefag").textContent = skjulteFag.size ? T.vis_alle : T.skjul_alle;
       tegnUke(false);
       dempFag();
     });
   });
   $("allefag").hidden = fag.length === 0;
-  $("allefag").textContent = skjulteFag.size ? "vis alle" : "skjul alle";
+  $("allefag").textContent = skjulteFag.size ? T.vis_alle : T.skjul_alle;
 }
 
 function dempFag() {
@@ -3967,7 +4346,7 @@ function tegnUke(animer = true, retning = "") {
       const erIdag = dag.dato === idagISO;
       const kort = dagensTimer.length
         ? dagensTimer.map((t) => timekort(t, erIdag)).join("")
-        : `<div class="tom">Ingen timer</div>`;
+        : `<div class="tom">${trygg(T.ingen_timer)}</div>`;
       return `<section class="dag${erIdag ? " idag" : ""}" style="--i:${i}">
         <header class="daghode"><span class="navn">${trygg(dag.navn)}${fristmerke(dag.navn)}</span><span class="dato">${trygg(dag.visning)}</span></header>
         <div class="timer">${kort}</div>
@@ -3999,10 +4378,10 @@ function timekort(t, erIdag) {
   if (t.tema) tilstand += " har-innhold";
   const klokke = [t.start, t.slutt].filter(Boolean).join("–");
   const hoyre = trygg(t.laerer);
-  const merke = t.type ? `<span class="merke ${/prøve|innlevering|frist/i.test(t.type) ? "viktig" : "rolig"}">${trygg(t.type)}</span>` : "";
+  const merke = t.type && t.fag ? `<span class="merke ${viktig(t.type) ? "viktig" : "rolig"}">${trygg(t.type)}</span>` : "";
   return `<article class="time${tilstand}" data-fagrad="${trygg(t.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}">
     <div class="klokke"><span>${trygg(klokke)}</span><span>${hoyre}</span></div>
-    <div class="fagnavn">${trygg(t.fag)}</div>
+    <div class="fagnavn">${trygg(t.fag || t.type || T.uke)}</div>
     ${t.tema ? `<p class="tema">${trygg(t.tema)}</p>` : ""}
     ${merke}
   </article>`;
@@ -4032,14 +4411,14 @@ function fristerPerDag() {
 function fristmerke(dagnavn) {
   const antall = (fristerPerDag().get(dagnavn) || []).filter((o) => !skjulteFag.has(o.fag)).length;
   if (!antall) return "";
-  const ord = antall === 1 ? "frist" : "frister";
-  return `<button class="fristmerke" type="button" data-frist="${trygg(dagnavn)}" title="${antall} ${ord} – se «Å gjøre denne uka»">${antall}</button>`;
+  const ord = antall === 1 ? T.frist : T.frister;
+  return `<button class="fristmerke" type="button" data-frist="${trygg(dagnavn)}" title="${antall} ${ord} – ${trygg(T.se_gjore)}">${antall}</button>`;
 }
 
 function tegnOppgaver() {
   const per = fristerPerDag();
   const totalt = [...per.values()].reduce((sum, liste) => sum + liste.length, 0);
-  $("antall").textContent = totalt ? `${totalt} punkt` : "";
+  $("antall").textContent = totalt ? `${totalt} ${T.punkt}` : "";
   $("oppgaver").innerHTML = totalt
     ? uka().dager
         .filter((d) => (per.get(d.navn) || []).length)
@@ -4048,14 +4427,14 @@ function tegnOppgaver() {
             <ul class="oppgaveliste">${per.get(d.navn).map(oppgaverad).join("")}</ul>
           </section>`)
         .join("")
-    : `<p class="tom">Ingen lekser eller frister denne uka.</p>`;
+    : `<p class="tom">${trygg(T.ingen_frister)}</p>`;
   avslor();
   dempFag();
 }
 
 function oppgaverad(o) {
   const f = farge(o.fag);
-  const merke = o.type ? `<span class="merke ${/prøve|innlevering|frist/i.test(o.type) ? "viktig" : "rolig"}">${trygg(o.type)}</span>` : "";
+  const merke = o.type ? `<span class="merke ${viktig(o.type) ? "viktig" : "rolig"}">${trygg(o.type)}</span>` : "";
   return `<li class="oppgave" data-fagrad="${trygg(o.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}">
     ${o.fag ? `<span class="fagetikett">${trygg(o.fag)}</span>` : `<span></span>`}
     <span class="hva"><span class="tekst">${trygg(o.tekst)}</span></span>
@@ -4083,7 +4462,7 @@ function settTema(valg) {
     document.documentElement.setAttribute("data-theme", valg);
     try { localStorage.setItem("ukeplan:tema", valg); } catch (e) {}
   }
-  $("temaknapp").textContent = morkModus() ? "Lys" : "Mørk";
+  $("temaknapp").textContent = morkModus() ? T.lys : T.mork;
   tegnUke(false);
   tegnOppgaver();
 }
@@ -4103,7 +4482,7 @@ function tegnAlt(retning = "") {
     merke.classList.add("bytt");
   }
   $("fotklasse").textContent = `${DATA.skole} · ${valgtKlasse}`;
-  document.title = `Uke ${uka().uke} · ${valgtKlasse} · ${DATA.skole}`;
+  document.title = `${T.uke} ${uka().uke} · ${valgtKlasse} · ${DATA.skole}`;
 }
 
 /* Uka siden åpner på: den som er nå, ellers den Oppsett peker på. */
@@ -4114,9 +4493,38 @@ function startuke() {
   return valgt >= 0 ? valgt : 0;
 }
 
+function settProfil() {
+  const rot = document.documentElement;
+  if (DATA.profilfarge) rot.style.setProperty("--profil", DATA.profilfarge);
+  rot.style.setProperty("--naa-tekst", `"${T.naa}"`);
+  if (DATA.merke) {
+    $("stempel").textContent = DATA.merke;
+    $("stempel").hidden = false;
+  }
+  if (DATA.logo) {
+    const logo = $("logo");
+    logo.src = DATA.logo;
+    logo.alt = DATA.skole;
+    logo.hidden = false;
+    $("skole").hidden = true;
+  }
+  $("uke-etikett").textContent = T.uke;
+  $("klasse-tittel").textContent = T.klasse;
+  $("fag-tittel").textContent = T.fag;
+  $("gjore-tittel").textContent = T.gjore;
+  $("tilbaketilnaa").textContent = T.tilbake;
+  $("skrivut").textContent = T.skriv_ut;
+  $("fot-oppdatert").textContent = `${T.oppdatert} ${GENERERT}`;
+  for (const [id, merkelapp] of [["forrige", T.forrige_uke], ["neste", T.neste_uke]]) {
+    $(id).title = merkelapp;
+    $(id).setAttribute("aria-label", merkelapp);
+  }
+}
+
 function start() {
+  settProfil();
   $("skole").textContent = DATA.skole;
-  $("overskrift").textContent = DATA.overskrift || "Ukeplan";
+  $("overskrift").textContent = DATA.overskrift || T.ukeplan;
   $("skrivut").addEventListener("click", () => window.print());
   $("allefag").addEventListener("click", () => {
     skjulteFag = skjulteFag.size ? new Set() : new Set(fagIBruk());
@@ -4141,7 +4549,7 @@ function start() {
   const fraUrl = DATA.uker.findIndex((u) => String(u.uke) === parametre.get("uke"));
   ukeIndeks = fraUrl >= 0 ? fraUrl : startuke();
 
-  $("temaknapp").textContent = morkModus() ? "Lys" : "Mørk";
+  $("temaknapp").textContent = morkModus() ? T.lys : T.mork;
   tegnKlasser();
   tegnAlt();
 

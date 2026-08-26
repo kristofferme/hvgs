@@ -9,8 +9,9 @@ from dataclasses import dataclass, field
 
 from openpyxl import load_workbook
 
-from .felles import (DAGER, datospenn, farge_for, nokkel, norsk_dato, rens, tolk_dag,
-                     tolk_dato, tolk_okt, tolk_type, uke_til_mandag)
+from .felles import (ARKNAVN, DAGER, PROFILFARGE_STANDARD, datospenn, farge_for, nokkel,
+                     norsk_dato, rens, tekster, tolk_dag, tolk_dato, tolk_farge, tolk_okt,
+                     tolk_sprak, tolk_type, uke_til_mandag, vis_dag)
 
 
 @dataclass
@@ -36,17 +37,29 @@ def _kolonneverdier(ws, kolonne: int, fra_rad: int) -> list[str]:
     return ut
 
 
+def _ark(wb, nokkelnavn: str):
+    """Finner arket enten boka er på bokmål eller nynorsk."""
+    for navn in ARKNAVN[nokkelnavn]:
+        if navn in wb.sheetnames:
+            return wb[navn]
+    return None
+
+
 def les(sti) -> Resultat:
     wb = load_workbook(sti, data_only=True)
     merknader: list[str] = []
 
-    for ark in ("Oppsett", "Timeplan", "Uke"):
-        if ark not in wb.sheetnames:
-            raise SystemExit(f"Arket «{ark}» mangler i {sti}. Lag en ny arbeidsbok med: ukeplan.py ny")
+    for nokkelnavn, vist in (("ark_oppsett", "Oppsett"), ("ark_timeplan", "Timeplan"), ("ark_uke", "Uke")):
+        if _ark(wb, nokkelnavn) is None:
+            raise SystemExit(f"Arket «{vist}» mangler i {sti}. Lag en ny arbeidsbok med: ukeplan.py ny")
 
-    opp = wb["Oppsett"]
-    skole = rens(opp["C4"].value) or "Skolen"
-    overskrift = rens(opp["C7"].value) or "Ukeplan"
+    opp = _ark(wb, "ark_oppsett")
+    sprak = tolk_sprak(opp["C8"].value)
+    T = tekster(sprak)
+    skole = rens(opp["C4"].value) or T["skole"]
+    overskrift = rens(opp["C7"].value) or T["ukeplan"]
+    profilfarge = tolk_farge(opp["C9"].value, PROFILFARGE_STANDARD)
+    logo = rens(opp["C10"].value)
 
     forste = tolk_dato(opp["C6"].value)
     uke_celle = rens(opp["C5"].value)
@@ -60,11 +73,11 @@ def les(sti) -> Resultat:
     forste -= dt.timedelta(days=forste.weekday())
     standarduke = int(uke_celle) if uke_celle.isdigit() else forste.isocalendar()[1]
 
-    klasser = [k for k in _kolonneverdier(opp, 2, 11) if nokkel(k) != "alle"]
-    fagnavn = _kolonneverdier(opp, 5, 10)
+    klasser = [k for k in _kolonneverdier(opp, 2, 14) if nokkel(k) != "alle"]
+    fagnavn = _kolonneverdier(opp, 5, 13)
     egne_farger = {}
     for i, navn in enumerate(fagnavn):
-        hex_ = rens(opp.cell(row=10 + i, column=6).value)
+        hex_ = rens(opp.cell(row=13 + i, column=6).value)
         if hex_.startswith("#") and len(hex_) == 7:
             egne_farger[navn] = hex_
 
@@ -94,7 +107,7 @@ def les(sti) -> Resultat:
         return t
 
     laerere = _les_laerere(wb, fest_klasse, fest_fag)
-    grunntimeplan = _les_timeplan(wb["Timeplan"], fest_klasse, fest_fag, laerere, merknader)
+    grunntimeplan = _les_timeplan(_ark(wb, "ark_timeplan"), fest_klasse, fest_fag, laerere, merknader)
     ukeinnhold, beskjeder = _les_innhold(wb, standarduke, fest_klasse, fest_fag, merknader)
 
     ukenumre = sorted({standarduke} | set(ukeinnhold) | set(beskjeder),
@@ -131,10 +144,15 @@ def les(sti) -> Resultat:
     if not klasser:
         merknader.append("Ingen klasser funnet. Legg dem inn i Oppsett.")
 
+    _vis_pa_malform(uker, sprak)
     data = {
         "skole": skole,
         "overskrift": overskrift,
         "standarduke": standarduke,
+        "sprak": sprak,
+        "tekst": T,
+        "profilfarge": profilfarge,
+        "logofil": logo,
         "klasser": klasser,
         "fag": fag_ut,
         "uker": uker,
@@ -142,12 +160,25 @@ def les(sti) -> Resultat:
     return Resultat(data=data, merknader=merknader)
 
 
+def _vis_pa_malform(uker, sprak: str) -> None:
+    """Dagnavnene skrives i den målforma boka bruker."""
+    for uke in uker:
+        for dag in uke["dager"]:
+            dag["navn"] = vis_dag(dag["navn"], sprak)
+        for time in uke["timer"]:
+            time["dag"] = vis_dag(time["dag"], sprak)
+        for oppgave in uke["oppgaver"]:
+            oppgave["dag"] = vis_dag(oppgave["dag"], sprak)
+            oppgave["frist"] = vis_dag(oppgave["frist"], sprak)
+
+
 def _les_laerere(wb, fest_klasse, fest_fag) -> dict:
     """(klasse, fag) → lærer. Tom klasse gjelder alle."""
     ut = {}
-    if "Lærere" not in wb.sheetnames:
+    ark = _ark(wb, "ark_larere")
+    if ark is None:
         return ut
-    for nr, (klasse, fag, laerer) in _rader(wb["Lærere"], 3):
+    for nr, (klasse, fag, laerer) in _rader(ark, 3):
         f = fest_fag(fag, f"Lærere rad {nr}")
         if not f:
             continue
@@ -196,7 +227,7 @@ def _les_timeplan(ws, fest_klasse, fest_fag, laerere, merknader) -> list[dict]:
 def _les_innhold(wb, standarduke, fest_klasse, fest_fag, merknader):
     """Uke- og beskjedradene, sortert i hver sin uke."""
     ukeinnhold: dict[int, list] = {}
-    for nr, rad in _rader(wb["Uke"], 8):
+    for nr, rad in _rader(_ark(wb, "ark_uke"), 8):
         uke, klasse, dag, fag, tema, lekse, frist, type_ = rad
         nummer = _tolk_uke(uke, standarduke, f"Uke rad {nr}", merknader)
         d = tolk_dag(dag)
@@ -218,8 +249,9 @@ def _les_innhold(wb, standarduke, fest_klasse, fest_fag, merknader):
         }))
 
     beskjeder: dict[int, list] = {}
-    if "Beskjeder" in wb.sheetnames:
-        for nr, (uke, klasse, tittel, tekst) in _rader(wb["Beskjeder"], 4):
+    beskjedark = _ark(wb, "ark_beskjeder")
+    if beskjedark is not None:
+        for nr, (uke, klasse, tittel, tekst) in _rader(beskjedark, 4):
             if not rens(tekst) and not rens(tittel):
                 continue
             nummer = _tolk_uke(uke, standarduke, f"Beskjeder rad {nr}", merknader)
@@ -253,11 +285,13 @@ def _fest_innhold(timer, oppgaver, rad, nr, merknader) -> None:
         treff["tema"] = " · ".join(x for x in (treff["tema"], rad["tema"]) if x)
         treff["lekse"] = " · ".join(x for x in (treff["lekse"], rad["lekse"]) if x)
         treff["type"] = rad["type"] or treff["type"]
-    if not traff and rad["dag"]:
+    # En rad uten fag som bare er en frist, hører hjemme i fristlista – ikke i timeplanen.
+    eget_kort = rad["tema"] or (rad["type"] and nokkel(rad["type"]) != "frist")
+    if not traff and rad["dag"] and eget_kort:
         timer.append({
             "klasse": rad["klasse"], "dag": rad["dag"], "start": "", "slutt": "",
-            "fag": rad["fag"] or "Info", "laerer": "",
-            "tema": rad["tema"], "lekse": rad["lekse"], "type": rad["type"],
+            "fag": rad["fag"], "laerer": "",
+            "tema": rad["tema"] or rad["lekse"], "lekse": "", "type": rad["type"],
         })
         if rad["fag"]:
             merknader.append(

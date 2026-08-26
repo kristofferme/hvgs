@@ -1,0 +1,64 @@
+# Henter arbeidsboka fra Teams/SharePoint og legger den i repoet.
+#
+# Lærerne redigerer fila der de alt jobber. Denne jobben ser etter endringer
+# hvert kvarter, kontrollerer at boka lar seg lese, og lagrer den bare hvis
+# den er endret. Da bygger Netlify nettsiden på nytt av seg selv.
+#
+# Oppsett (én gang): Settings → Secrets and variables → Actions → New secret
+#   Navn:  ARBEIDSBOK_URL
+#   Verdi: nedlastingslenka til Ukeplan.xlsx (se ukeplan/README.md)
+
+name: Hent arbeidsboka
+
+on:
+  schedule:
+    - cron: "*/15 5-16 * * 1-5"    # hvert kvarter, hverdager ca. 07–18 norsk tid
+  workflow_dispatch:               # og når du trykker «Run workflow»
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arbeidsbok
+  cancel-in-progress: false
+
+jobs:
+  hent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Last ned arbeidsboka
+        env:
+          ARBEIDSBOK_URL: ${{ secrets.ARBEIDSBOK_URL }}
+        run: |
+          if [ -z "$ARBEIDSBOK_URL" ]; then
+            echo "::error::ARBEIDSBOK_URL mangler. Legg inn nedlastingslenka som en secret."
+            exit 1
+          fi
+          curl -sSL --fail --retry 3 --retry-delay 5 -o ny.xlsx "$ARBEIDSBOK_URL"
+          # En innloggingsside er HTML, ikke et regneark.
+          if ! file ny.xlsx | grep -qiE "excel|zip archive"; then
+            echo "::error::Det som kom ned er ikke et regneark. Er lenka åpen for alle med lenka?"
+            head -c 400 ny.xlsx
+            exit 1
+          fi
+
+      - name: Kontroller at boka lar seg lese
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check openpyxl
+          mv ny.xlsx ukeplan/Ukeplan.xlsx
+          cd ukeplan && python3 ukeplan.py sjekk
+
+      - name: Lagre hvis noe er endret
+        run: |
+          if git diff --quiet -- ukeplan/Ukeplan.xlsx; then
+            echo "Ingen endringer i arbeidsboka."
+            exit 0
+          fi
+          git config user.name "Vekeplan"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ukeplan/Ukeplan.xlsx
+          git commit -m "Ny arbeidsbok frå Teams"
+          git push
+          echo "Arbeidsboka er oppdatert. Netlify bygger nettsiden nå."

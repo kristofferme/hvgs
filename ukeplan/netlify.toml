@@ -1,0 +1,24 @@
+# Brukes når Netlify-prosjektet har «Base directory» satt til: ukeplan
+#
+# Netlify henter Ukeplan.xlsx fra repoet, bygger nettsiden og publiserer den.
+# Legger du en ny Ukeplan.xlsx i repoet, er planen ute et minutt senere.
+
+[build]
+  publish = "publisert"
+  command = "python3 -m pip install --quiet --disable-pip-version-check openpyxl && python3 ukeplan.py bygg --fil Ukeplan.xlsx --ut publisert/index.html"
+
+[build.environment]
+  PYTHON_VERSION = "3.11"
+
+# Planen endrer seg ofte – nettleseren skal alltid hente den nyeste.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Kortlenker per klasse: /1ID → planen med 1ID valgt.
+[[redirects]]
+  from = "/:klasse"
+  to = "/index.html?klasse=:klasse"
+  status = 200
+  force = false

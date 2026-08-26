@@ -96,17 +96,45 @@ så siden ser lik ut på skolens nett, på mobilen og uten nett i det hele tatt.
 
 ## Legg den ut
 
-HTML-fila er selvstendig, så den kan legges hvor som helst:
+Planen ligger på **https://hvgs-vekeplan.netlify.app** – Netlify-prosjektet
+`hvgs-vekeplan`. Adressen er den samme hele året; du overskriver bare innholdet.
+
+Kortlenke per klasse, klar til å limes inn som **Nettsted-fane** i klasseteamet
+i Teams:
 
 ```
-python3 ukeplan.py bygg --ut ../static/ukeplan.html   # publiseres med resten av nettstedet
-python3 ukeplan.py følg --ut ~/Nettsted/ukeplan.html  # bygger dit hver gang du lagrer
+https://hvgs-vekeplan.netlify.app/1ID
+https://hvgs-vekeplan.netlify.app/1HO
+https://hvgs-vekeplan.netlify.app/2AKV%2FFF     ← skråstrek skrives %2F
 ```
 
-Legg den i en mappe som allerede publiseres (skolens nettsted, Netlify, GitHub
-Pages), og legg adressen inn som en **Nettsted-fane** i klasseteamet i Teams –
-én fane per klasse med `?klasse=…` i lenka. Da er lenka den samme hele året;
-du overskriver bare fila.
+Fanen åpner rett i riktig klasse og på uka vi er i nå.
+
+### Tre måter å oppdatere på
+
+**1. Fra terminalen** – bygger og legger ut i én kommando:
+
+```
+python3 ukeplan.py publiser
+```
+
+Første gang: `npx netlify-cli login`.
+
+**2. Automatisk fra GitHub** – legg `Ukeplan.xlsx` i repoet, så bygger Netlify
+selv. Slik kobles det opp én gang, i Netlify:
+
+- Project configuration → Build & deploy → Link repository → `kristofferme/hvgs`
+- **Base directory:** `ukeplan`
+- **Branch to deploy:** `claude/ukeplaner-excel-html-w4xmxs` (eller `master` når
+  greina er flettet inn)
+- Resten leses fra `ukeplan/netlify.toml`: Netlify installerer openpyxl, kjører
+  `ukeplan.py bygg` og publiserer mappa `publisert`.
+
+Etterpå holder det å laste opp en ny `Ukeplan.xlsx` i GitHub
+(Add file → Upload files) for å oppdatere planen. Ingen terminal.
+
+**3. Mens du jobber** – `python3 ukeplan.py følg` bygger `ukeplan.html` lokalt
+hvert lagre, så du ser resultatet før du legger det ut.
 
 ## Kommandoer
 
@@ -117,6 +145,7 @@ du overskriver bare fila.
 | `ukeplan.py ny --sprak nynorsk` | arbeidsbok og nettside på nynorsk |
 | `ukeplan.py følg` | bygger nettsiden hver gang arbeidsboka lagres |
 | `ukeplan.py bygg` | bygger én gang |
+| `ukeplan.py publiser` | bygger og legger ut på Netlify |
 | `ukeplan.py sjekk` | leter etter skrivefeil og rader som ikke henger sammen |
 
 ## Filene
@@ -128,6 +157,8 @@ ukeplanlib/regneark.py lager arbeidsboka
 ukeplanlib/les.py      leser arbeidsboka og setter sammen hver uke
 ukeplanlib/bygg.py     fyller malen og legger inn logoen
 ukeplanlib/demo.py     eksempeldataene
+netlify.toml           byggeoppskrift for Netlify
+Ukeplan.xlsx           arbeidsboka som ligger til grunn for det som publiseres
 mal/side.html          nettsiden – utseende og oppførsel
 mal/fonter.css         skriftene, lagt inn som data-URI
 verktoy/hent_fonter.py henter skriftene på nytt hvis skriftvalget endres

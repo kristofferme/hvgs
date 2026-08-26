@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -26,6 +27,8 @@ from ukeplanlib.regneark import lag_arbeidsbok  # noqa: E402
 
 STANDARDFIL = HER / "Ukeplan.xlsx"
 STANDARDUT = HER / "ukeplan.html"
+NETLIFY_SIDE = "hvgs-vekeplan"
+NETLIFY_ADRESSE = "https://hvgs-vekeplan.netlify.app"
 
 
 def si(tekst: str = "") -> None:
@@ -76,6 +79,30 @@ def _oppsummer(data) -> None:
     si(f"{data['skole']} · {len(uker)} uker: " + ", ".join(str(u["uke"]) for u in uker))
     si(f"{len(data['klasser'])} klasser · {sum(len(u['rader']) for u in uker)} rader · "
        f"{punkt} punkt å gjøre · {sum(len(u['beskjeder']) for u in uker)} beskjeder")
+
+
+def kommando_publiser(args) -> int:
+    """Bygger planen og legger den ut på Netlify."""
+    fil = Path(args.fil)
+    mappe = Path(args.mappe)
+    kode = kommando_bygg(argparse.Namespace(fil=str(fil), ut=str(mappe / "index.html")))
+    if kode:
+        return kode
+    si("")
+    si(f"Legger ut på Netlify ({args.side}) …")
+    kommando = ["npx", "--yes", "netlify-cli", "deploy", "--prod",
+                "--dir", str(mappe), "--site", args.side]
+    try:
+        resultat = subprocess.run(kommando, check=False)
+    except FileNotFoundError:
+        si("Fant ikke npx. Installer Node.js, eller legg ut mappa manuelt:")
+        si(f"  {mappe}  →  https://app.netlify.com/projects/{args.side}/deploys")
+        return 1
+    if resultat.returncode:
+        si("Netlify svarte ikke som forventet. Er du logget inn? Kjør:  npx netlify-cli login")
+        return resultat.returncode
+    si(f"Ute på {args.adresse}")
+    return 0
 
 
 def kommando_folg(args) -> int:
@@ -157,6 +184,13 @@ def main(argv=None) -> int:
     folg.add_argument("--fil", default=str(STANDARDFIL))
     folg.add_argument("--ut", default=str(STANDARDUT))
     folg.set_defaults(funksjon=kommando_folg)
+
+    publiser = under.add_parser("publiser", help="bygg og legg ut på Netlify")
+    publiser.add_argument("--fil", default=str(STANDARDFIL))
+    publiser.add_argument("--mappe", default=str(HER / "publisert"))
+    publiser.add_argument("--side", default=NETLIFY_SIDE)
+    publiser.add_argument("--adresse", default=NETLIFY_ADRESSE)
+    publiser.set_defaults(funksjon=kommando_publiser)
 
     sjekk = under.add_parser("sjekk", help="se etter skrivefeil og rader som ikke henger sammen")
     sjekk.add_argument("--fil", default=str(STANDARDFIL))

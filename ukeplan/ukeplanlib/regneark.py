@@ -12,8 +12,10 @@ from openpyxl.utils import get_column_letter
 from openpyxl.workbook.defined_name import DefinedName
 from openpyxl.worksheet.datavalidation import DataValidation
 
-from .felles import (PROFILFARGE_STANDARD, TYPER, dagnavn, datospenn, farge_for, tekster,
-                     tolk_sprak, uke_til_mandag)
+import re
+
+from .felles import (PROFILFARGE_STANDARD, dagnavn, datospenn, farge_for, tekster,
+                     tolk_sprak, typenavn, uke_til_mandag)
 
 SKRIFT = "Aptos Narrow"
 BLEKK = "16212A"
@@ -28,8 +30,10 @@ STANDARDFAG = [
     "Samfunnskunnskap", "Geografi", "Historie", "Religion og etikk", "Kroppsøving",
     "Spansk", "Yrkesfagleg fordjuping",
 ]
-STANDARDKLASSER = ["1STA", "1STB", "2STA", "3STA", "1HSA", "1TIA"]
+STANDARDKLASSER = ["1ID", "1HO", "1NA", "1RM", "1TIF1", "1TIF2", "1TIF3",
+                   "2AKV/FF", "2KJP/AR", "2KJP/RM", "3PB1", "3PB2"]
 
+FAGRADER = 40           # fag per klasse
 INNHOLDSRADER = 400     # rader til tema og lekser
 BESKJEDRADER = 120
 UKER_I_LISTA = 46       # nedtrekket dekker et skoleår
@@ -121,6 +125,41 @@ def _klasseskille(ws, omrade: str, kolonne: str, forste_rad: int) -> None:
     )
 
 
+def _omradenavn(klasse: str) -> str:
+    """«2AKV/FF» → «FAG_2AKV_FF». Namngjevne område toler ikkje / og mellomrom."""
+    return "FAG_" + re.sub(r"[^A-Za-z0-9_]", "_", klasse)
+
+
+def _fagperklasse(ws, klasser: list[str], fag: list[str], fagvalg: dict, T) -> dict:
+    """Ei kolonne per klasse. Nedtrekket for Fag følgjer klassen som er valt."""
+    ws.sheet_view.showGridLines = False
+    ws.freeze_panes = "A2"
+    kolonner = ["Alle"] + klasser
+    omrader = {}
+    for i, klasse in enumerate(kolonner, start=1):
+        bokstav = get_column_letter(i)
+        ws.column_dimensions[bokstav].width = 28
+        c = ws.cell(row=1, column=i, value=klasse)
+        c.font = _skrift(bold=True, color="FFFFFF")
+        c.fill = PatternFill("solid", fgColor=BLEKK)
+        c.alignment = Alignment(vertical="center", horizontal="left", indent=1)
+        for r in range(2, 2 + FAGRADER):
+            celle = ws.cell(row=r, column=i)
+            celle.font = _skrift()
+            celle.alignment = Alignment(vertical="center", indent=1)
+            celle.border = Border(bottom=KANT, right=KANT)
+        for r, navn in enumerate(fagvalg.get(klasse, fag if klasse == "Alle" else []), start=2):
+            ws.cell(row=r, column=i, value=navn)
+        _fargekoder(ws, f"{bokstav}2:{bokstav}{1 + FAGRADER}", bokstav, 2, fag)
+        _liste(ws, f"{bokstav}2:{bokstav}{1 + FAGRADER}", "Fagliste", "Faget. Hentast frå Oppsett.")
+        omrader[_omradenavn(klasse)] = (
+            f"OFFSET('{T['fag_per_klasse']}'!${bokstav}$2,0,0,"
+            f"MAX(1,COUNTA('{T['fag_per_klasse']}'!${bokstav}$2:${bokstav}${1 + FAGRADER})),1)"
+        )
+    ws.row_dimensions[1].height = 26
+    return omrader
+
+
 def _ukeskille(ws, omrade: str, forste_rad: int) -> None:
     """Tykk strek der ukenummeret bytter, så uker skiller seg fra klasser."""
     ws.conditional_formatting.add(
@@ -144,7 +183,7 @@ def ukeliste(forste_dag: dt.date, antall: int = UKER_I_LISTA) -> list[str]:
 
 # ── Ukeark ───────────────────────────────────────────────────────
 def lag_arbeidsbok(sti, skole=None, uke=None, forste_dag=None, overskrift=None,
-                   klasser=None, fag=None, innhold=None,
+                   klasser=None, fag=None, innhold=None, fagvalg=None,
                    sprak="nb", profilfarge=PROFILFARGE_STANDARD, logo="") -> None:
     """Skriver en ferdig arbeidsbok. Uten innhold blir arkene tomme og klare."""
     sprak = tolk_sprak(sprak)
@@ -179,6 +218,8 @@ def lag_arbeidsbok(sti, skole=None, uke=None, forste_dag=None, overskrift=None,
                  "2  Veke – éi rad per ting. Vel veke, klasse og fag, skriv kva de jobbar med og kva som skal gjerast."),
         ("steg", "3  Beskjeder – korte meldinger hjem, med samme ukevalg.",
                  "3  Meldingar – korte meldingar heim, med same vekeval."),
+        ("steg", "4  Fag per klasse – hvilke fag hver klasse har. Fyller du ut denne, viser Fag-nedtrekket bare klassens egne fag.",
+                 "4  Fag per klasse – kva fag kvar klasse har. Fyller du ut denne, viser Fag-nedtrekket berre faga til klassen."),
         ("", "", ""),
         ("steg", "Så kjører du:  python3 ukeplan.py følg", "Så køyrer du:  python3 ukeplan.py følg"),
         ("brod", "Da bygges nettsiden på nytt hver gang du lagrer arbeidsboka. Du trenger ikke gjøre noe mer.",
@@ -294,7 +335,7 @@ def lag_arbeidsbok(sti, skole=None, uke=None, forste_dag=None, overskrift=None,
     dager = dagnavn(sprak)
     for i, d in enumerate(dager):
         lister.cell(row=2 + i, column=1, value=d)
-    ekte_typer = TYPER[sprak]
+    ekte_typer = typenavn(sprak)
     for i, t in enumerate(ekte_typer):
         lister.cell(row=2 + i, column=2, value=t)
     lister["F1"] = "Målformer"
@@ -317,6 +358,11 @@ def lag_arbeidsbok(sti, skole=None, uke=None, forste_dag=None, overskrift=None,
     for n, formel in navn.items():
         wb.defined_names.add(DefinedName(n, attr_text=formel))
 
+    # ── Fag per klasse ───────────────────────────────────────────
+    fpk = wb.create_sheet(T["fag_per_klasse"])
+    for n, formel in _fagperklasse(fpk, klasser, fag, fagvalg or {}, T).items():
+        wb.defined_names.add(DefinedName(n, attr_text=formel))
+
     # ── Uke ──────────────────────────────────────────────────────
     uk = wb.create_sheet(T["ark_uke"])
     uk.sheet_view.showGridLines = False
@@ -326,7 +372,10 @@ def lag_arbeidsbok(sti, skole=None, uke=None, forste_dag=None, overskrift=None,
     sist = 1 + INNHOLDSRADER
     _liste(uk, f"A2:A{sist}", "Uker", "Velg uke. Lista viser ukenummer og datoer.")
     _liste(uk, f"B2:B{sist}", "Klasser", "Klassen dette gjelder. Velg «Alle» for alle klasser.")
-    _liste(uk, f"C2:C{sist}", "Fagliste", "Faget. Ett kort per fag på nettsiden.")
+    # Fag-nedtrekket viser faga klassen har. Ukjent klasse gir hele faglista.
+    _liste(uk, f"C2:C{sist}",
+           'IF($B2="",Fagliste,IFERROR(INDIRECT("FAG_"&SUBSTITUTE(SUBSTITUTE(SUBSTITUTE($B2,"/","_")," ","_"),"-","_")),Fagliste))',
+           "Faget. Lista viser faga klassen har.")
     _liste(uk, f"F2:F{sist}", "Dager", "Når må det være ferdig? La stå tomt om det gjelder hele uka.")
     _liste(uk, f"G2:G{sist}", "Typer", "Merk prøver, innleveringer og turer.")
     _fargekoder(uk, f"C2:C{sist}", "C", 2, fag)

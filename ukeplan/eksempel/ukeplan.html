@@ -194,7 +194,16 @@ h1{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:70
 .beskjed p{margin:0;font-size:14.5px;color:var(--blekk);line-height:1.5}
 
 /* ── Framdrift og visning ─────────────────────────── */
-.styrelinje{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin:34px 0 22px}
+.oppsummering{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 0}
+.oppsummering[hidden]{display:none}
+.sammendrag{
+  display:inline-flex;align-items:baseline;gap:8px;padding:7px 13px;border-radius:99px;
+  font:500 12.5px/1 "Instrument Sans",sans-serif;border:1px solid var(--linje);color:var(--blekk);
+}
+.sammendrag b{font-family:"DM Mono",monospace;font-weight:500;font-size:12px}
+.sammendrag.viktig{border-color:color-mix(in oklab,var(--frist) 45%,transparent);color:var(--frist)}
+.sammendrag.timen{background:var(--innhold);border-color:transparent;color:var(--blekk-svak)}
+.styrelinje{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin:26px 0 22px}
 .bytter{display:inline-flex;background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);overflow:hidden}
 .bytter button{
   font:600 13px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:transparent;border:0;
@@ -205,26 +214,38 @@ h1{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:70
 .stolpe{position:relative;flex:1;height:6px;border-radius:99px;background:var(--innhold);overflow:hidden}
 .stolpe i{position:absolute;inset:0 auto 0 0;width:0;background:var(--naa);border-radius:99px;transition:width .45s cubic-bezier(.2,.75,.3,1)}
 .framdrift .tall{font-family:"DM Mono",monospace;font-size:12px;color:var(--blekk-svak);white-space:nowrap}
+.framdrift.ferdig .tall{color:var(--naa)}
 .framdrift[hidden]{display:none}
 
 /* ── Fagkort ──────────────────────────────────────── */
-.fagrutenett{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start}
+.fagrutenett{columns:330px;column-gap:14px}
 .fagkort{
-  background:var(--kort);border:1px solid var(--linje-svak);border-left:4px solid var(--fag);
-  border-radius:var(--r);padding:15px 17px 16px;
+  break-inside:avoid;margin:0 0 14px;
+  background:var(--kort);border:1px solid var(--linje-svak);border-radius:var(--r);overflow:hidden;
   animation:stig .48s cubic-bezier(.2,.75,.3,1) backwards;animation-delay:calc(var(--i) * 45ms);
   transition:opacity .3s;
 }
+.fagtopp{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:10px 15px 11px;
+  background:color-mix(in oklab,var(--fag) 13%,var(--kort));
+  border-bottom:1px solid color-mix(in oklab,var(--fag) 26%,transparent);
+}
+.fagtal{font-family:"DM Mono",monospace;font-size:11px;color:var(--fagtekst);opacity:.7}
+.fagkropp{padding:13px 15px 14px}
 .uten-bevegelse .fagkort{animation:none}
 .frem .fagkort{--fra-x:36px}
 .tilbake .fagkort{--fra-x:-36px}
 @keyframes stig{from{opacity:0;transform:translate(var(--fra-x,0px),14px)}to{opacity:1;transform:none}}
-.fagnamn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:17px;letter-spacing:-.015em;color:var(--fagtekst);margin:0}
-.tema{font-size:15px;line-height:1.45;margin:7px 0 0;color:var(--blekk)}
-.punkt{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
-.fagkort .punkt{border-top:1px solid var(--linje-svak);padding-top:10px}
+.fagnamn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:16.5px;letter-spacing:-.015em;color:var(--fagtekst);margin:0;line-height:1.15}
+.tema{font-size:15px;line-height:1.45;margin:0;color:var(--blekk)}
+.punkt{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.fagkropp .tema + .punkt{border-top:1px solid var(--linje-svak);margin-top:11px;padding-top:9px}
 .punktrad{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 9px;padding:6px 0}
 .punktrad label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;flex:1 1 auto;min-width:0}
+.punktrad.itimen{display:flex;align-items:flex-start;gap:10px}
+.punktrad.itimen .strek{flex:none;width:19px;height:19px;margin-top:1px;display:grid;place-items:center}
+.punktrad.itimen .strek::before{content:"";width:11px;height:2px;border-radius:2px;background:var(--fag)}
+.punktrad.itimen .punkttekst{color:var(--blekk)}
 .punktrad input{position:absolute;opacity:0;width:1px;height:1px}
 .hake{
   flex:none;width:19px;height:19px;margin-top:1px;border-radius:4px;
@@ -243,9 +264,11 @@ h1{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:70
 .punkttekst{font-size:15px;line-height:1.4;transition:opacity .25s}
 .punktrad.gjort .punkttekst{opacity:.45;text-decoration:line-through;text-decoration-thickness:1px}
 .fristlapp{font-family:"DM Mono",monospace;font-size:11.5px;color:var(--naa);white-space:nowrap}
-.merke{display:inline-block;font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
-.merke.viktig{color:var(--frist)}
-.merke.rolig{color:var(--blekk-svak)}
+.merke{display:inline-block;font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.merke.viktig{color:var(--frist);border:1px solid currentColor}
+.merke.timen{color:var(--blekk-svak);background:var(--innhold)}
+.merke.arbeid{color:var(--blekk-svak);border:1px solid var(--linje)}
+.fristlapp.viktig{color:var(--frist)}
 .dim{opacity:var(--dempet)}
 .tom{border:1px dashed var(--linje);border-radius:var(--r);padding:22px;font-size:14px;color:var(--blekk-svak);text-align:center}
 
@@ -270,10 +293,12 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--linje-svak);d
   .verktoy{position:absolute;top:0;right:0;margin:0}
   .velgere{gap:20px}
   .velgergruppe:has(.fagfilter){width:100%}
-  .fagfilter{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-ms-overflow-style:none}
-  .fagfilter::-webkit-scrollbar{display:none}
-  .fagknapp{flex:none}
-  .fagrutenett{grid-template-columns:1fr}
+  /* Klassane og faga rullar sidelengs, så uka startar høgt oppe på telefonen. */
+  .fagfilter,.klasser{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-ms-overflow-style:none}
+  .fagfilter::-webkit-scrollbar,.klasser::-webkit-scrollbar{display:none}
+  .fagknapp,.klasse{flex:none}
+  .klasser{padding:4px 4px 10px}
+  .fagrutenett{columns:1}
   .styrelinje{gap:12px}
   .fristlapp{margin-left:0}
 }
@@ -286,7 +311,7 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--linje-svak);d
   .velgere,.verktoy,.knapp,.bla,.tilbaketilnaa,.bytter,.nullstill,.framdrift{display:none !important}
   body{font-size:11px;background:#fff;color:#000}
   .ramme{max-width:none;padding:0}
-  .fagrutenett{grid-template-columns:repeat(3,1fr);gap:8px}
+  .fagrutenett{columns:3;column-gap:8px}
   .fagkort,.beskjed,.fristbolk,.punktrad{break-inside:avoid;animation:none;box-shadow:none !important}
   .hake{border-color:#000}
   @page{size:A4;margin:12mm}
@@ -334,6 +359,7 @@ try {
   </div>
 
   <section class="beskjeder" id="beskjeder"></section>
+  <section class="oppsummering" id="oppsummering" hidden></section>
 
   <div class="styrelinje">
     <div class="bytter" role="group">
@@ -414,6 +440,9 @@ const DATA = {
   "av": "av",
   "fjern_haker": "fjern hakar",
   "anna": "Anna",
+  "alt_gjort": "Alt gjort denne veka",
+  "denne_uka": "Denne veka",
+  "fag_per_klasse": "Fag per klasse",
   "ingenting": "Ingenting lagt inn for denne klassen denne veka.",
   "kol_frist": "Frist",
   "kol_type": "Type",
@@ -424,12 +453,18 @@ const DATA = {
  "profilfarge": "#0093C9",
  "logofil": "profil/logo.png",
  "klasser": [
-  "1STA",
-  "2STA",
-  "3STA",
-  "1HSA",
-  "1TIA",
-  "1RMA"
+  "1ID",
+  "1HO",
+  "1NA",
+  "1RM",
+  "1TIF1",
+  "1TIF2",
+  "1TIF3",
+  "2AKV/FF",
+  "2KJP/AR",
+  "2KJP/RM",
+  "3PB1",
+  "3PB2"
  ],
  "fag": [
   {
@@ -437,24 +472,12 @@ const DATA = {
    "farge": "#2F4B7C"
   },
   {
-   "navn": "Matematikk 1T",
-   "farge": "#A6432C"
-  },
-  {
-   "navn": "Matematikk 1P-Y",
-   "farge": "#A6432C"
-  },
-  {
-   "navn": "Matematikk S1",
-   "farge": "#A6432C"
-  },
-  {
-   "navn": "Matematikk R2",
-   "farge": "#A6432C"
-  },
-  {
    "navn": "Engelsk",
    "farge": "#1F6E5B"
+  },
+  {
+   "navn": "Matematikk 1P",
+   "farge": "#A6432C"
   },
   {
    "navn": "Naturfag",
@@ -469,36 +492,20 @@ const DATA = {
    "farge": "#2A6B57"
   },
   {
-   "navn": "Historie",
-   "farge": "#7A4B2A"
-  },
-  {
-   "navn": "Religion og etikk",
-   "farge": "#8A6A17"
-  },
-  {
    "navn": "Kroppsøving",
    "farge": "#1D6D82"
   },
   {
-   "navn": "Spansk",
-   "farge": "#8C4A2F"
+   "navn": "Aktivitetslære",
+   "farge": "#3B5E8C"
   },
   {
-   "navn": "Biologi 1",
-   "farge": "#4F7020"
+   "navn": "Treningslære",
+   "farge": "#8A4B2A"
   },
   {
-   "navn": "Biologi 2",
-   "farge": "#4F7020"
-  },
-  {
-   "navn": "Sosiologi og sosialantropologi",
-   "farge": "#6B3A63"
-  },
-  {
-   "navn": "Sosialkunnskap",
-   "farge": "#6B3A63"
+   "navn": "Matematikk 1P-Y",
+   "farge": "#A6432C"
   },
   {
    "navn": "Helsefremjande arbeid",
@@ -513,6 +520,26 @@ const DATA = {
    "farge": "#55606B"
   },
   {
+   "navn": "Yrkesfagleg fordjuping",
+   "farge": "#55606B"
+  },
+  {
+   "navn": "Naturbasert produksjon og tenesteyting",
+   "farge": "#2A6B57"
+  },
+  {
+   "navn": "Naturbasert aktivitet",
+   "farge": "#6B3A63"
+  },
+  {
+   "navn": "Råvare, produksjon og kvalitet",
+   "farge": "#7A6A1C"
+  },
+  {
+   "navn": "Bransje og arbeidsliv",
+   "farge": "#8A5A2B"
+  },
+  {
    "navn": "Produksjon og tenester",
    "farge": "#8A5A2B"
   },
@@ -521,18 +548,198 @@ const DATA = {
    "farge": "#3B5E8C"
   },
   {
-   "navn": "Råvare, produksjon og kvalitet",
+   "navn": "Drift og produksjon",
+   "farge": "#245F70"
+  },
+  {
+   "navn": "Anlegg og teknikk",
+   "farge": "#8C3A52"
+  },
+  {
+   "navn": "Fangst og reiskap",
+   "farge": "#4C6B2F"
+  },
+  {
+   "navn": "Fartøy og tryggleik",
    "farge": "#3B5E8C"
   },
   {
-   "navn": "Bransje og arbeidsliv",
-   "farge": "#8A5A2B"
+   "navn": "Programfag 1",
+   "farge": "#8A4B2A"
   },
   {
-   "navn": "Yrkesfagleg fordjuping",
-   "farge": "#55606B"
+   "navn": "Programfag 2",
+   "farge": "#2A6B57"
+  },
+  {
+   "navn": "Historie",
+   "farge": "#7A4B2A"
+  },
+  {
+   "navn": "Matematikk 2P-Y",
+   "farge": "#A6432C"
   }
  ],
+ "fagperklasse": {
+  "Alle": [
+   "Norsk",
+   "Engelsk",
+   "Matematikk 1P",
+   "Naturfag",
+   "Samfunnskunnskap",
+   "Geografi",
+   "Kroppsøving",
+   "Aktivitetslære",
+   "Treningslære",
+   "Matematikk 1P-Y",
+   "Helsefremjande arbeid",
+   "Kommunikasjon og samhandling",
+   "Yrkesliv i helse- og oppvekstfag",
+   "Yrkesfagleg fordjuping",
+   "Naturbasert produksjon og tenesteyting",
+   "Naturbasert aktivitet",
+   "Råvare, produksjon og kvalitet",
+   "Bransje og arbeidsliv",
+   "Produksjon og tenester",
+   "Konstruksjons- og styringsteknikk",
+   "Drift og produksjon",
+   "Anlegg og teknikk",
+   "Fangst og reiskap",
+   "Fartøy og tryggleik",
+   "Programfag 1",
+   "Programfag 2",
+   "Historie",
+   "Matematikk 2P-Y"
+  ],
+  "1ID": [
+   "Norsk",
+   "Engelsk",
+   "Matematikk 1P",
+   "Naturfag",
+   "Samfunnskunnskap",
+   "Geografi",
+   "Kroppsøving",
+   "Aktivitetslære",
+   "Treningslære"
+  ],
+  "1HO": [
+   "Norsk",
+   "Engelsk",
+   "Matematikk 1P-Y",
+   "Naturfag",
+   "Kroppsøving",
+   "Helsefremjande arbeid",
+   "Kommunikasjon og samhandling",
+   "Yrkesliv i helse- og oppvekstfag",
+   "Yrkesfagleg fordjuping"
+  ],
+  "1NA": [
+   "Norsk",
+   "Engelsk",
+   "Matematikk 1P-Y",
+   "Naturfag",
+   "Kroppsøving",
+   "Naturbasert produksjon og tenesteyting",
+   "Naturbasert aktivitet",
+   "Yrkesfagleg fordjuping"
+  ],
+  "1RM": [
+   "Norsk",
+   "Engelsk",
+   "Matematikk 1P-Y",
+   "Naturfag",
+   "Kroppsøving",
+   "Råvare, produksjon og kvalitet",
+   "Bransje og arbeidsliv",
+   "Yrkesfagleg fordjuping"
+  ],
+  "1TIF1": [
+   "Norsk",
+   "Engelsk",
+   "Matematikk 1P-Y",
+   "Naturfag",
+   "Kroppsøving",
+   "Produksjon og tenester",
+   "Konstruksjons- og styringsteknikk",
+   "Yrkesfagleg fordjuping"
+  ],
+  "1TIF2": [
+   "Norsk",
+   "Engelsk",
+   "Matematikk 1P-Y",
+   "Naturfag",
+   "Kroppsøving",
+   "Produksjon og tenester",
+   "Konstruksjons- og styringsteknikk",
+   "Yrkesfagleg fordjuping"
+  ],
+  "1TIF3": [
+   "Norsk",
+   "Engelsk",
+   "Matematikk 1P-Y",
+   "Naturfag",
+   "Kroppsøving",
+   "Produksjon og tenester",
+   "Konstruksjons- og styringsteknikk",
+   "Yrkesfagleg fordjuping"
+  ],
+  "2AKV/FF": [
+   "Norsk",
+   "Samfunnskunnskap",
+   "Kroppsøving",
+   "Drift og produksjon",
+   "Anlegg og teknikk",
+   "Fangst og reiskap",
+   "Fartøy og tryggleik",
+   "Yrkesfagleg fordjuping"
+  ],
+  "2KJP/AR": [
+   "Norsk",
+   "Samfunnskunnskap",
+   "Kroppsøving",
+   "Programfag 1",
+   "Programfag 2",
+   "Yrkesfagleg fordjuping"
+  ],
+  "2KJP/RM": [
+   "Norsk",
+   "Samfunnskunnskap",
+   "Kroppsøving",
+   "Råvare, produksjon og kvalitet",
+   "Bransje og arbeidsliv",
+   "Yrkesfagleg fordjuping"
+  ],
+  "3PB1": [
+   "Norsk",
+   "Historie",
+   "Matematikk 2P-Y",
+   "Naturfag",
+   "Samfunnskunnskap",
+   "Kroppsøving"
+  ],
+  "3PB2": [
+   "Norsk",
+   "Historie",
+   "Matematikk 2P-Y",
+   "Naturfag",
+   "Samfunnskunnskap",
+   "Kroppsøving"
+  ]
+ },
+ "typar": {
+  "I timen": "timen",
+  "Hjemmearbeid": "arbeid",
+  "Innlevering": "viktig",
+  "Prøve": "viktig",
+  "Vurdering": "viktig",
+  "Framføring": "viktig",
+  "Frist": "viktig",
+  "Ekskursjon": "timen",
+  "Utplassering": "timen",
+  "Fagdag": "timen",
+  "Info": "timen",
+  "Heimearbeid": "arbeid"
+ },
  "uker": [
   {
    "uke": 35,
@@ -567,76 +774,60 @@ const DATA = {
    ],
    "rader": [
     {
-     "klasse": "1STA",
+     "klasse": "1ID",
      "fag": "Norsk",
      "tema": "Kva er sakprosa? Vi les og samanliknar tekstar",
      "tekst": "Les s. 12–19 i Panorama",
      "frist": "Onsdag",
-     "type": ""
+     "type": "Heimearbeid"
     },
     {
-     "klasse": "1STA",
-     "fag": "Matematikk 1T",
-     "tema": "Repetisjon: tal og algebra",
-     "tekst": "Oppgåve 1.20–1.34",
-     "frist": "Fredag",
-     "type": ""
-    },
-    {
-     "klasse": "1STA",
-     "fag": "Naturfag",
-     "tema": "HMS og tryggleik på naturfagrommet",
-     "tekst": "",
+     "klasse": "1ID",
+     "fag": "Aktivitetslære",
+     "tema": "Basistrening og oppvarming",
+     "tekst": "Ta med innesko og treningstøy",
      "frist": "",
-     "type": "Info"
+     "type": "I timen"
     },
     {
-     "klasse": "2STA",
-     "fag": "Norsk",
-     "tema": "Retorikk: etos, patos og logos",
-     "tekst": "Les kapittel 2 og finn tre døme frå reklame",
-     "frist": "Torsdag",
-     "type": ""
-    },
-    {
-     "klasse": "2STA",
-     "fag": "Biologi 1",
-     "tema": "Årsplan og vurderingar. Kva er økologi?",
-     "tekst": "",
-     "frist": "",
-     "type": ""
-    },
-    {
-     "klasse": "3STA",
-     "fag": "Norsk",
-     "tema": "Vi startar med litteraturhistoria",
-     "tekst": "Les utdraget frå Ibsen",
-     "frist": "Torsdag",
-     "type": ""
-    },
-    {
-     "klasse": "1HSA",
+     "klasse": "1HO",
      "fag": "Helsefremjande arbeid",
      "tema": "Bli kjend med faget og programområdet",
      "tekst": "",
      "frist": "",
-     "type": "Info"
+     "type": "I timen"
     },
     {
-     "klasse": "1TIA",
+     "klasse": "1TIF1",
      "fag": "Yrkesfagleg fordjuping",
      "tema": "Verkstadkurs: tryggleik, verneutstyr og orden",
      "tekst": "Ta HMS-kurset i Teams",
      "frist": "Fredag",
-     "type": ""
+     "type": "Heimearbeid"
     },
     {
-     "klasse": "1RMA",
+     "klasse": "1NA",
+     "fag": "Naturbasert aktivitet",
+     "tema": "Vi riggar båten og går gjennom tryggleik om bord",
+     "tekst": "",
+     "frist": "",
+     "type": "I timen"
+    },
+    {
+     "klasse": "1RM",
      "fag": "Råvare, produksjon og kvalitet",
      "tema": "Hygiene og reinhald på kjøkkenet",
      "tekst": "Les hygieneheftet",
      "frist": "Torsdag",
-     "type": ""
+     "type": "Heimearbeid"
+    },
+    {
+     "klasse": "3PB1",
+     "fag": "Norsk",
+     "tema": "Vi startar med litteraturhistoria",
+     "tekst": "Les utdraget frå Ibsen",
+     "frist": "Torsdag",
+     "type": "Heimearbeid"
     }
    ],
    "beskjeder": [
@@ -680,15 +871,15 @@ const DATA = {
    ],
    "rader": [
     {
-     "klasse": "1STA",
+     "klasse": "1ID",
      "fag": "Norsk",
      "tema": "Argumenterande tekst: oppbygging og kjeldebruk",
-     "tekst": "Skriv utkast til argumenterande tekst i Teams",
+     "tekst": "Skriv utkast i Teams",
      "frist": "Torsdag",
-     "type": ""
+     "type": "Heimearbeid"
     },
     {
-     "klasse": "1STA",
+     "klasse": "1ID",
      "fag": "Norsk",
      "tema": "",
      "tekst": "Lever den ferdige teksten i Teams",
@@ -696,23 +887,31 @@ const DATA = {
      "type": "Innlevering"
     },
     {
-     "klasse": "1STA",
-     "fag": "Matematikk 1T",
-     "tema": "Potensar og røter",
-     "tekst": "Oppgåve 2.14–2.28",
-     "frist": "Tysdag",
-     "type": ""
+     "klasse": "1ID",
+     "fag": "Treningslære",
+     "tema": "Utholdenheit: puls og intensitetssoner",
+     "tekst": "Vi testar puls i gymsalen",
+     "frist": "",
+     "type": "I timen"
     },
     {
-     "klasse": "1STA",
+     "klasse": "1ID",
+     "fag": "Matematikk 1P",
+     "tema": "Prosent og prosentpoeng",
+     "tekst": "Oppgåve 2.14–2.28",
+     "frist": "Tysdag",
+     "type": "Heimearbeid"
+    },
+    {
+     "klasse": "1ID",
      "fag": "Naturfag",
      "tema": "Cella: oppbygging og funksjon",
      "tekst": "Teikn ei dyrecelle med namn på delane",
      "frist": "Fredag",
-     "type": ""
+     "type": "Heimearbeid"
     },
     {
-     "klasse": "1STA",
+     "klasse": "1ID",
      "fag": "Engelsk",
      "tema": "Australia: reading and vocabulary",
      "tekst": "Glosetest – 20 ord frå kapittel 3",
@@ -720,79 +919,7 @@ const DATA = {
      "type": "Vurdering"
     },
     {
-     "klasse": "1STA",
-     "fag": "Geografi",
-     "tema": "Naturressursar på Nordvestlandet",
-     "tekst": "Sjå filmen i Teams før timen",
-     "frist": "Torsdag",
-     "type": ""
-    },
-    {
-     "klasse": "2STA",
-     "fag": "Historie",
-     "tema": "Den industrielle revolusjonen",
-     "tekst": "Les s. 88–95 og svar på tre spørsmål",
-     "frist": "Onsdag",
-     "type": ""
-    },
-    {
-     "klasse": "2STA",
-     "fag": "Biologi 1",
-     "tema": "Feltarbeid i fjøra – vi bruker skulebåten",
-     "tekst": "Ta med regntøy og støvlar",
-     "frist": "Tysdag",
-     "type": "Tur"
-    },
-    {
-     "klasse": "2STA",
-     "fag": "Biologi 1",
-     "tema": "",
-     "tekst": "Skriv feltrapport frå fjøra",
-     "frist": "Fredag",
-     "type": "Innlevering"
-    },
-    {
-     "klasse": "2STA",
-     "fag": "Matematikk S1",
-     "tema": "Funksjonar: nullpunkt og topppunkt",
-     "tekst": "Øv på kapittel 3",
-     "frist": "Fredag",
-     "type": "Prøve"
-    },
-    {
-     "klasse": "2STA",
-     "fag": "Spansk",
-     "tema": "Presentación: mi pueblo",
-     "tekst": "Øv på framføringa heime",
-     "frist": "Torsdag",
-     "type": ""
-    },
-    {
-     "klasse": "3STA",
-     "fag": "Historie",
-     "tema": "Den kalde krigen: kjeldegransking",
-     "tekst": "Les utdraga i klasserommet",
-     "frist": "Torsdag",
-     "type": ""
-    },
-    {
-     "klasse": "3STA",
-     "fag": "Matematikk R2",
-     "tema": "Integrasjon: delvis integrasjon",
-     "tekst": "Oppgåve 5.30–5.44",
-     "frist": "Fredag",
-     "type": ""
-    },
-    {
-     "klasse": "3STA",
-     "fag": "Biologi 2",
-     "tema": "Genteknologi: kva er CRISPR?",
-     "tekst": "Sjå dokumentaren i Teams",
-     "frist": "Onsdag",
-     "type": ""
-    },
-    {
-     "klasse": "1HSA",
+     "klasse": "1HO",
      "fag": "Yrkesfagleg fordjuping",
      "tema": "Utplassering på sjukeheimen tysdag og onsdag",
      "tekst": "Ta med arbeidstøy og namneskilt",
@@ -800,60 +927,156 @@ const DATA = {
      "type": "Utplassering"
     },
     {
-     "klasse": "1HSA",
+     "klasse": "1HO",
      "fag": "Kommunikasjon og samhandling",
      "tema": "Aktiv lytting og brukarmedverknad",
      "tekst": "Skriv logg frå utplasseringa",
      "frist": "Torsdag",
-     "type": ""
+     "type": "Innlevering"
     },
     {
-     "klasse": "1HSA",
+     "klasse": "1HO",
      "fag": "Naturfag",
      "tema": "Kosthald og helse",
      "tekst": "Les s. 40–48",
      "frist": "Fredag",
-     "type": ""
+     "type": "Heimearbeid"
     },
     {
-     "klasse": "1TIA",
-     "fag": "Produksjon og tenester",
-     "tema": "Måling og toleransar",
-     "tekst": "Oppgåvehefte s. 4–7",
-     "frist": "Torsdag",
-     "type": ""
+     "klasse": "1HO",
+     "fag": "Helsefremjande arbeid",
+     "tema": "Vi øver på stell og forflytting i øvingsrommet",
+     "tekst": "",
+     "frist": "",
+     "type": "I timen"
     },
     {
-     "klasse": "1TIA",
-     "fag": "Konstruksjons- og styringsteknikk",
-     "tema": "Pneumatikk: enkle kretsar",
-     "tekst": "Teikn kretsen frå timen på nytt",
-     "frist": "Fredag",
-     "type": ""
+     "klasse": "1NA",
+     "fag": "Naturbasert produksjon og tenesteyting",
+     "tema": "Merdkant og fôring – vi er på anlegget onsdag",
+     "tekst": "Ta med flytedress og støvlar",
+     "frist": "Onsdag",
+     "type": "Ekskursjon"
     },
     {
-     "klasse": "1TIA",
-     "fag": "Norsk",
-     "tema": "Å skrive ein arbeidsrapport",
-     "tekst": "Skriv rapport frå verkstadoppgåva",
+     "klasse": "1NA",
+     "fag": "Naturfag",
+     "tema": "Vasskvalitet: oksygen, temperatur og salt",
+     "tekst": "Skriv ferdig målejournalen",
      "frist": "Fredag",
      "type": "Innlevering"
     },
     {
-     "klasse": "1RMA",
+     "klasse": "1TIF1",
+     "fag": "Produksjon og tenester",
+     "tema": "Måling og toleransar",
+     "tekst": "Oppgåvehefte s. 4–7",
+     "frist": "Torsdag",
+     "type": "Heimearbeid"
+    },
+    {
+     "klasse": "1TIF1",
+     "fag": "Konstruksjons- og styringsteknikk",
+     "tema": "Pneumatikk: vi koplar enkle kretsar i verkstaden",
+     "tekst": "",
+     "frist": "",
+     "type": "I timen"
+    },
+    {
+     "klasse": "1TIF1",
+     "fag": "Norsk",
+     "tema": "Å skrive ein arbeidsrapport",
+     "tekst": "Lever rapport frå verkstadoppgåva",
+     "frist": "Fredag",
+     "type": "Innlevering"
+    },
+    {
+     "klasse": "1TIF2",
+     "fag": "Produksjon og tenester",
+     "tema": "Sveis: kilsveis i posisjon PB",
+     "tekst": "Øv på prøvestykket",
+     "frist": "Fredag",
+     "type": "Vurdering"
+    },
+    {
+     "klasse": "1TIF3",
+     "fag": "Yrkesfagleg fordjuping",
+     "tema": "Utplassering i bedrift torsdag og fredag",
+     "tekst": "Meld frå om oppmøtestad",
+     "frist": "Onsdag",
+     "type": "Frist"
+    },
+    {
+     "klasse": "1RM",
      "fag": "Råvare, produksjon og kvalitet",
      "tema": "Fisk: filetering og kvalitet",
      "tekst": "Sjå instruksjonsvideoen før timen",
      "frist": "Torsdag",
-     "type": ""
+     "type": "Heimearbeid"
     },
     {
-     "klasse": "1RMA",
+     "klasse": "1RM",
      "fag": "Bransje og arbeidsliv",
-     "tema": "Yrkesroller i restaurantbransjen",
-     "tekst": "Skriv ned tre yrke du vil vite meir om",
+     "tema": "Vi lagar lunsj til personalrommet fredag",
+     "tekst": "",
+     "frist": "",
+     "type": "I timen"
+    },
+    {
+     "klasse": "2AKV/FF",
+     "fag": "Drift og produksjon",
+     "tema": "Fôring og fôrfaktor",
+     "tekst": "Rekn ut fôrfaktor for merd 3",
+     "frist": "Torsdag",
+     "type": "Heimearbeid"
+    },
+    {
+     "klasse": "2AKV/FF",
+     "fag": "Fartøy og tryggleik",
+     "tema": "Tryggleikskurs om bord – heile onsdagen",
+     "tekst": "",
+     "frist": "",
+     "type": "Ekskursjon"
+    },
+    {
+     "klasse": "2KJP/RM",
+     "fag": "Råvare, produksjon og kvalitet",
+     "tema": "Menyplanlegging til hausten",
+     "tekst": "Lever menyforslaget",
      "frist": "Fredag",
-     "type": ""
+     "type": "Innlevering"
+    },
+    {
+     "klasse": "3PB1",
+     "fag": "Historie",
+     "tema": "Den industrielle revolusjonen",
+     "tekst": "Les s. 88–95 og svar på tre spørsmål",
+     "frist": "Onsdag",
+     "type": "Heimearbeid"
+    },
+    {
+     "klasse": "3PB1",
+     "fag": "Norsk",
+     "tema": "Retorikk: vi analyserer talar i lag",
+     "tekst": "",
+     "frist": "",
+     "type": "I timen"
+    },
+    {
+     "klasse": "3PB1",
+     "fag": "Matematikk 2P-Y",
+     "tema": "Prøve i økonomi",
+     "tekst": "Øv på kapittel 3",
+     "frist": "Fredag",
+     "type": "Prøve"
+    },
+    {
+     "klasse": "3PB2",
+     "fag": "Norsk",
+     "tema": "Retorikk: etos, patos og logos",
+     "tekst": "Les kapittel 2",
+     "frist": "Torsdag",
+     "type": "Heimearbeid"
     },
     {
      "klasse": "Alle",
@@ -871,14 +1094,14 @@ const DATA = {
      "tekst": "Foreldremøte for alle Vg1-klassane torsdag kl. 18.00 i auditoriet. Meld frå i Visma InSchool."
     },
     {
-     "klasse": "1HSA",
+     "klasse": "1HO",
      "tittel": "Utplassering tysdag og onsdag",
      "tekst": "Oppmøte direkte på sjukeheimen kl. 08.00. Hugs arbeidstøy, namneskilt og matpakke."
     },
     {
-     "klasse": "2STA",
-     "tittel": "Feltarbeid med skulebåten",
-     "tekst": "Vi går frå kaia kl. 10.00 tysdag. Kle deg etter vêret – det blir vått."
+     "klasse": "1NA",
+     "tittel": "På anlegget onsdag",
+     "tekst": "Vi går frå kaia kl. 09.00. Flytedress og støvlar er påbode. Ta med matpakke."
     }
    ]
   },
@@ -915,71 +1138,39 @@ const DATA = {
    ],
    "rader": [
     {
-     "klasse": "1STA",
+     "klasse": "1ID",
      "fag": "Naturfag",
      "tema": "Arv og miljø",
      "tekst": "Les s. 52–60",
      "frist": "Torsdag",
-     "type": ""
+     "type": "Heimearbeid"
     },
     {
-     "klasse": "1STA",
-     "fag": "Matematikk 1T",
-     "tema": "Prøve i tal og algebra",
+     "klasse": "1ID",
+     "fag": "Matematikk 1P",
+     "tema": "Prøve i tal og prosent",
      "tekst": "Øv på kapittel 1 og 2",
      "frist": "Torsdag",
      "type": "Prøve"
     },
     {
-     "klasse": "1STA",
-     "fag": "Samfunnskunnskap",
-     "tema": "Demokrati: kven bestemmer i Noreg?",
-     "tekst": "Les s. 22–29",
-     "frist": "Fredag",
-     "type": ""
+     "klasse": "1ID",
+     "fag": "Aktivitetslære",
+     "tema": "Vi spelar volleyball i gymsalen",
+     "tekst": "",
+     "frist": "",
+     "type": "I timen"
     },
     {
-     "klasse": "2STA",
-     "fag": "Spansk",
-     "tema": "Framføring: mi bygd",
-     "tekst": "Framfør presentasjonen",
-     "frist": "Onsdag",
-     "type": "Vurdering"
-    },
-    {
-     "klasse": "2STA",
-     "fag": "Historie",
-     "tema": "Nasjonalisme i Europa",
-     "tekst": "Les s. 96–103",
-     "frist": "Fredag",
-     "type": ""
-    },
-    {
-     "klasse": "3STA",
-     "fag": "Norsk",
-     "tema": "Tentamen i norsk hovudmål – heile dagen",
-     "tekst": "Ta med ladar til PC-en",
-     "frist": "Måndag",
-     "type": "Prøve"
-    },
-    {
-     "klasse": "3STA",
-     "fag": "Sosialkunnskap",
-     "tema": "Sosial ulikskap i Noreg",
-     "tekst": "Finn ein artikkel og ta han med",
-     "frist": "Torsdag",
-     "type": ""
-    },
-    {
-     "klasse": "1HSA",
+     "klasse": "1HO",
      "fag": "Yrkesliv i helse- og oppvekstfag",
      "tema": "Yrkesetikk og teieplikt",
      "tekst": "",
      "frist": "",
-     "type": ""
+     "type": "I timen"
     },
     {
-     "klasse": "1HSA",
+     "klasse": "1HO",
      "fag": "Helsefremjande arbeid",
      "tema": "Ernæring og måltid",
      "tekst": "Lag ein døgnmeny og lever i Teams",
@@ -987,20 +1178,52 @@ const DATA = {
      "type": "Innlevering"
     },
     {
-     "klasse": "1TIA",
-     "fag": "Yrkesfagleg fordjuping",
-     "tema": "Utplassering i bedrift heile onsdagen",
-     "tekst": "Meld frå til kontaktlærar om oppmøtestad",
-     "frist": "Onsdag",
-     "type": "Utplassering"
+     "klasse": "1NA",
+     "fag": "Naturbasert aktivitet",
+     "tema": "Vi går ut med båten tysdag",
+     "tekst": "Ta med varme klede",
+     "frist": "",
+     "type": "Ekskursjon"
     },
     {
-     "klasse": "1RMA",
+     "klasse": "1TIF1",
+     "fag": "Yrkesfagleg fordjuping",
+     "tema": "Utplassering i bedrift heile onsdagen",
+     "tekst": "Meld frå til kontaktlærar",
+     "frist": "Måndag",
+     "type": "Frist"
+    },
+    {
+     "klasse": "1RM",
      "fag": "Bransje og arbeidsliv",
-     "tema": "Vi lagar lunsj til personalrommet",
+     "tema": "Servering: vi øver på å ta imot gjester",
      "tekst": "",
      "frist": "",
-     "type": ""
+     "type": "I timen"
+    },
+    {
+     "klasse": "2AKV/FF",
+     "fag": "Anlegg og teknikk",
+     "tema": "Fortøying og nøter",
+     "tekst": "Framføring av gruppeoppgåva",
+     "frist": "Torsdag",
+     "type": "Framføring"
+    },
+    {
+     "klasse": "3PB1",
+     "fag": "Norsk",
+     "tema": "Tentamen i norsk hovudmål – heile dagen",
+     "tekst": "Ta med ladar til PC-en",
+     "frist": "Måndag",
+     "type": "Prøve"
+    },
+    {
+     "klasse": "3PB2",
+     "fag": "Samfunnskunnskap",
+     "tema": "Sosial ulikskap i Noreg",
+     "tekst": "Finn ein artikkel og ta han med",
+     "frist": "Torsdag",
+     "type": "Heimearbeid"
     },
     {
      "klasse": "Alle",
@@ -1018,7 +1241,7 @@ const DATA = {
      "tekst": "Fredag er det fagdag om psykisk helse for heile skulen. Vanleg timeplan går ut."
     },
     {
-     "klasse": "3STA",
+     "klasse": "3PB1",
      "tittel": "Tentamen måndag",
      "tekst": "Norsktentamen måndag. Møt opp kl. 08.00 utanfor auditoriet."
     }
@@ -1028,15 +1251,21 @@ const DATA = {
  "logo": ""
 };
 const T = DATA.tekst;
-const GENERERT = "26. aug 12:01";
+const GENERERT = "26. aug 12:26";
 
 const $ = (id) => document.getElementById(id);
 const tekst = (v) => (v == null ? "" : String(v));
 const trygg = (s) => tekst(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const VIKTIG = /prøve|innlevering|frist|vurdering/i;
+const slagFor = (type) => (type ? (DATA.typar[type] || "arbeid") : "arbeid");
 
 const fagFarge = new Map(DATA.fag.map((f) => [f.navn, f.farge]));
 const fagOrden = new Map(DATA.fag.map((f, i) => [f.navn, i]));
+/* Fagene kommer i den rekkefølgen skolen har satt dem opp for klassen. */
+function ordenFor(fag) {
+  const liste = (DATA.fagperklasse || {})[valgtKlasse];
+  const i = liste ? liste.indexOf(fag) : -1;
+  return i >= 0 ? i : 500 + (fagOrden.get(fag) ?? 99);
+}
 const farge = (navn) => fagFarge.get(navn) || "#5B6A72";
 
 /* Fagfargene er valgt for lys bakgrunn; på mørk bakgrunn løftes de opp. */
@@ -1077,10 +1306,12 @@ const gjelder = (rad) => {
 };
 const mine = () => uka().rader.filter(gjelder);
 const oppgavene = () => mine().filter((r) => r.tekst);
+/* Framdriften teller bare det eleven faktisk skal gjøre selv. */
+const mineOppgaver = () => oppgavene().filter((r) => slagFor(r.type) !== "timen");
 const fagIBruk = () => {
   const sett = new Set();
   mine().forEach((r) => r.fag && sett.add(r.fag));
-  return [...sett].sort((a, b) => (fagOrden.get(a) ?? 99) - (fagOrden.get(b) ?? 99) || a.localeCompare(b, "nb"));
+  return [...sett].sort((a, b) => ordenFor(a) - ordenFor(b) || a.localeCompare(b, "nb"));
 };
 
 /* ── Klasse og uke ──────────────────────────────── */
@@ -1089,6 +1320,8 @@ function tegnKlasser() {
     .map((k) => `<button class="klasse" type="button" data-klasse="${trygg(k)}" aria-pressed="${k === valgtKlasse}">${trygg(k)}</button>`)
     .join("");
   $("klasser").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => velgKlasse(b.dataset.klasse)));
+  const valgt = $("klasser").querySelector('[aria-pressed="true"]');
+  if (valgt) valgt.scrollIntoView({ inline: "center", block: "nearest" });
 }
 
 function velgKlasse(k) {
@@ -1155,12 +1388,19 @@ function dempFag() {
 
 /* ── Punktene ───────────────────────────────────── */
 function punktrad(rad, hoyre) {
+  const slag = slagFor(rad.type);
+  const merke = rad.type && slag !== "arbeid" ? `<span class="merke ${slag}">${trygg(rad.type)}</span>` : "";
+  const frist = rad.frist ? `<span class="fristlapp${slag === "viktig" ? " viktig" : ""}">${trygg(rad.frist.toLowerCase())}</span>` : "";
+  const meta = `<span class="meta">${hoyre}${frist}${merke}</span>`;
+  /* «I timen» er noko vi gjer i lag – ingen hake å setje. */
+  if (slag === "timen") {
+    return `<li class="punktrad itimen"><span class="strek"></span><span class="punkttekst">${trygg(rad.tekst)}</span>${meta}</li>`;
+  }
   const id = idFor(rad);
   const erGjort = gjort.has(id);
-  const merke = rad.type ? `<span class="merke ${VIKTIG.test(rad.type) ? "viktig" : "rolig"}">${trygg(rad.type)}</span>` : "";
   return `<li class="punktrad${erGjort ? " gjort" : ""}" data-id="${id}">
     <label><input type="checkbox" data-id="${id}"${erGjort ? " checked" : ""}><span class="hake"></span><span class="punkttekst">${trygg(rad.tekst)}</span></label>
-    <span class="meta">${hoyre}${merke}</span>
+    ${meta}
   </li>`;
 }
 
@@ -1174,14 +1414,20 @@ function tegnFagvisning() {
     if (rad.tekst) b.punkt.push(rad);
   });
   const sortert = [...bolker.values()].sort(
-    (a, b) => (fagOrden.get(a.fag) ?? 99) - (fagOrden.get(b.fag) ?? 99) || a.fag.localeCompare(b.fag, "nb")
+    (a, b) => ordenFor(a.fag) - ordenFor(b.fag) || a.fag.localeCompare(b.fag, "nb")
   );
   return `<div class="fagrutenett">${sortert.map((b, i) => {
     const f = farge(b.fag);
+    const gjenstar = b.punkt.filter((r) => slagFor(r.type) !== "timen" && !gjort.has(idFor(r))).length;
     return `<article class="fagkort" data-fagrad="${trygg(b.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)};--i:${i}">
-      <h3 class="fagnamn">${trygg(b.fag || b.punkt.map((r) => r.type).find(Boolean) || T.anna)}</h3>
-      ${b.tema.length ? `<p class="tema">${trygg(b.tema.join(" · "))}</p>` : ""}
-      ${b.punkt.length ? `<ul class="punkt">${b.punkt.map((r) => punktrad(r, r.frist ? `<span class="fristlapp">${trygg(r.frist.toLowerCase())}</span>` : "")).join("")}</ul>` : ""}
+      <header class="fagtopp">
+        <h3 class="fagnamn">${trygg(b.fag || b.punkt.map((r) => r.type).find(Boolean) || T.anna)}</h3>
+        ${gjenstar ? `<span class="fagtal" title="${gjenstar} ${T.punkt}">${gjenstar}</span>` : ""}
+      </header>
+      <div class="fagkropp">
+        ${b.tema.length ? `<p class="tema">${trygg(b.tema.join(" · "))}</p>` : ""}
+        ${b.punkt.length ? `<ul class="punkt">${b.punkt.map((r) => punktrad(r, "")).join("")}</ul>` : ""}
+      </div>
     </article>`;
   }).join("")}</div>`;
 }
@@ -1201,7 +1447,8 @@ function tegnFristvisning() {
       <ul class="punkt">${bolker.get(dagnavn).map((r) => {
         const f = farge(r.fag);
         const etikett = r.fag ? `<span class="fagetikett">${trygg(r.fag)}</span>` : "";
-        return punktrad(r, etikett).replace('<li class="punktrad', `<li data-fagrad="${trygg(r.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}" class="punktrad`);
+        return punktrad({ ...r, frist: "" }, etikett)
+          .replace('<li class="punktrad', `<li data-fagrad="${trygg(r.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}" class="punktrad`);
       }).join("")}</ul>
     </section>`;
   }).join("")}</div>`;
@@ -1227,12 +1474,32 @@ function tegnPlan(animer = true, retning = "") {
 }
 
 function tegnFramdrift() {
-  const alle = oppgavene();
+  const alle = mineOppgaver();
   const ferdige = alle.filter((r) => gjort.has(idFor(r))).length;
   $("framdrift").hidden = alle.length === 0;
   $("framdriftstall").textContent = `${ferdige} ${T.av} ${alle.length} ${T.gjort}`;
   $("stolpe").style.width = alle.length ? `${(ferdige / alle.length) * 100}%` : "0";
   $("fjernhaker").hidden = ferdige === 0;
+  const ferdig = alle.length > 0 && ferdige === alle.length;
+  $("framdrift").classList.toggle("ferdig", ferdig);
+  if (ferdig) $("framdriftstall").textContent = T.alt_gjort;
+}
+
+function tegnOppsummering() {
+  const tall = new Map();
+  oppgavene().concat(mine().filter((r) => !r.tekst)).forEach((rad) => {
+    const slag = slagFor(rad.type);
+    if (!rad.type || slag === "arbeid") return;
+    tall.set(rad.type, (tall.get(rad.type) || 0) + 1);
+  });
+  const vekt = (type) => (slagFor(type) === "viktig" ? 0 : 1);
+  const biter = [...tall.entries()].sort(
+    (a, b) => vekt(a[0]) - vekt(b[0]) || b[1] - a[1] || a[0].localeCompare(b[0], "nb")
+  );
+  $("oppsummering").hidden = biter.length === 0;
+  $("oppsummering").innerHTML = biter
+    .map(([type, n]) => `<span class="sammendrag ${slagFor(type)}"><b>${n}</b><span>${trygg(type)}</span></span>`)
+    .join("");
 }
 
 /* ── Beskjeder ──────────────────────────────────── */
@@ -1259,6 +1526,7 @@ function tegnAlt(retning = "") {
   tegnTopp(retning);
   tegnFagfilter();
   tegnBeskjeder();
+  tegnOppsummering();
   tegnPlan(true, retning);
   tegnFramdrift();
   const merke = $("klassemerke");
@@ -1336,7 +1604,7 @@ function start() {
     dempFag();
   });
   $("fjernhaker").addEventListener("click", () => {
-    oppgavene().forEach((r) => gjort.delete(idFor(r)));
+    mineOppgaver().forEach((r) => gjort.delete(idFor(r)));
     lagreGjort();
     tegnPlan(false);
     tegnFramdrift();

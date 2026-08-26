@@ -10,7 +10,7 @@ from openpyxl import load_workbook
 
 from .felles import (ARKNAVN, DAGER, PROFILFARGE_STANDARD, datospenn, farge_for, nokkel,
                      norsk_dato, rens, tekster, tolk_dag, tolk_dato, tolk_farge,
-                     tolk_sprak, tolk_type, uke_til_mandag, vis_dag)
+                     tolk_sprak, tolk_type, typeslag, uke_til_mandag, vis_dag)
 
 
 @dataclass
@@ -80,6 +80,7 @@ def les(sti) -> Resultat:
         if hex_.startswith("#") and len(hex_) == 7:
             egne_farger[navn] = hex_
 
+    fagperklasse = _les_fagvalg(wb)
     kjente_klasser = {nokkel(k): k for k in klasser}
     kjente_fag = {nokkel(f): f for f in fagnavn}
 
@@ -120,7 +121,7 @@ def les(sti) -> Resultat:
             "tema": tema,
             "tekst": oppgave,
             "frist": tolk_dag(frist),
-            "type": tolk_type(type_),
+            "type": tolk_type(type_, sprak),
         })
 
     beskjeder: dict[int, list] = {}
@@ -177,9 +178,27 @@ def les(sti) -> Resultat:
         "logofil": logo,
         "klasser": klasser,
         "fag": fag_ut,
+        "fagperklasse": fagperklasse,
+        "typar": typeslag(),
         "uker": uker,
     }
     return Resultat(data=data, merknader=merknader)
+
+
+def _les_fagvalg(wb) -> dict:
+    """Arket «Fag per klasse»: én kolonne per klasse, faget i den rekkefølgen skolen vil ha."""
+    ark = _ark(wb, "fag_per_klasse")
+    if ark is None:
+        return {}
+    ut = {}
+    for kolonne in ark.iter_cols(min_row=1, values_only=True):
+        klasse = rens(kolonne[0])
+        if not klasse:
+            continue
+        fagene = [rens(v) for v in kolonne[1:] if rens(v)]
+        if fagene:
+            ut[klasse] = fagene
+    return ut
 
 
 def _tolk_uke(verdi, standarduke: int, hvor: str, merknader) -> int:

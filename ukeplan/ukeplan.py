@@ -46,6 +46,7 @@ def kommando_ny(args) -> int:
         klasser=demomodul.KLASSER if args.demo else None,
         fag=demomodul.FAG if args.demo else None,
         innhold=demomodul.demoinnhold() if args.demo else None,
+        fagvalg=demomodul.FAGVALG if args.demo else None,
         sprak=args.sprak or (demomodul.SPRAK if args.demo else "bokmal"),
         logo=demomodul.LOGO if args.demo else "",
     )
@@ -116,7 +117,7 @@ def kommando_sjekk(args) -> int:
         return 1
     resultat = les(fil)
     if not resultat.merknader:
-        si("Alt henger sammen. Timeplanen, uka og beskjedene bruker klasser og fag som finnes i Oppsett.")
+        si("Alt henger sammen. Ukearket og beskjedene bruker klasser og fag som finnes i Oppsett.")
         return 0
     _merknader(resultat.merknader)
     return 0

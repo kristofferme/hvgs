@@ -121,7 +121,16 @@ h1{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:70
 .beskjed p{margin:0;font-size:14.5px;color:var(--blekk);line-height:1.5}
 
 /* ── Framdrift og visning ─────────────────────────── */
-.styrelinje{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin:34px 0 22px}
+.oppsummering{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 0}
+.oppsummering[hidden]{display:none}
+.sammendrag{
+  display:inline-flex;align-items:baseline;gap:8px;padding:7px 13px;border-radius:99px;
+  font:500 12.5px/1 "Instrument Sans",sans-serif;border:1px solid var(--linje);color:var(--blekk);
+}
+.sammendrag b{font-family:"DM Mono",monospace;font-weight:500;font-size:12px}
+.sammendrag.viktig{border-color:color-mix(in oklab,var(--frist) 45%,transparent);color:var(--frist)}
+.sammendrag.timen{background:var(--innhold);border-color:transparent;color:var(--blekk-svak)}
+.styrelinje{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin:26px 0 22px}
 .bytter{display:inline-flex;background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);overflow:hidden}
 .bytter button{
   font:600 13px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:transparent;border:0;
@@ -132,26 +141,38 @@ h1{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:70
 .stolpe{position:relative;flex:1;height:6px;border-radius:99px;background:var(--innhold);overflow:hidden}
 .stolpe i{position:absolute;inset:0 auto 0 0;width:0;background:var(--naa);border-radius:99px;transition:width .45s cubic-bezier(.2,.75,.3,1)}
 .framdrift .tall{font-family:"DM Mono",monospace;font-size:12px;color:var(--blekk-svak);white-space:nowrap}
+.framdrift.ferdig .tall{color:var(--naa)}
 .framdrift[hidden]{display:none}
 
 /* ── Fagkort ──────────────────────────────────────── */
-.fagrutenett{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;align-items:start}
+.fagrutenett{columns:330px;column-gap:14px}
 .fagkort{
-  background:var(--kort);border:1px solid var(--linje-svak);border-left:4px solid var(--fag);
-  border-radius:var(--r);padding:15px 17px 16px;
+  break-inside:avoid;margin:0 0 14px;
+  background:var(--kort);border:1px solid var(--linje-svak);border-radius:var(--r);overflow:hidden;
   animation:stig .48s cubic-bezier(.2,.75,.3,1) backwards;animation-delay:calc(var(--i) * 45ms);
   transition:opacity .3s;
 }
+.fagtopp{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:10px 15px 11px;
+  background:color-mix(in oklab,var(--fag) 13%,var(--kort));
+  border-bottom:1px solid color-mix(in oklab,var(--fag) 26%,transparent);
+}
+.fagtal{font-family:"DM Mono",monospace;font-size:11px;color:var(--fagtekst);opacity:.7}
+.fagkropp{padding:13px 15px 14px}
 .uten-bevegelse .fagkort{animation:none}
 .frem .fagkort{--fra-x:36px}
 .tilbake .fagkort{--fra-x:-36px}
 @keyframes stig{from{opacity:0;transform:translate(var(--fra-x,0px),14px)}to{opacity:1;transform:none}}
-.fagnamn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:17px;letter-spacing:-.015em;color:var(--fagtekst);margin:0}
-.tema{font-size:15px;line-height:1.45;margin:7px 0 0;color:var(--blekk)}
-.punkt{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
-.fagkort .punkt{border-top:1px solid var(--linje-svak);padding-top:10px}
+.fagnamn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:16.5px;letter-spacing:-.015em;color:var(--fagtekst);margin:0;line-height:1.15}
+.tema{font-size:15px;line-height:1.45;margin:0;color:var(--blekk)}
+.punkt{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.fagkropp .tema + .punkt{border-top:1px solid var(--linje-svak);margin-top:11px;padding-top:9px}
 .punktrad{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 9px;padding:6px 0}
 .punktrad label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;flex:1 1 auto;min-width:0}
+.punktrad.itimen{display:flex;align-items:flex-start;gap:10px}
+.punktrad.itimen .strek{flex:none;width:19px;height:19px;margin-top:1px;display:grid;place-items:center}
+.punktrad.itimen .strek::before{content:"";width:11px;height:2px;border-radius:2px;background:var(--fag)}
+.punktrad.itimen .punkttekst{color:var(--blekk)}
 .punktrad input{position:absolute;opacity:0;width:1px;height:1px}
 .hake{
   flex:none;width:19px;height:19px;margin-top:1px;border-radius:4px;
@@ -170,9 +191,11 @@ h1{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:70
 .punkttekst{font-size:15px;line-height:1.4;transition:opacity .25s}
 .punktrad.gjort .punkttekst{opacity:.45;text-decoration:line-through;text-decoration-thickness:1px}
 .fristlapp{font-family:"DM Mono",monospace;font-size:11.5px;color:var(--naa);white-space:nowrap}
-.merke{display:inline-block;font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
-.merke.viktig{color:var(--frist)}
-.merke.rolig{color:var(--blekk-svak)}
+.merke{display:inline-block;font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.merke.viktig{color:var(--frist);border:1px solid currentColor}
+.merke.timen{color:var(--blekk-svak);background:var(--innhold)}
+.merke.arbeid{color:var(--blekk-svak);border:1px solid var(--linje)}
+.fristlapp.viktig{color:var(--frist)}
 .dim{opacity:var(--dempet)}
 .tom{border:1px dashed var(--linje);border-radius:var(--r);padding:22px;font-size:14px;color:var(--blekk-svak);text-align:center}
 
@@ -197,10 +220,12 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--linje-svak);d
   .verktoy{position:absolute;top:0;right:0;margin:0}
   .velgere{gap:20px}
   .velgergruppe:has(.fagfilter){width:100%}
-  .fagfilter{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-ms-overflow-style:none}
-  .fagfilter::-webkit-scrollbar{display:none}
-  .fagknapp{flex:none}
-  .fagrutenett{grid-template-columns:1fr}
+  /* Klassane og faga rullar sidelengs, så uka startar høgt oppe på telefonen. */
+  .fagfilter,.klasser{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-ms-overflow-style:none}
+  .fagfilter::-webkit-scrollbar,.klasser::-webkit-scrollbar{display:none}
+  .fagknapp,.klasse{flex:none}
+  .klasser{padding:4px 4px 10px}
+  .fagrutenett{columns:1}
   .styrelinje{gap:12px}
   .fristlapp{margin-left:0}
 }
@@ -213,7 +238,7 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--linje-svak);d
   .velgere,.verktoy,.knapp,.bla,.tilbaketilnaa,.bytter,.nullstill,.framdrift{display:none !important}
   body{font-size:11px;background:#fff;color:#000}
   .ramme{max-width:none;padding:0}
-  .fagrutenett{grid-template-columns:repeat(3,1fr);gap:8px}
+  .fagrutenett{columns:3;column-gap:8px}
   .fagkort,.beskjed,.fristbolk,.punktrad{break-inside:avoid;animation:none;box-shadow:none !important}
   .hake{border-color:#000}
   @page{size:A4;margin:12mm}
@@ -261,6 +286,7 @@ try {
   </div>
 
   <section class="beskjeder" id="beskjeder"></section>
+  <section class="oppsummering" id="oppsummering" hidden></section>
 
   <div class="styrelinje">
     <div class="bytter" role="group">
@@ -290,10 +316,16 @@ const GENERERT = "__GENERERT__";
 const $ = (id) => document.getElementById(id);
 const tekst = (v) => (v == null ? "" : String(v));
 const trygg = (s) => tekst(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const VIKTIG = /prøve|innlevering|frist|vurdering/i;
+const slagFor = (type) => (type ? (DATA.typar[type] || "arbeid") : "arbeid");
 
 const fagFarge = new Map(DATA.fag.map((f) => [f.navn, f.farge]));
 const fagOrden = new Map(DATA.fag.map((f, i) => [f.navn, i]));
+/* Fagene kommer i den rekkefølgen skolen har satt dem opp for klassen. */
+function ordenFor(fag) {
+  const liste = (DATA.fagperklasse || {})[valgtKlasse];
+  const i = liste ? liste.indexOf(fag) : -1;
+  return i >= 0 ? i : 500 + (fagOrden.get(fag) ?? 99);
+}
 const farge = (navn) => fagFarge.get(navn) || "#5B6A72";
 
 /* Fagfargene er valgt for lys bakgrunn; på mørk bakgrunn løftes de opp. */
@@ -334,10 +366,12 @@ const gjelder = (rad) => {
 };
 const mine = () => uka().rader.filter(gjelder);
 const oppgavene = () => mine().filter((r) => r.tekst);
+/* Framdriften teller bare det eleven faktisk skal gjøre selv. */
+const mineOppgaver = () => oppgavene().filter((r) => slagFor(r.type) !== "timen");
 const fagIBruk = () => {
   const sett = new Set();
   mine().forEach((r) => r.fag && sett.add(r.fag));
-  return [...sett].sort((a, b) => (fagOrden.get(a) ?? 99) - (fagOrden.get(b) ?? 99) || a.localeCompare(b, "nb"));
+  return [...sett].sort((a, b) => ordenFor(a) - ordenFor(b) || a.localeCompare(b, "nb"));
 };
 
 /* ── Klasse og uke ──────────────────────────────── */
@@ -346,6 +380,8 @@ function tegnKlasser() {
     .map((k) => `<button class="klasse" type="button" data-klasse="${trygg(k)}" aria-pressed="${k === valgtKlasse}">${trygg(k)}</button>`)
     .join("");
   $("klasser").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => velgKlasse(b.dataset.klasse)));
+  const valgt = $("klasser").querySelector('[aria-pressed="true"]');
+  if (valgt) valgt.scrollIntoView({ inline: "center", block: "nearest" });
 }
 
 function velgKlasse(k) {
@@ -412,12 +448,19 @@ function dempFag() {
 
 /* ── Punktene ───────────────────────────────────── */
 function punktrad(rad, hoyre) {
+  const slag = slagFor(rad.type);
+  const merke = rad.type && slag !== "arbeid" ? `<span class="merke ${slag}">${trygg(rad.type)}</span>` : "";
+  const frist = rad.frist ? `<span class="fristlapp${slag === "viktig" ? " viktig" : ""}">${trygg(rad.frist.toLowerCase())}</span>` : "";
+  const meta = `<span class="meta">${hoyre}${frist}${merke}</span>`;
+  /* «I timen» er noko vi gjer i lag – ingen hake å setje. */
+  if (slag === "timen") {
+    return `<li class="punktrad itimen"><span class="strek"></span><span class="punkttekst">${trygg(rad.tekst)}</span>${meta}</li>`;
+  }
   const id = idFor(rad);
   const erGjort = gjort.has(id);
-  const merke = rad.type ? `<span class="merke ${VIKTIG.test(rad.type) ? "viktig" : "rolig"}">${trygg(rad.type)}</span>` : "";
   return `<li class="punktrad${erGjort ? " gjort" : ""}" data-id="${id}">
     <label><input type="checkbox" data-id="${id}"${erGjort ? " checked" : ""}><span class="hake"></span><span class="punkttekst">${trygg(rad.tekst)}</span></label>
-    <span class="meta">${hoyre}${merke}</span>
+    ${meta}
   </li>`;
 }
 
@@ -431,14 +474,20 @@ function tegnFagvisning() {
     if (rad.tekst) b.punkt.push(rad);
   });
   const sortert = [...bolker.values()].sort(
-    (a, b) => (fagOrden.get(a.fag) ?? 99) - (fagOrden.get(b.fag) ?? 99) || a.fag.localeCompare(b.fag, "nb")
+    (a, b) => ordenFor(a.fag) - ordenFor(b.fag) || a.fag.localeCompare(b.fag, "nb")
   );
   return `<div class="fagrutenett">${sortert.map((b, i) => {
     const f = farge(b.fag);
+    const gjenstar = b.punkt.filter((r) => slagFor(r.type) !== "timen" && !gjort.has(idFor(r))).length;
     return `<article class="fagkort" data-fagrad="${trygg(b.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)};--i:${i}">
-      <h3 class="fagnamn">${trygg(b.fag || b.punkt.map((r) => r.type).find(Boolean) || T.anna)}</h3>
-      ${b.tema.length ? `<p class="tema">${trygg(b.tema.join(" · "))}</p>` : ""}
-      ${b.punkt.length ? `<ul class="punkt">${b.punkt.map((r) => punktrad(r, r.frist ? `<span class="fristlapp">${trygg(r.frist.toLowerCase())}</span>` : "")).join("")}</ul>` : ""}
+      <header class="fagtopp">
+        <h3 class="fagnamn">${trygg(b.fag || b.punkt.map((r) => r.type).find(Boolean) || T.anna)}</h3>
+        ${gjenstar ? `<span class="fagtal" title="${gjenstar} ${T.punkt}">${gjenstar}</span>` : ""}
+      </header>
+      <div class="fagkropp">
+        ${b.tema.length ? `<p class="tema">${trygg(b.tema.join(" · "))}</p>` : ""}
+        ${b.punkt.length ? `<ul class="punkt">${b.punkt.map((r) => punktrad(r, "")).join("")}</ul>` : ""}
+      </div>
     </article>`;
   }).join("")}</div>`;
 }
@@ -458,7 +507,8 @@ function tegnFristvisning() {
       <ul class="punkt">${bolker.get(dagnavn).map((r) => {
         const f = farge(r.fag);
         const etikett = r.fag ? `<span class="fagetikett">${trygg(r.fag)}</span>` : "";
-        return punktrad(r, etikett).replace('<li class="punktrad', `<li data-fagrad="${trygg(r.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}" class="punktrad`);
+        return punktrad({ ...r, frist: "" }, etikett)
+          .replace('<li class="punktrad', `<li data-fagrad="${trygg(r.fag)}" style="--fag:${f};--fagtekst:${tekstfarge(f)}" class="punktrad`);
       }).join("")}</ul>
     </section>`;
   }).join("")}</div>`;
@@ -484,12 +534,32 @@ function tegnPlan(animer = true, retning = "") {
 }
 
 function tegnFramdrift() {
-  const alle = oppgavene();
+  const alle = mineOppgaver();
   const ferdige = alle.filter((r) => gjort.has(idFor(r))).length;
   $("framdrift").hidden = alle.length === 0;
   $("framdriftstall").textContent = `${ferdige} ${T.av} ${alle.length} ${T.gjort}`;
   $("stolpe").style.width = alle.length ? `${(ferdige / alle.length) * 100}%` : "0";
   $("fjernhaker").hidden = ferdige === 0;
+  const ferdig = alle.length > 0 && ferdige === alle.length;
+  $("framdrift").classList.toggle("ferdig", ferdig);
+  if (ferdig) $("framdriftstall").textContent = T.alt_gjort;
+}
+
+function tegnOppsummering() {
+  const tall = new Map();
+  oppgavene().concat(mine().filter((r) => !r.tekst)).forEach((rad) => {
+    const slag = slagFor(rad.type);
+    if (!rad.type || slag === "arbeid") return;
+    tall.set(rad.type, (tall.get(rad.type) || 0) + 1);
+  });
+  const vekt = (type) => (slagFor(type) === "viktig" ? 0 : 1);
+  const biter = [...tall.entries()].sort(
+    (a, b) => vekt(a[0]) - vekt(b[0]) || b[1] - a[1] || a[0].localeCompare(b[0], "nb")
+  );
+  $("oppsummering").hidden = biter.length === 0;
+  $("oppsummering").innerHTML = biter
+    .map(([type, n]) => `<span class="sammendrag ${slagFor(type)}"><b>${n}</b><span>${trygg(type)}</span></span>`)
+    .join("");
 }
 
 /* ── Beskjeder ──────────────────────────────────── */
@@ -516,6 +586,7 @@ function tegnAlt(retning = "") {
   tegnTopp(retning);
   tegnFagfilter();
   tegnBeskjeder();
+  tegnOppsummering();
   tegnPlan(true, retning);
   tegnFramdrift();
   const merke = $("klassemerke");
@@ -593,7 +664,7 @@ function start() {
     dempFag();
   });
   $("fjernhaker").addEventListener("click", () => {
-    oppgavene().forEach((r) => gjort.delete(idFor(r)));
+    mineOppgaver().forEach((r) => gjort.delete(idFor(r)));
     lagreGjort();
     tegnPlan(false);
     tegnFramdrift();

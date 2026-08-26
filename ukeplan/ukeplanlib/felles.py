@@ -21,11 +21,32 @@ DAGFORMER = {
 }
 MANEDER = ["jan", "feb", "mar", "apr", "mai", "jun", "jul", "aug", "sep", "okt", "nov", "des"]
 
+# Typene sier hva slags punkt det er – ikke alt er lekse.
+#   arbeid = noe eleven gjør selv     viktig = vurdering eller frist
+#   timen  = noe vi gjør i lag, uten avkryssing
 TYPER = {
-    "nb": ["Prøve", "Innlevering", "Frist", "Vurdering", "Utplassering", "Fagdag", "Tur", "Info"],
-    "nn": ["Prøve", "Innlevering", "Frist", "Vurdering", "Utplassering", "Fagdag", "Tur", "Info"],
+    "nb": [
+        ("I timen", "timen"), ("Hjemmearbeid", "arbeid"), ("Innlevering", "viktig"),
+        ("Prøve", "viktig"), ("Vurdering", "viktig"), ("Framføring", "viktig"),
+        ("Frist", "viktig"), ("Ekskursjon", "timen"), ("Utplassering", "timen"),
+        ("Fagdag", "timen"), ("Info", "timen"),
+    ],
+    "nn": [
+        ("I timen", "timen"), ("Heimearbeid", "arbeid"), ("Innlevering", "viktig"),
+        ("Prøve", "viktig"), ("Vurdering", "viktig"), ("Framføring", "viktig"),
+        ("Frist", "viktig"), ("Ekskursjon", "timen"), ("Utplassering", "timen"),
+        ("Fagdag", "timen"), ("Info", "timen"),
+    ],
 }
-VIKTIGE_TYPER = ("prøve", "innlevering", "frist", "vurdering")
+
+
+def typenavn(sprak: str = "nb") -> list[str]:
+    return [navn for navn, _ in TYPER[tolk_sprak(sprak)]]
+
+
+def typeslag() -> dict:
+    """Alle typenavn på begge målformer → slaget de hører til."""
+    return {navn: slag for liste in TYPER.values() for navn, slag in liste}
 
 # Faste farger for fagene. Nøkkelen er faget i liten skrift uten skilletegn,
 # så «Matematikk 1P-Y» og «matematikk 1py» treffer det samme.
@@ -117,6 +138,8 @@ TEKSTER = {
         "etter_fag": "Etter fag", "etter_frist": "Etter frist",
         "gjennom_uka": "Gjennom uka", "gjort": "gjort", "av": "av",
         "fjern_haker": "fjern haker", "anna": "Annet",
+        "alt_gjort": "Alt gjort denne uka", "denne_uka": "Denne uka",
+        "fag_per_klasse": "Fag per klasse",
         "ingenting": "Ingenting lagt inn for denne klassen denne uka.",
         "kol_frist": "Frist", "kol_type": "Type", "kol_larer": "Lærer",
         "kol_tittel": "Overskrift", "kol_beskjed": "Beskjed",
@@ -148,14 +171,16 @@ TEKSTER = {
         "etter_fag": "Etter fag", "etter_frist": "Etter frist",
         "gjennom_uka": "Gjennom veka", "gjort": "gjort", "av": "av",
         "fjern_haker": "fjern hakar", "anna": "Anna",
+        "alt_gjort": "Alt gjort denne veka", "denne_uka": "Denne veka",
+        "fag_per_klasse": "Fag per klasse",
         "ingenting": "Ingenting lagt inn for denne klassen denne veka.",
         "kol_frist": "Frist", "kol_type": "Type", "kol_larer": "Lærar",
         "kol_tittel": "Overskrift", "kol_beskjed": "Melding",
     },
 }
-ARKNAVN = {navn: [TEKSTER["nb"][navn], TEKSTER["nn"][navn]] for navn in
+ARKNAVN = {navn: sorted({TEKSTER["nb"][navn], TEKSTER["nn"][navn]}) for navn in
            ("ark_start", "ark_oppsett", "ark_timeplan", "ark_larere", "ark_uke",
-            "ark_beskjeder", "ark_lister")}
+            "ark_beskjeder", "ark_lister", "fag_per_klasse")}
 
 
 def tekster(sprak: str = "nb") -> dict:
@@ -255,10 +280,13 @@ def tolk_dato(verdi):
 
 
 def tolk_type(verdi, sprak: str = "nb") -> str:
+    """Kjenner igjen typen på begge målformer og skriver den i bokas målform."""
     n = nokkel(verdi)
-    for t in TYPER["nb"] + TYPER["nn"]:
-        if nokkel(t) == n:
-            return t
+    if not n:
+        return ""
+    for i, (navn, _) in enumerate(TYPER["nb"]):
+        if n in (nokkel(navn), nokkel(TYPER["nn"][i][0])):
+            return TYPER[tolk_sprak(sprak)][i][0]
     return rens(verdi)
 
 

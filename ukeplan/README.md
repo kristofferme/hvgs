@@ -2,8 +2,11 @@
 
 Læreren fyller ut én tabell i Excel. Elevene får én nettside de kan huke av i.
 
-Satt opp for **Hustadvika vidaregåande skole**: nynorsk, videregående klasser og
-fag, og skolens profilfarge og logo. Alt sammen står i Oppsett og kan byttes.
+Satt opp for **Hustadvika vidaregåande skole**: nynorsk, skolens egne klasser
+(1ID, 1HO, 1NA, 1RM, 1TIF1–3, 2AKV/FF, 2KJP/AR, 2KJP/RM, 3PB1, 3PB2) med fag
+per klasse, og skolens profilfarge og logo. Alt sammen står i arkene og kan
+byttes. Faglistene for 2KJP/AR og 2KJP/RM har programfag som må rettes til de
+faktiske faga.
 
 ```
 python3 ukeplan.py ny --demo     # arbeidsbok med et ferdig eksempel
@@ -30,6 +33,19 @@ Alle kolonnene bortsett fra de to tekstfeltene har nedtrekksliste. Uke-lista
 viser både nummer og datoer, så du slipper å telle. Skriver du to rader i samme
 fag, havner begge på samme kort på nettsiden – «Vi jobber med» øverst, punktene
 under. «Alle» i klassefeltet gjelder alle klassene. Frist er valgfri.
+
+**Type** sier hva slags punkt det er – alt er ikke lekse:
+
+| Type | På nettsiden |
+| --- | --- |
+| *tom* eller Hjemmearbeid | Vanlig punkt med avkryssingsboks |
+| Innlevering, Prøve, Vurdering, Framføring, Frist | Avkryssingsboks, rødt merke, og telles i «denne uka»-stripa |
+| I timen, Ekskursjon, Utplassering, Fagdag, Info | Ingen boks – dette gjør dere i lag. Vises med strek foran og et rolig merke |
+
+**Fag per klasse** – én kolonne per klasse med fagene klassen har. Fyller du ut
+denne, viser Fag-nedtrekket bare klassens egne fag når du har valgt klasse, og
+kortene på nettsiden kommer i den rekkefølgen du har satt dem opp. Lar du en
+klasse stå tom, får du hele faglista.
 
 **Beskjeder** – korte meldinger hjem, med samme ukevalg.
 
@@ -61,11 +77,14 @@ Uke rad 41: uke 99 finnes ikke. Raden havner i uke 36.
 Én fil med alle ukene, og ingenting utenfor den – skriftene ligger inne i fila,
 så siden ser lik ut på skolens nett, på mobilen og uten nett i det hele tatt.
 
-- **Ett kort per fag.** «Vi jobber med» øverst, punktene under, med frist og
-  eventuelt merke (prøve, innlevering, utplassering, fagdag).
-- **Elevene huker av.** Haken ligger i elevens egen nettleser – ingen
-  innlogging, ingen personopplysninger, og læreren ser den ikke. Framdriften
-  vises som «3 av 7 gjort» øverst.
+- **Ett kort per fag**, med fagets farge i toppbandet og antall punkt som står
+  igjen. «Vi jobber med» øverst, punktene under, med frist og merke.
+- **En stripe over planen** viser hva som skiller seg ut denne uka:
+  «1 Innlevering · 1 Vurdering · 1 Ekskursjon».
+- **Elevene huker av** det de skal gjøre selv. Haken ligger i elevens egen
+  nettleser – ingen innlogging, ingen personopplysninger, og læreren ser den
+  ikke. Framdriften vises som «3 av 7 gjort», og blir til «Alt gjort denne uka»
+  når siste hake er satt. Punkter merket «I timen» teller ikke med.
 - **Etter fag eller etter frist.** Samme punkter, to grupperinger, ett klikk.
   Valget huskes.
 - **Klasse** velges med ett klikk og huskes. `ukeplan.html?klasse=1STA&uke=36`
@@ -94,7 +113,7 @@ du overskriver bare fila.
 | Kommando | Gjør |
 | --- | --- |
 | `ukeplan.py ny` | ny, tom arbeidsbok |
-| `ukeplan.py ny --demo` | ferdig utfylt eksempel: seks klasser, tre uker |
+| `ukeplan.py ny --demo` | ferdig utfylt eksempel: tolv klasser, tre uker |
 | `ukeplan.py ny --sprak nynorsk` | arbeidsbok og nettside på nynorsk |
 | `ukeplan.py følg` | bygger nettsiden hver gang arbeidsboka lagres |
 | `ukeplan.py bygg` | bygger én gang |

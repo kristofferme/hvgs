@@ -1,0 +1,24 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/sp/v2/column-formatting.schema.json",
+  "elmType": "div",
+  "attributes": {
+    "class": "=if(Number([$Frist]) <= Number(@now) && [$Status] != 'Avslutta', 'sp-field-severity--blocked', '')"
+  },
+  "style": {
+    "display": "flex",
+    "align-items": "center",
+    "gap": "6px"
+  },
+  "children": [
+    {
+      "elmType": "span",
+      "attributes": {
+        "iconName": "=if(Number([$Frist]) <= Number(@now) && [$Status] != 'Avslutta', 'Warning', '')"
+      }
+    },
+    {
+      "elmType": "span",
+      "txtContent": "=if([$Frist] == '', '', toLocaleDateString([$Frist]))"
+    }
+  ]
+}

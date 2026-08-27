@@ -1,0 +1,6 @@
+# Arbeidsboka og møtevisningen inneholder personopplysninger.
+# De skal ligge i Teams, ikke i GitHub.
+/Trafikklys.xlsx
+/Elevstatus.html
+/mote/
+__pycache__/

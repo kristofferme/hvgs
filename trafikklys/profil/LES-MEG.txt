@@ -1,0 +1,8 @@
+Legg logoen til skolen her, som logo.png eller logo.svg.
+
+Filnavnet skriver du i Oppsett-arket, feltet «Logo»: profil/logo.png
+Neste gang du kjører «python3 trafikklys.py bygg», legges logoen inn i
+møtevisningen som en del av fila – ingen lenker ut.
+
+Vekeplanen ved siden av bruker samme logo. Ligger den allerede i
+../ukeplan/profil/, kan du skrive ../ukeplan/profil/logo.png i stedet.

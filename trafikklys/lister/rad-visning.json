@@ -1,0 +1,4 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/sp/v2/row-formatting.schema.json",
+  "additionalRowClass": "=if([$Lys] == 'Raudt', 'sp-field-severity--blocked', if([$Lys] == 'Gult', 'sp-field-severity--warning', if([$Lys] == 'Grønt', 'sp-field-severity--good', '')))"
+}

@@ -1,0 +1,650 @@
+<title>__TITTEL__</title>
+<style>
+__FONTER__
+
+:root{
+  --ark:#E7EBE8;
+  --kort:#FFFFFF;
+  --blekk:#16212A;
+  --blekk-svak:#5B6A72;
+  --linje:rgba(22,33,42,.16);
+  --linje-svak:rgba(22,33,42,.08);
+  --profil:#0093C9;
+  --naa:color-mix(in oklab,var(--profil) 72%,var(--blekk));
+  --gronn:#2E7D4F;
+  --gul:#B77F0F;
+  --rod:#B3382A;
+  --felt:#FFFFFF;
+  --skygge:rgba(22,33,42,.9);
+  --r:3px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ark:#121A1F; --kort:#1A242B; --blekk:#E8EDEA; --blekk-svak:#93A2A8;
+    --linje:rgba(232,237,234,.22); --linje-svak:rgba(232,237,234,.10);
+    --naa:color-mix(in oklab,var(--profil) 68%,white);
+    --gronn:#5FBE86; --gul:#E0AE4A; --rod:#E88374;
+    --felt:#222E36; --skygge:rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ark:#121A1F; --kort:#1A242B; --blekk:#E8EDEA; --blekk-svak:#93A2A8;
+  --linje:rgba(232,237,234,.22); --linje-svak:rgba(232,237,234,.10);
+  --naa:color-mix(in oklab,var(--profil) 68%,white);
+  --gronn:#5FBE86; --gul:#E0AE4A; --rod:#E88374;
+  --felt:#222E36; --skygge:rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ark);color:var(--blekk);
+  font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;
+}
+.ramme{max-width:1500px;margin:0 auto;padding:clamp(20px,3vw,44px) clamp(16px,3vw,40px) 96px}
+
+/* ── Toppen ───────────────────────────────────────── */
+.topp{display:flex;flex-wrap:wrap;align-items:flex-end;gap:clamp(16px,3vw,40px);padding-bottom:22px;border-bottom:1.5px solid var(--blekk)}
+.moteblokk{display:flex;align-items:stretch;gap:6px}
+.mote{display:flex;flex-direction:column;justify-content:flex-end;gap:2px;padding:8px 18px 10px;background:var(--blekk);color:var(--ark);border-radius:var(--r) var(--r) 0 0;min-width:180px}
+.mote .etikett{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.72}
+.mote .navn{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:800;font-size:clamp(20px,2.6vw,30px);line-height:1.02;letter-spacing:-.02em}
+.mote .dato{font-family:"DM Mono",monospace;font-size:11.5px;opacity:.7}
+.bla{
+  width:32px;align-self:stretch;display:grid;place-items:center;cursor:pointer;
+  background:var(--felt);color:var(--blekk);border:1.5px solid var(--blekk);border-radius:var(--r);
+  font-family:"Bricolage Grotesque",sans-serif;font-size:19px;font-weight:500;line-height:1;
+  transition:background .16s,color .16s,transform .16s,opacity .16s;
+}
+.bla:hover:not(:disabled){background:var(--blekk);color:var(--ark)}
+.bla:active:not(:disabled){transform:scale(.94)}
+.bla:disabled{opacity:.25;cursor:default}
+.tittelblokk{flex:1 1 300px;min-width:0}
+.logo{display:block;height:clamp(28px,3.2vw,38px);width:auto;max-width:min(340px,72vw);margin:0 0 10px}
+.logo[hidden]{display:none}
+:root[data-theme="dark"] .logo{background:#fff;padding:6px 10px;border-radius:var(--r)}
+.skole{font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--naa);margin:0 0 5px}
+h1{font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:700;font-size:clamp(26px,3.4vw,38px);line-height:1.02;letter-spacing:-.025em;margin:0;text-wrap:balance}
+.klassemerke{display:inline-block;color:var(--naa)}
+.klassemerke.bytt,.mote .navn.bytt{animation:vend .34s cubic-bezier(.2,.75,.3,1)}
+@keyframes vend{from{opacity:0;transform:translateY(.28em) rotateX(-55deg)}to{opacity:1;transform:none}}
+.verktoy{display:flex;gap:8px;align-items:center;margin-left:auto}
+.knapp{font:500 13px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);padding:9px 13px;cursor:pointer;transition:transform .14s cubic-bezier(.2,.7,.3,1),box-shadow .14s}
+.knapp:hover{transform:translate(-1px,-1px);box-shadow:2px 2px 0 var(--blekk)}
+.knapp:active{transform:translate(1px,1px);box-shadow:none}
+
+/* ── Personvern ───────────────────────────────────── */
+.personvern{
+  display:flex;align-items:center;gap:10px;margin:18px 0 0;padding:10px 14px;
+  border:1px solid var(--linje);border-left:4px solid var(--rod);border-radius:var(--r);
+  background:color-mix(in oklab,var(--rod) 7%,var(--kort));
+  font-size:13px;color:var(--blekk-svak);
+}
+.personvern b{color:var(--blekk);font-weight:600}
+
+/* ── Velgere ──────────────────────────────────────── */
+.velgere{display:flex;flex-wrap:wrap;gap:clamp(18px,4vw,56px);padding:22px 0 20px;border-bottom:1px solid var(--linje-svak)}
+.velgertittel{font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--blekk-svak);margin:0 0 10px}
+.klasser{display:flex;flex-wrap:wrap;gap:9px}
+.klasse{
+  font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:700;font-size:17px;letter-spacing:-.01em;
+  color:var(--blekk);background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);
+  padding:8px 15px;cursor:pointer;box-shadow:3px 3px 0 var(--blekk);
+  transition:transform .16s cubic-bezier(.2,.7,.3,1),box-shadow .16s,background .16s,color .16s;
+}
+.klasse:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--blekk)}
+.klasse[aria-pressed="true"]{background:var(--blekk);color:var(--ark);transform:translate(2px,2px);box-shadow:0 0 0 var(--blekk)}
+.klasse .prikk{display:inline-block;width:7px;height:7px;border-radius:99px;margin-left:7px;vertical-align:middle;background:var(--rod)}
+.klasse .prikk[hidden]{display:none}
+:where(button,input,a,summary):focus-visible{outline:2px solid var(--naa);outline-offset:3px}
+
+/* ── Nøkkeltall ───────────────────────────────────── */
+.noklar{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin:24px 0 0}
+.tall{
+  display:flex;flex-direction:column;gap:2px;min-width:118px;padding:11px 15px 12px;
+  background:var(--kort);border:1px solid var(--linje);border-radius:var(--r);
+}
+.tall .stor{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:30px;line-height:1;letter-spacing:-.02em}
+.tall .liten{font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--blekk-svak)}
+.tall.gronn{border-left:4px solid var(--gronn)} .tall.gronn .stor{color:var(--gronn)}
+.tall.gul{border-left:4px solid var(--gul)}    .tall.gul .stor{color:var(--gul)}
+.tall.rod{border-left:4px solid var(--rod)}    .tall.rod .stor{color:var(--rod)}
+
+/* ── Ta opp i møtet ───────────────────────────────── */
+.koen{margin:22px 0 0;padding:16px 18px;background:var(--kort);border:1px solid var(--linje);border-left:4px solid var(--naa);border-radius:var(--r)}
+.koen h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:15px;margin:0 0 10px;letter-spacing:-.01em}
+.kolapper{display:flex;flex-wrap:wrap;gap:8px}
+.kolapp{
+  display:inline-flex;align-items:center;gap:8px;font:500 13.5px/1 "Instrument Sans",sans-serif;
+  color:var(--blekk);background:var(--felt);border:1px solid var(--linje);border-radius:99px;
+  padding:7px 13px 7px 10px;cursor:pointer;transition:border-color .16s,transform .14s;
+}
+.kolapp:hover{border-color:var(--blekk);transform:translateY(-1px)}
+.kolapp .merke{font-size:11px}
+.kolapp .antal{font-family:"DM Mono",monospace;font-size:11px;color:var(--blekk-svak)}
+.tomt{color:var(--blekk-svak);font-size:14px;margin:0}
+
+/* ── Styrelinje ───────────────────────────────────── */
+.styrelinje{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:26px 0 12px}
+.bytter{display:inline-flex;border:1.5px solid var(--blekk);border-radius:var(--r);overflow:hidden}
+.bytter button{font:500 13px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:var(--felt);border:0;padding:9px 14px;cursor:pointer}
+.bytter button+button{border-left:1.5px solid var(--blekk)}
+.bytter button[aria-pressed="true"]{background:var(--blekk);color:var(--ark)}
+.nullstill{font:500 12.5px/1 "Instrument Sans",sans-serif;color:var(--blekk-svak);background:none;border:0;border-bottom:1px solid var(--linje);padding:5px 2px;cursor:pointer}
+.nullstill:hover{color:var(--blekk);border-color:var(--blekk)}
+
+/* ── Rutenettet ───────────────────────────────────── */
+.rutebord{overflow-x:auto;border:1px solid var(--linje);border-radius:var(--r);background:var(--kort)}
+table.rutenett{border-collapse:collapse;width:100%;min-width:760px}
+.rutenett th,.rutenett td{text-align:left;vertical-align:middle}
+.rutenett thead th{
+  position:sticky;top:0;z-index:2;background:var(--blekk);color:var(--ark);
+  font:600 12px/1.25 "Instrument Sans",sans-serif;padding:11px 10px;
+}
+.rutenett thead th.hjorne{width:24%;min-width:190px;font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase}
+.rutenett thead th .hint{display:block;font:400 10.5px/1.3 "Instrument Sans",sans-serif;opacity:.62;margin-top:3px;max-width:15ch}
+.elevrad{border-top:1px solid var(--linje-svak)}
+.elevrad:hover{background:color-mix(in oklab,var(--blekk) 4%,var(--kort))}
+.elevrad.open{background:color-mix(in oklab,var(--naa) 8%,var(--kort))}
+th.elevnamn{padding:0;font-weight:400}
+th.elevnamn button{
+  display:flex;align-items:center;gap:9px;width:100%;text-align:left;cursor:pointer;
+  font:600 15px/1.2 "Instrument Sans",sans-serif;color:var(--blekk);
+  background:none;border:0;padding:10px 12px;
+}
+th.elevnamn .kryss{font-family:"DM Mono",monospace;font-size:12px;color:var(--blekk-svak);transition:transform .18s}
+.elevrad.open th.elevnamn .kryss{transform:rotate(90deg)}
+th.elevnamn .tiltaksmerke{
+  margin-left:auto;font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+  color:var(--blekk-svak);border:1px solid var(--linje);border-radius:99px;padding:2px 7px;flex:none;
+}
+td.rute{padding:5px 6px;border-left:1px solid var(--linje-svak)}
+.ruteknapp{
+  display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:38px;
+  border:1px solid transparent;border-radius:var(--r);background:transparent;cursor:default;
+  font:500 12px/1 "DM Mono",monospace;color:var(--blekk-svak);padding:4px;
+}
+.rutekappe{color:var(--linje)}
+.ruteknapp[data-lys]{cursor:pointer}
+.ruteknapp[data-lys="gronn"]{background:color-mix(in oklab,var(--gronn) 15%,var(--kort));border-color:color-mix(in oklab,var(--gronn) 32%,transparent);color:var(--gronn)}
+.ruteknapp[data-lys="gul"]{background:color-mix(in oklab,var(--gul) 20%,var(--kort));border-color:color-mix(in oklab,var(--gul) 40%,transparent);color:var(--gul)}
+.ruteknapp[data-lys="rod"]{background:color-mix(in oklab,var(--rod) 20%,var(--kort));border-color:color-mix(in oklab,var(--rod) 42%,transparent);color:var(--rod)}
+.merke{font-style:normal;font-size:13px;line-height:1}
+.rutekappe{font-style:normal;color:var(--linje);font-size:15px;line-height:1}
+.antal{font-size:11px;opacity:.8}
+.pil{font-size:12px;font-weight:700}
+.pil.verre{color:var(--rod)}
+.pil.bedre{color:var(--gronn)}
+.pil.ny{color:var(--naa)}
+.detaljrad>td{padding:0;border-left:0}
+.detaljar{padding:4px 12px 20px 30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}
+.detalj{background:var(--felt);border:1px solid var(--linje);border-radius:var(--r);padding:12px 14px}
+.detalj h4{font:600 13px/1.2 "Instrument Sans",sans-serif;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.detalj h4 .merke{font-size:12px}
+.detalj h4[data-lys="gronn"]{color:var(--gronn)} .detalj h4[data-lys="gul"]{color:var(--gul)} .detalj h4[data-lys="rod"]{color:var(--rod)}
+.melding{font-size:13.5px;margin:0 0 9px;padding-left:11px;border-left:2px solid var(--linje)}
+.melding:last-child{margin-bottom:0}
+.melding .kven{display:block;font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--blekk-svak);margin-top:3px}
+.melding.tom{color:var(--blekk-svak);font-style:italic}
+.detalj.tiltakskort{border-left:3px solid var(--naa)}
+.tiltakslinje{font-size:13.5px;margin:0 0 10px}
+.tiltakslinje:last-child{margin-bottom:0}
+.tiltakslinje .under{display:block;font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.06em;color:var(--blekk-svak);margin-top:3px}
+.tiltakslinje .over-frist{color:var(--rod);font-weight:600}
+.tiltakslinje.lukka{opacity:.55;text-decoration:line-through}
+
+/* ── Tiltak ───────────────────────────────────────── */
+.tiltaksbolk{margin:40px 0 0}
+.tiltaksbolk h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:20px;letter-spacing:-.02em;margin:0 0 14px}
+.tiltaksbord{overflow-x:auto;border:1px solid var(--linje);border-radius:var(--r);background:var(--kort)}
+.tiltakstabell{width:100%;min-width:680px;border-collapse:collapse}
+.tiltakstabell th{background:var(--blekk);color:var(--ark);font:600 12px/1.2 "Instrument Sans",sans-serif;text-align:left;padding:10px}
+.tiltakstabell td{padding:10px;border-top:1px solid var(--linje-svak);font-size:13.5px;vertical-align:top}
+.tiltakstabell tr.lukka td{opacity:.5}
+.tiltakstabell .frist.over{color:var(--rod);font-weight:600}
+.tiltakstabell .motekol{font-family:"DM Mono",monospace;font-size:11px;color:var(--blekk-svak);white-space:nowrap}
+.statuslapp{display:inline-block;font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.06em;border:1px solid var(--linje);border-radius:99px;padding:2px 8px;white-space:nowrap}
+
+footer{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;margin-top:48px;padding-top:16px;border-top:1px solid var(--linje-svak);font-family:"DM Mono",monospace;font-size:11px;color:var(--blekk-svak)}
+
+/* ── Utskrift ─────────────────────────────────────── */
+@page{size:A4 landscape;margin:12mm}
+@media print{
+  :root{--ark:#fff;--kort:#fff;--felt:#fff;--blekk:#000;--blekk-svak:#444;--linje:#bbb;--linje-svak:#ddd}
+  body{background:#fff;font-size:11px}
+  .ramme{padding:0;max-width:none}
+  .verktoy,.velgere,.bytter,.nullstill{display:none}
+  .kolapp{border:0;background:none;padding:2px 14px 2px 0;font-size:11px}
+  .personvern{border-left-width:3px}
+  .bla{display:none}
+  .rutebord,.tiltaksbord{overflow:visible;border:1px solid #999}
+  .tiltakstabell{min-width:0}
+  table.rutenett{min-width:0}
+  .rutenett thead th{position:static;background:#fff;color:#000;border-bottom:1.5px solid #000}
+  .elevrad,.detaljrad{break-inside:avoid}
+  .ruteknapp[data-lys]{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tiltaksbolk{break-inside:auto}
+  .tiltaksbolk h2,.tiltakstabell thead{break-after:avoid}
+  .tiltakstabell tr{break-inside:avoid}
+}
+</style>
+<script>
+/* Lagret lys/mørk-valg settes før siden tegnes, så den ikke blinker. */
+try {
+  const valgt = localStorage.getItem("elevstatus:tema");
+  if (valgt === "light" || valgt === "dark") document.documentElement.setAttribute("data-theme", valgt);
+} catch (e) {}
+</script>
+
+<div class="ramme">
+  <header class="topp">
+    <div class="moteblokk">
+      <button class="bla" id="forrige" type="button" title="">←</button>
+      <div class="mote">
+        <span class="etikett" id="mote-etikett">Møte</span>
+        <span class="navn" id="motenavn">–</span>
+        <span class="dato" id="motedato"></span>
+      </div>
+      <button class="bla" id="neste" type="button" title="">→</button>
+    </div>
+    <div class="tittelblokk">
+      <img class="logo" id="logo" alt="" hidden>
+      <p class="skole"><span id="skole"></span> <span id="skolear"></span></p>
+      <h1><span id="overskrift">Elevstatus</span> <span class="klassemerke" id="klassemerke"></span></h1>
+    </div>
+    <div class="verktoy">
+      <button class="knapp" id="temaknapp" type="button">Mørk</button>
+      <button class="knapp" id="skrivut" type="button">Skriv ut</button>
+    </div>
+  </header>
+
+  <p class="personvern"><b id="personvern-tittel"></b> <span id="personvern-tekst"></span></p>
+
+  <div class="velgere">
+    <div class="velgergruppe">
+      <p class="velgertittel" id="klasse-tittel">Klasse</p>
+      <div class="klasser" id="klasser" role="group"></div>
+    </div>
+  </div>
+
+  <section class="noklar" id="noklar"></section>
+  <section class="koen" id="koen"></section>
+
+  <div class="styrelinje">
+    <div class="bytter" role="group">
+      <button id="sort-rodt" type="button" aria-pressed="true"></button>
+      <button id="sort-abc" type="button" aria-pressed="false"></button>
+    </div>
+    <button class="nullstill" id="visalle" type="button"></button>
+    <button class="nullstill" id="visdetaljar" type="button"></button>
+  </div>
+
+  <main class="rutebord" id="rutebord" aria-live="polite"></main>
+
+  <section class="tiltaksbolk" id="tiltaksbolk"></section>
+
+  <footer>
+    <span id="fotklasse"></span>
+    <span id="fotpersonvern"></span>
+    <span id="fot-oppdatert"></span>
+  </footer>
+</div>
+
+<script>
+const DATA = __DATA__;
+const T = DATA.tekst;
+const GENERERT = "__GENERERT__";
+
+const $ = (id) => document.getElementById(id);
+const tekst = (v) => (v == null ? "" : String(v));
+const trygg = (s) => tekst(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const VEKT = {gronn: 1, gul: 2, rod: 3};
+/* Formene skiller lysene fra hverandre også for den som ikke ser farge. */
+const MERKE = {gronn: "●", gul: "▲", rod: "■"};
+const lystekst = (lys) => DATA.lystekster[lys] || lys;
+
+const KLASSER = DATA.klasser.slice();
+const OMRADER = DATA.omrader.slice();
+const MOTER = DATA.moter.slice();
+
+let valgtKlasse = KLASSER[0] || "";
+let valgtMote = MOTER.length ? MOTER[MOTER.length - 1].navn : "";
+let sortering = "rodt";
+let alleElever = false;
+let alleDetaljar = false;
+const opne = new Set();
+
+/* ── Husk valg, men aldri noe om elevene ─────────── */
+const husk = (n, v) => { try { localStorage.setItem("elevstatus:" + n, v); } catch (e) {} };
+const hent = (n) => { try { return localStorage.getItem("elevstatus:" + n); } catch (e) { return null; } };
+
+/* ── Oppslag ─────────────────────────────────────── */
+function meldingar(klasse, mote) {
+  return DATA.innmeldingar.filter((i) => i.klasse === klasse && i.mote === mote);
+}
+/* elev → område → {lys, meldingar[]} for ett møte. */
+function rutekart(klasse, mote) {
+  const kart = new Map();
+  meldingar(klasse, mote).forEach((i) => {
+    if (!kart.has(i.elev)) kart.set(i.elev, new Map());
+    const rad = kart.get(i.elev);
+    if (!rad.has(i.omrade)) rad.set(i.omrade, {lys: i.lys, meldingar: []});
+    const rute = rad.get(i.omrade);
+    if (VEKT[i.lys] > VEKT[rute.lys]) rute.lys = i.lys;
+    rute.meldingar.push(i);
+  });
+  return kart;
+}
+function moteIndeks(navn) {
+  const i = MOTER.findIndex((m) => m.navn === navn);
+  return i < 0 ? MOTER.length - 1 : i;
+}
+function forrigeMote() {
+  const i = moteIndeks(valgtMote);
+  return i > 0 ? MOTER[i - 1].navn : null;
+}
+function elevliste(klasse) {
+  return (DATA.elever[klasse] || []).slice();
+}
+function tiltakFor(klasse, elev) {
+  return DATA.tiltak.filter((t) => t.klasse === klasse && (!elev || t.elev === elev));
+}
+const iDag = new Date().toISOString().slice(0, 10);
+const overFrist = (t) => t.apen && t.frist && t.frist < iDag;
+
+/* ── Tegning ─────────────────────────────────────── */
+function tegnKlasser() {
+  $("klasser").innerHTML = KLASSER.map((k) => {
+    const raude = new Set(meldingar(k, valgtMote).filter((i) => i.lys === "rod").map((i) => i.elev));
+    return `<button class="klasse" type="button" data-klasse="${trygg(k)}"` +
+           ` aria-pressed="${k === valgtKlasse}">${trygg(k)}` +
+           `<span class="prikk" ${raude.size ? "" : "hidden"} title="${raude.size} ${trygg(T.rode)}"></span></button>`;
+  }).join("");
+  $("klasser").querySelectorAll(".klasse").forEach((b) => {
+    b.onclick = () => { velgKlasse(b.dataset.klasse); };
+  });
+}
+
+function tegnMote() {
+  const m = MOTER[moteIndeks(valgtMote)];
+  const navn = $("motenavn");
+  navn.textContent = m ? (m.navn || T.mote) : "–";
+  navn.classList.remove("bytt"); void navn.offsetWidth; navn.classList.add("bytt");
+  $("motedato").textContent = m ? m.datotekst : "";
+  const i = moteIndeks(valgtMote);
+  $("forrige").disabled = i <= 0;
+  $("neste").disabled = i >= MOTER.length - 1;
+}
+
+function tegnNoklar() {
+  const kart = rutekart(valgtKlasse, valgtMote);
+  const tal = {gronn: 0, gul: 0, rod: 0};
+  kart.forEach((rad) => rad.forEach((rute) => { tal[rute.lys] += 1; }));
+  const antalMeldingar = meldingar(valgtKlasse, valgtMote).length;
+  const kort = [
+    ["rod", tal.rod, T.rode],
+    ["gul", tal.gul, T.gule],
+    ["gronn", tal.gronn, T.grone],
+  ].map(([k, n, navn]) =>
+    `<div class="tall ${k}"><span class="stor">${n}</span><span class="liten">${trygg(navn)}</span></div>`
+  ).join("");
+  const elevtal = `<div class="tall"><span class="stor">${kart.size}</span>` +
+    `<span class="liten">${trygg(T.elevar_med)}</span></div>`;
+  const meldingstal = `<div class="tall"><span class="stor">${antalMeldingar}</span>` +
+    `<span class="liten">${trygg(antalMeldingar === 1 ? T.melding : T.meldinger)}</span></div>`;
+  $("noklar").innerHTML = kort + elevtal + meldingstal;
+}
+
+function tegnKo() {
+  const kart = rutekart(valgtKlasse, valgtMote);
+  const rader = [];
+  kart.forEach((rad, elev) => {
+    let rod = 0, gul = 0;
+    rad.forEach((rute) => { if (rute.lys === "rod") rod += 1; else if (rute.lys === "gul") gul += 1; });
+    if (rod || gul) rader.push({elev, rod, gul});
+  });
+  rader.sort((a, b) => b.rod - a.rod || b.gul - a.gul || a.elev.localeCompare(b.elev, "no"));
+  const lapper = rader.map((r) => {
+    const lys = r.rod ? "rod" : "gul";
+    return `<button class="kolapp" type="button" data-elev="${trygg(r.elev)}">` +
+      `<i class="merke" style="color:var(--${lys})">${MERKE[lys]}</i>${trygg(r.elev)}` +
+      `<span class="antal">${r.rod ? r.rod + "■" : ""}${r.rod && r.gul ? " " : ""}` +
+      `${r.gul ? r.gul + "▲" : ""}</span></button>`;
+  }).join("");
+  $("koen").innerHTML = `<h2>${trygg(T.motekoe)}</h2>` +
+    (rader.length ? `<div class="kolapper">${lapper}</div>` : `<p class="tomt">${trygg(T.ingen_ko)}</p>`);
+  $("koen").querySelectorAll(".kolapp").forEach((b) => {
+    b.onclick = () => {
+      const elev = b.dataset.elev;
+      opne.add(elev);
+      tegnRutenett();
+      const rad = document.querySelector(`.elevrad[data-elev="${CSS.escape(elev)}"]`);
+      if (rad) rad.scrollIntoView({behavior: "smooth", block: "center"});
+    };
+  });
+}
+
+function trend(elev, omrade, lys) {
+  const forrige = forrigeMote();
+  if (!forrige) return null;
+  const før = rutekart(valgtKlasse, forrige).get(elev);
+  const rute = før && før.get(omrade);
+  if (!rute) return {slag: "ny", pil: "✱", tekst: T.ny_siden_sist};
+  if (VEKT[lys] > VEKT[rute.lys]) return {slag: "verre", pil: "↑", tekst: T.verre};
+  if (VEKT[lys] < VEKT[rute.lys]) return {slag: "bedre", pil: "↓", tekst: T.bedre};
+  return null;
+}
+
+function tegnRutenett() {
+  const kart = rutekart(valgtKlasse, valgtMote);
+  let elever = elevliste(valgtKlasse);
+  if (!alleElever) elever = elever.filter((e) => kart.has(e));
+  kart.forEach((_, e) => { if (!elever.includes(e)) elever.push(e); });
+
+  const poeng = (e) => {
+    const rad = kart.get(e);
+    if (!rad) return 0;
+    let sum = 0;
+    rad.forEach((rute) => { sum += VEKT[rute.lys] === 3 ? 100 : VEKT[rute.lys] === 2 ? 10 : 1; });
+    return sum;
+  };
+  elever.sort((a, b) => (sortering === "rodt" ? poeng(b) - poeng(a) : 0) || a.localeCompare(b, "no"));
+
+  if (!elever.length) {
+    /* Tom klasse og tomt møte er to ulike ting å si fra om. */
+    const tom = elevliste(valgtKlasse).length === 0 && kart.size === 0;
+    $("rutebord").innerHTML = `<p class="tomt" style="padding:22px">` +
+      `${trygg(tom ? T.ingen_elever : T.ingen_innmelding)}</p>`;
+    return;
+  }
+
+  const hode = OMRADER.map((o) =>
+    `<th scope="col">${trygg(o.navn)}${o.forklaring ? `<span class="hint">${trygg(o.forklaring)}</span>` : ""}</th>`
+  ).join("");
+
+  const rader = elever.map((elev) => {
+    const rad = kart.get(elev);
+    const apen = opne.has(elev) || alleDetaljar;
+    const apneTiltak = tiltakFor(valgtKlasse, elev).filter((t) => t.apen).length;
+    const ruter = OMRADER.map((o) => {
+      const rute = rad && rad.get(o.navn);
+      if (!rute) return `<td class="rute"><span class="ruteknapp"><i class="rutekappe">·</i></span></td>`;
+      const t = trend(elev, o.navn, rute.lys);
+      const antal = rute.meldingar.length;
+      const merkelapp = `${elev}, ${o.navn}: ${lystekst(rute.lys)}` +
+        (antal > 1 ? `, ${antal} ${T.meldinger}` : "") + (t ? `, ${t.tekst}` : "");
+      return `<td class="rute"><button class="ruteknapp" type="button" data-lys="${rute.lys}"` +
+        ` data-elev="${trygg(elev)}" aria-label="${trygg(merkelapp)}" title="${trygg(merkelapp)}">` +
+        `<i class="merke">${MERKE[rute.lys]}</i>` +
+        (antal > 1 ? `<span class="antal">${antal}</span>` : "") +
+        (t ? `<span class="pil ${t.slag}">${t.pil}</span>` : "") +
+        `</button></td>`;
+    }).join("");
+    const detalj = apen
+      ? `<tr class="detaljrad"><td colspan="${OMRADER.length + 1}">${detaljar(elev, rad)}</td></tr>`
+      : "";
+    return `<tr class="elevrad${apen ? " open" : ""}" data-elev="${trygg(elev)}">` +
+      `<th scope="row" class="elevnamn"><button type="button" data-elev="${trygg(elev)}"` +
+      ` aria-expanded="${apen}"><span class="kryss">›</span>${trygg(elev)}` +
+      (apneTiltak ? `<span class="tiltaksmerke">${apneTiltak} ${trygg(T.aapne)}</span>` : "") +
+      `</button></th>${ruter}</tr>${detalj}`;
+  }).join("");
+
+  $("rutebord").innerHTML =
+    `<table class="rutenett"><thead><tr><th class="hjorne" scope="col">${trygg(T.elev)}</th>${hode}</tr></thead>` +
+    `<tbody>${rader}</tbody></table>`;
+
+  $("rutebord").querySelectorAll("th.elevnamn button, .ruteknapp[data-lys]").forEach((b) => {
+    b.onclick = () => {
+      const elev = b.dataset.elev;
+      if (opne.has(elev)) opne.delete(elev); else opne.add(elev);
+      tegnRutenett();
+    };
+  });
+}
+
+function detaljar(elev, rad) {
+  const kort = [];
+  OMRADER.forEach((o) => {
+    const rute = rad && rad.get(o.navn);
+    if (!rute) return;
+    const linjer = rute.meldingar.map((m) =>
+      `<p class="melding${m.merknad ? "" : " tom"}">${trygg(m.merknad || T.ingen_merknad)}` +
+      `<span class="kven">${trygg(m.larer || T.larer)}</span></p>`
+    ).join("");
+    kort.push(`<div class="detalj"><h4 data-lys="${rute.lys}"><i class="merke">${MERKE[rute.lys]}</i>` +
+      `${trygg(o.navn)} · ${trygg(lystekst(rute.lys))}</h4>${linjer}</div>`);
+  });
+  const tiltak = tiltakFor(valgtKlasse, elev);
+  if (tiltak.length) {
+    const linjer = tiltak.map((t) =>
+      `<p class="tiltakslinje${t.apen ? "" : " lukka"}">${trygg(t.tiltak)}` +
+      `<span class="under">${trygg(t.ansvarleg || "")}` +
+      (t.fristtekst ? ` · <span class="${overFrist(t) ? "over-frist" : ""}">${trygg(t.fristtekst)}` +
+        `${overFrist(t) ? " · " + trygg(T.over_frist) : ""}</span>` : "") +
+      (t.status ? ` · ${trygg(t.status)}` : "") + `</span></p>`
+    ).join("");
+    kort.push(`<div class="detalj tiltakskort"><h4>${trygg(T.tiltak)}</h4>${linjer}</div>`);
+  }
+  return `<div class="detaljar">${kort.join("") || `<p class="tomt">${trygg(T.uten_lys)}</p>`}</div>`;
+}
+
+function tegnTiltak() {
+  const alle = tiltakFor(valgtKlasse, null).slice();
+  alle.sort((a, b) => (b.apen - a.apen) || (a.frist || "9999").localeCompare(b.frist || "9999"));
+  if (!alle.length) {
+    $("tiltaksbolk").innerHTML = `<h2>${trygg(T.tiltak)}</h2><p class="tomt">${trygg(T.ingen_tiltak)}</p>`;
+    return;
+  }
+  const rader = alle.map((t) =>
+    `<tr class="${t.apen ? "" : "lukka"}"><td>${trygg(t.elev)}</td><td>${trygg(t.omrade)}</td>` +
+    `<td>${trygg(t.tiltak)}</td><td>${trygg(t.ansvarleg)}</td>` +
+    `<td class="frist ${overFrist(t) ? "over" : ""}">${trygg(t.fristtekst)}</td>` +
+    `<td><span class="statuslapp">${trygg(t.status)}</span></td>` +
+    `<td class="motekol">${trygg(t.mote)}</td></tr>`
+  ).join("");
+  $("tiltaksbolk").innerHTML = `<h2>${trygg(T.tiltak)}</h2>` +
+    `<div class="tiltaksbord"><table class="tiltakstabell"><thead><tr>` +
+    `<th>${trygg(T.elev)}</th><th>${trygg(T.omrade)}</th>` +
+    `<th>${trygg(T.tiltak)}</th><th>${trygg(T.ansvarleg)}</th><th>${trygg(T.frist)}</th>` +
+    `<th>${trygg(T.status)}</th><th>${trygg(T.mote)}</th></tr></thead>` +
+    `<tbody>${rader}</tbody></table></div>`;
+}
+
+function tegn() {
+  tegnKlasser();
+  tegnMote();
+  tegnNoklar();
+  tegnKo();
+  tegnRutenett();
+  tegnTiltak();
+  $("klassemerke").textContent = valgtKlasse;
+  $("klassemerke").classList.remove("bytt"); void $("klassemerke").offsetWidth;
+  $("klassemerke").classList.add("bytt");
+  $("fotklasse").textContent = `${valgtKlasse} · ${valgtMote}`;
+}
+
+function velgKlasse(k) {
+  if (k === valgtKlasse) return;
+  valgtKlasse = k;
+  opne.clear();
+  husk("klasse", k);
+  tegn();
+}
+function velgMote(steg) {
+  const i = moteIndeks(valgtMote) + steg;
+  if (i < 0 || i >= MOTER.length) return;
+  valgtMote = MOTER[i].navn;
+  opne.clear();
+  tegn();
+}
+
+/* ── Oppstart ────────────────────────────────────── */
+document.documentElement.style.setProperty("--profil", DATA.profilfarge);
+if (DATA.logo) { $("logo").src = DATA.logo; $("logo").hidden = false; $("logo").alt = DATA.skole; }
+$("skole").textContent = DATA.skole;
+$("skolear").textContent = DATA.skolear;
+$("overskrift").textContent = T.elevstatus;
+$("mote-etikett").textContent = T.mote;
+$("klasse-tittel").textContent = T.klasse;
+$("forrige").title = T.forrige_mote;
+$("neste").title = T.neste_mote;
+$("skrivut").textContent = T.skriv_ut;
+$("personvern-tittel").textContent = T.personvern;
+$("personvern-tekst").textContent = T.personvern_hvor;
+$("fotpersonvern").textContent = T.personvern;
+$("fot-oppdatert").textContent = `${T.oppdatert} ${GENERERT}`;
+$("sort-rodt").textContent = T.mest_rodt;
+$("sort-abc").textContent = T.alfabetisk;
+
+const lagretKlasse = hent("klasse");
+if (lagretKlasse && KLASSER.includes(lagretKlasse)) valgtKlasse = lagretKlasse;
+const lagretSort = hent("sortering");
+if (lagretSort === "abc" || lagretSort === "rodt") sortering = lagretSort;
+
+function oppdaterBrytere() {
+  $("sort-rodt").setAttribute("aria-pressed", String(sortering === "rodt"));
+  $("sort-abc").setAttribute("aria-pressed", String(sortering === "abc"));
+  $("visalle").textContent = alleElever ? T.vis_meldte : T.vis_alle_elever;
+  $("visdetaljar").textContent = alleDetaljar ? T.skjul_alt : T.vis_alt;
+}
+$("sort-rodt").onclick = () => { sortering = "rodt"; husk("sortering", sortering); oppdaterBrytere(); tegnRutenett(); };
+$("sort-abc").onclick = () => { sortering = "abc"; husk("sortering", sortering); oppdaterBrytere(); tegnRutenett(); };
+$("visalle").onclick = () => { alleElever = !alleElever; oppdaterBrytere(); tegnRutenett(); };
+$("visdetaljar").onclick = () => {
+  alleDetaljar = !alleDetaljar;
+  if (!alleDetaljar) opne.clear();
+  oppdaterBrytere();
+  tegnRutenett();
+};
+$("forrige").onclick = () => velgMote(-1);
+$("neste").onclick = () => velgMote(1);
+$("skrivut").onclick = () => window.print();
+
+const temaknapp = $("temaknapp");
+function settTema(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  husk("tema", t);
+  temaknapp.textContent = t === "dark" ? T.lys_knapp : T.mork;
+}
+temaknapp.textContent = document.documentElement.getAttribute("data-theme") === "dark" ? T.lys_knapp : T.mork;
+temaknapp.onclick = () => {
+  const na = document.documentElement.getAttribute("data-theme") ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  settTema(na === "dark" ? "light" : "dark");
+};
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches("input, textarea")) return;
+  if (e.key === "ArrowLeft") velgMote(-1);
+  if (e.key === "ArrowRight") velgMote(1);
+});
+
+if (!MOTER.length) {
+  $("koen").innerHTML = `<p class="tomt">${trygg(T.ingen_moter)}</p>`;
+}
+oppdaterBrytere();
+tegn();
+</script>

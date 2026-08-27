@@ -1,0 +1,13 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/sp/v2/column-formatting.schema.json",
+  "elmType": "div",
+  "txtContent": "@currentField",
+  "style": {
+    "display": "=if(@currentField == '', 'none', 'inline-block')",
+    "padding": "2px 12px",
+    "border-radius": "12px",
+    "font-weight": "600",
+    "color": "#ffffff",
+    "background-color": "=if(@currentField == 'Grønt', '#2E7D4F', if(@currentField == 'Gult', '#B77F0F', if(@currentField == 'Raudt', '#B3382A', '#8A8886')))"
+  }
+}

@@ -1,0 +1,32 @@
+Verdiene til valgkolonnene i lista. Kopier og lim inn.
+
+Lys:
+Grønt
+Gult
+Raudt
+
+Område:
+Frammøte
+Fagleg utvikling
+Arbeidsinnsats
+Motivasjon
+Trivsel
+Klassemiljø
+Heim og føresette
+Praktiske forhold
+
+Klasse:
+1ID
+1HO
+2AKV/FF
+
+Møte:
+1 · Haust
+2 · Før jul
+
+Status:
+Ikkje starta
+Pågår
+Blir følgd opp
+Avslutta
+Vidareført

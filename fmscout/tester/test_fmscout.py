@@ -18,7 +18,8 @@ import urllib.request
 from pathlib import Path
 
 ROT = Path(__file__).resolve().parent.parent
-os.sys.path.insert(0, str(ROT))
+KODE = ROT / "Mac" / "FM Scout.app" / "Contents" / "Resources"
+os.sys.path.insert(0, str(KODE))
 _MIDLERTIDIG = tempfile.mkdtemp(prefix="fmscout-test-")
 os.environ["FMSCOUT_HOME"] = _MIDLERTIDIG
 

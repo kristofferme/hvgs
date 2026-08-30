@@ -10,7 +10,9 @@ import unicodedata
 from pathlib import Path
 
 HER = Path(__file__).resolve().parent
-ROT = HER.parent
+# Fra fmscoutlib/ inne i appen og ut til fmscout-mappa:
+# Resources → Contents → FM Scout.app → Mac → fmscout
+ROT = HER.parent.parent.parent.parent.parent
 
 
 def si(tekst: str = "") -> None:

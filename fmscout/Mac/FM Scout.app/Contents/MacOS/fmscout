@@ -1,17 +1,17 @@
 #!/bin/bash
 # Dobbeltklikk-starteren.
 #
-# Finner verktøymappa og Python, spør etter fila med den vanlige «velg fil»-ruta
-# på Mac, og starter tabellen i nettleseren. Ingen terminal involvert.
+# Spør etter fila med den vanlige «velg fil»-ruta på Mac, og åpner tabellen i
+# nettleseren. Ingen terminal involvert.
 #
-# Appen skal tåle å bli flyttet. Den leter seg oppover fra der den ligger, så i
-# de vanlige mappene, og finner den fortsatt ingenting, spør den pent om å få
-# vite hvor mappa er – og husker svaret.
+# Koden ligger inne i appen, i Contents/Resources. Det er med vilje: macOS
+# kopierer nedlastede apper til et midlertidig, skrivebeskyttet sted og kjører
+# dem derfra – uten mappa rundt (det heter App Translocation). En app som leter
+# etter filer ved siden av seg selv, finner dem ikke da. En app som har dem med
+# seg, virker uansett hvor den ligger og uansett hvor den blir kopiert.
 
 LOGG="$HOME/Library/Logs/fmscout.log"
-INNST="$HOME/Library/Application Support/fmscout"
-HUSKET="$INNST/mappe.txt"
-mkdir -p "$(dirname "$LOGG")" "$INNST"
+mkdir -p "$(dirname "$LOGG")"
 
 logg() { echo "$(date '+%Y-%m-%d %H:%M:%S')  $*" >>"$LOGG"; }
 
@@ -33,68 +33,14 @@ sporr_ja_nei() {   # tittel, tekst, ja-knapp -> 0 hvis ja
     -- "$1" "$2" "$3" >/dev/null 2>&1
 }
 
-# Godtar både selve fmscout-mappa og mappa over den.
-mappe_ok() {
-  if [ -f "$1/fmscout.py" ]; then echo "$1"; return 0; fi
-  if [ -f "$1/fmscout/fmscout.py" ]; then echo "$1/fmscout"; return 0; fi
-  return 1
-}
+KODE="$(cd "$(dirname "$0")/../Resources" 2>/dev/null && pwd)"
+if [ -z "$KODE" ] || [ ! -f "$KODE/fmscout.py" ]; then
+  logg "koden mangler i appen. Startet fra: $0"
+  varsle "FM Scout" "Appen er ufullstendig – koden mangler inni den.
 
-finn_mappa() {
-  local sti kandidat
-
-  # 1. Der vi fant den sist.
-  if [ -f "$HUSKET" ]; then
-    sti="$(cat "$HUSKET")"
-    if kandidat="$(mappe_ok "$sti")"; then echo "$kandidat"; return 0; fi
-  fi
-
-  # 2. Oppover fra appen. Normalt ligger fmscout.py fem nivåer opp
-  #    (MacOS → Contents → FM Scout.app → Mac → fmscout), men vi teller ikke –
-  #    vi går til vi finner den, så tåler den å ligge dypere eller grunnere.
-  sti="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
-  while [ -n "$sti" ] && [ "$sti" != "/" ]; do
-    if kandidat="$(mappe_ok "$sti")"; then echo "$kandidat"; return 0; fi
-    sti="$(dirname "$sti")"
-  done
-
-  # 3. De vanlige stedene folk pakker ut ting.
-  for base in "$HOME/Downloads" "$HOME/Desktop" "$HOME/Documents" "$HOME/Developer" "$HOME"; do
-    [ -d "$base" ] || continue
-    sti="$(/usr/bin/find "$base" -maxdepth 4 -name fmscout.py \
-             -not -path "$HOME/Library/*" -not -path "*/.*" -print -quit 2>/dev/null)"
-    if [ -n "$sti" ]; then echo "$(dirname "$sti")"; return 0; fi
-  done
-  return 1
-}
-
-ROT="$(finn_mappa)"
-
-# 4. Fortsatt ingenting? Da spør vi.
-if [ -z "$ROT" ]; then
-  logg "fant ikke fmscout.py. Appen ligger i: $(dirname "$0")"
-  if ! sporr_ja_nei "FM Scout" "Fant ikke resten av verktøyet.
-
-Appen leter etter mappa som heter fmscout, den med fmscout.py i seg. Vil du vise meg hvor den er? Da husker jeg det til neste gang." "Vis meg mappa"; then
-    exit 0
-  fi
-  VALGT="$(/usr/bin/osascript <<'AS' 2>/dev/null
-tell application "System Events" to activate
-set valgt to choose folder with prompt "Velg fmscout-mappa"
-POSIX path of valgt
-AS
-)"
-  VALGT="${VALGT%/}"
-  if [ -n "$VALGT" ]; then ROT="$(mappe_ok "$VALGT")"; fi
-  if [ -z "$ROT" ]; then
-    varsle "FM Scout" "Fant ikke fmscout.py i den mappa.
-
-Velg mappa som heter fmscout – den som inneholder fmscout.py og mappa Mac."
-    exit 1
-  fi
+Det skjer som regel om bare selve appen er kopiert ut av en zip-fil i stedet for hele mappa. Last ned på nytt, og dobbeltklikk zip-fila så den pakkes ut i sin helhet."
+  exit 1
 fi
-
-echo "$ROT" >"$HUSKET"
 
 # --- hvilken Python? --------------------------------------------------------
 PY=""
@@ -134,9 +80,9 @@ AS
 # --- i gang -----------------------------------------------------------------
 logg ""
 logg "=== $FIL"
-logg "mappe: $ROT · python: $PY"
+logg "kode: $KODE · python: $PY"
 
-cd "$ROT" || exit 1
+cd "$KODE" || exit 1
 "$PY" fmscout.py åpne "$FIL" >>"$LOGG" 2>&1
 kode=$?
 

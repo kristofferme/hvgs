@@ -1,0 +1,2 @@
+# fmscout bruker bare det som følger med Python 3.
+# Ingenting å installere.

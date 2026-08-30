@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fmscout</title>
+<link rel="stylesheet" href="/stil.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>⚽</text></svg>">
+</head>
+<body>
+<header class="topp">
+  <div class="merke">fmscout</div>
+  <div class="kilde" id="kilde"></div>
+  <div class="sok">
+    <input id="tekstsok" type="search" placeholder="Søk etter navn, klubb, nasjon …  (/)" autocomplete="off">
+  </div>
+  <div class="knapper">
+    <button id="knapp-kolonner" class="knapp">Kolonner</button>
+    <button id="knapp-csv" class="knapp primær">Eksporter CSV</button>
+  </div>
+</header>
+
+<div class="brett">
+  <aside class="filtre" id="filtre">
+    <div class="filtertopp">
+      <h2>Filtre</h2>
+      <button id="knapp-nullstill" class="lenkeknapp">Nullstill</button>
+    </div>
+    <div id="filterinnhold"></div>
+  </aside>
+
+  <main class="hoved">
+    <div class="verktoylinje">
+      <div id="treffinfo" class="treffinfo">Laster …</div>
+      <div class="blaing">
+        <label>Rader
+          <select id="sidestorrelse">
+            <option>50</option><option selected>100</option><option>250</option><option>500</option>
+          </select>
+        </label>
+        <button id="forrige" class="knapp liten">‹</button>
+        <span id="sidetall">–</span>
+        <button id="neste" class="knapp liten">›</button>
+      </div>
+    </div>
+    <div id="sammendrag" class="sammendrag"></div>
+    <div class="tabellramme">
+      <table id="tabell">
+        <thead><tr id="hodemal"></tr></thead>
+        <tbody id="kropp"></tbody>
+      </table>
+      <div id="tomt" class="tomt skjult">Ingen spillere passer med filtrene.</div>
+    </div>
+  </main>
+
+  <aside class="detalj skjult" id="detalj">
+    <button class="lukk" id="lukk-detalj" title="Lukk (Esc)">×</button>
+    <div id="detaljinnhold"></div>
+  </aside>
+</div>
+
+<div class="modal skjult" id="modal-kolonner">
+  <div class="modalboks">
+    <div class="modaltopp">
+      <h2>Hvilke kolonner vil du se?</h2>
+      <button class="lukk" id="lukk-kolonner">×</button>
+    </div>
+    <div class="forvalg" id="forvalg"></div>
+    <div class="kolonnevalg" id="kolonnevalg"></div>
+    <div class="modalbunn">
+      <span id="kolonnetelling"></span>
+      <button class="knapp primær" id="bruk-kolonner">Ferdig</button>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

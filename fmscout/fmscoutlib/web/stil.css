@@ -1,0 +1,156 @@
+:root {
+  --bg: #f6f7f9;
+  --flate: #ffffff;
+  --kant: #dfe3e8;
+  --tekst: #1c2126;
+  --dempet: #6b7681;
+  --aksent: #1f7a4d;
+  --aksent-svak: #e8f3ec;
+  --rad: #f2f5f8;
+  --skygge: 0 1px 2px rgba(20, 30, 40, .08), 0 8px 24px rgba(20, 30, 40, .06);
+  --lav: #c0392b; --middels: #b8860b; --god: #1f7a4d; --topp: #0f9d58;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14181d; --flate: #1b2027; --kant: #2b323b; --tekst: #e6eaee;
+    --dempet: #97a2ad; --aksent: #38b06f; --aksent-svak: #1d3328; --rad: #20262e;
+    --skygge: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+    --lav: #e06a5d; --middels: #d6a72c; --god: #45c081; --topp: #5ad48f;
+  }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--tekst);
+  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  display: flex; flex-direction: column;
+}
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--dempet); margin: 0; }
+
+.topp {
+  display: flex; align-items: center; gap: 16px; padding: 10px 16px;
+  background: var(--flate); border-bottom: 1px solid var(--kant); flex: 0 0 auto;
+}
+.merke { font-weight: 700; letter-spacing: -.02em; font-size: 16px; }
+.kilde { color: var(--dempet); font-size: 12px; max-width: 26ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sok { flex: 1; }
+.sok input {
+  width: 100%; max-width: 520px; padding: 7px 12px; border-radius: 8px;
+  border: 1px solid var(--kant); background: var(--bg); color: var(--tekst); font: inherit;
+}
+.sok input:focus { outline: 2px solid var(--aksent); outline-offset: -1px; }
+.knapper { display: flex; gap: 8px; }
+
+.knapp {
+  font: inherit; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--kant);
+  background: var(--flate); color: var(--tekst); cursor: pointer;
+}
+.knapp:hover { border-color: var(--aksent); }
+.knapp.primær { background: var(--aksent); border-color: var(--aksent); color: #fff; }
+.knapp.liten { padding: 3px 9px; }
+.lenkeknapp { background: none; border: 0; color: var(--aksent); cursor: pointer; font: inherit; padding: 0; }
+
+.brett { display: flex; flex: 1; min-height: 0; }
+.filtre {
+  width: 290px; flex: 0 0 auto; background: var(--flate); border-right: 1px solid var(--kant);
+  overflow-y: auto; padding: 12px 14px 40px;
+}
+.filtertopp { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.bolk { border-top: 1px solid var(--kant); padding: 10px 0; }
+.bolk > summary { cursor: pointer; font-weight: 600; font-size: 13px; list-style: none; display: flex; justify-content: space-between; }
+.bolk > summary::-webkit-details-marker { display: none; }
+.bolk > summary::after { content: "▾"; color: var(--dempet); }
+.bolk[open] > summary::after { content: "▴"; }
+.bolkinnhold { padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+.valgt { color: var(--aksent); font-weight: 600; }
+
+.parinput { display: flex; align-items: center; gap: 6px; }
+.parinput label { flex: 1; font-size: 12px; color: var(--dempet); }
+.parinput input { width: 68px; padding: 4px 6px; border: 1px solid var(--kant); border-radius: 6px;
+  background: var(--bg); color: var(--tekst); font: inherit; }
+select, .sokefelt {
+  padding: 5px 8px; border: 1px solid var(--kant); border-radius: 6px;
+  background: var(--bg); color: var(--tekst); font: inherit; width: 100%;
+}
+.avkryss { max-height: 210px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding-right: 4px; }
+.avkryss label { display: flex; gap: 6px; align-items: center; font-size: 13px; cursor: pointer; }
+.avkryss .antall { margin-left: auto; color: var(--dempet); font-size: 11px; }
+.brikker { display: flex; flex-wrap: wrap; gap: 5px; }
+.brikke {
+  padding: 3px 9px; border-radius: 999px; border: 1px solid var(--kant);
+  background: var(--bg); cursor: pointer; font-size: 12px; user-select: none;
+}
+.brikke.på { background: var(--aksent); border-color: var(--aksent); color: #fff; }
+.kravrad { display: flex; gap: 5px; align-items: center; }
+.kravrad select { flex: 1; }
+.kravrad input { width: 52px; padding: 4px; border: 1px solid var(--kant); border-radius: 6px;
+  background: var(--bg); color: var(--tekst); font: inherit; }
+
+.hoved { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.verktoylinje {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 14px; border-bottom: 1px solid var(--kant); background: var(--flate);
+}
+.treffinfo { font-size: 13px; }
+.treffinfo b { font-size: 15px; }
+.blaing { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--dempet); }
+.blaing select { width: auto; }
+.sammendrag { display: flex; gap: 18px; padding: 6px 14px; font-size: 12px; color: var(--dempet);
+  background: var(--flate); border-bottom: 1px solid var(--kant); flex-wrap: wrap; }
+.sammendrag span b { color: var(--tekst); }
+
+.tabellramme { flex: 1; overflow: auto; position: relative; }
+table { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+thead th {
+  position: sticky; top: 0; z-index: 2; background: var(--flate); text-align: left;
+  padding: 7px 10px; font-size: 12px; font-weight: 600; white-space: nowrap;
+  border-bottom: 1px solid var(--kant); cursor: pointer; user-select: none;
+}
+thead th:hover { color: var(--aksent); }
+thead th .pil { color: var(--aksent); font-size: 10px; }
+tbody td { padding: 5px 10px; border-bottom: 1px solid var(--kant); white-space: nowrap; }
+tbody tr:nth-child(even) { background: var(--rad); }
+tbody tr:hover { background: var(--aksent-svak); cursor: pointer; }
+td.tall { text-align: right; }
+td.navn { font-weight: 600; position: sticky; left: 0; background: inherit; }
+.tomt { padding: 40px; text-align: center; color: var(--dempet); }
+
+.a { font-weight: 600; }
+.a1 { color: var(--lav); } .a2 { color: var(--middels); }
+.a3 { color: var(--tekst); } .a4 { color: var(--god); } .a5 { color: var(--topp); }
+
+.detalj {
+  width: 340px; flex: 0 0 auto; background: var(--flate); border-left: 1px solid var(--kant);
+  overflow-y: auto; padding: 14px 16px 40px; position: relative;
+}
+.lukk { position: absolute; top: 8px; right: 10px; background: none; border: 0; font-size: 22px;
+  color: var(--dempet); cursor: pointer; line-height: 1; }
+.detalj h3 { margin: 0 0 2px; font-size: 18px; }
+.detalj .under { color: var(--dempet); font-size: 13px; margin-bottom: 12px; }
+.nokkeltall { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.nokkeltall div { background: var(--bg); border: 1px solid var(--kant); border-radius: 8px; padding: 6px 8px; }
+.nokkeltall small { display: block; color: var(--dempet); font-size: 11px; }
+.nokkeltall b { font-size: 16px; }
+.attgruppe { margin-bottom: 12px; }
+.attgruppe h4 { margin: 0 0 4px; font-size: 12px; text-transform: uppercase; color: var(--dempet); letter-spacing: .05em; }
+.attrad { display: flex; justify-content: space-between; padding: 1px 0; font-size: 13px; }
+
+.modal { position: fixed; inset: 0; background: rgba(10, 15, 20, .45); display: flex;
+  align-items: center; justify-content: center; z-index: 20; padding: 20px; }
+.modalboks { background: var(--flate); border-radius: 12px; box-shadow: var(--skygge);
+  width: min(880px, 100%); max-height: 86vh; display: flex; flex-direction: column; position: relative; }
+.modaltopp, .modalbunn { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.modaltopp { border-bottom: 1px solid var(--kant); }
+.modalbunn { border-top: 1px solid var(--kant); color: var(--dempet); font-size: 12px; }
+.forvalg { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px 18px 0; }
+.kolonnevalg { overflow-y: auto; padding: 12px 18px; display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+.kolonnegruppe h4 { margin: 0 0 5px; font-size: 12px; text-transform: uppercase; color: var(--dempet); }
+.kolonnegruppe label { display: flex; gap: 6px; align-items: center; font-size: 13px; padding: 1px 0; cursor: pointer; }
+.skjult { display: none !important; }
+
+@media (max-width: 900px) {
+  .filtre { position: absolute; z-index: 10; height: 100%; box-shadow: var(--skygge); }
+  .detalj { position: absolute; right: 0; height: 100%; z-index: 10; box-shadow: var(--skygge); }
+  .kilde { display: none; }
+}

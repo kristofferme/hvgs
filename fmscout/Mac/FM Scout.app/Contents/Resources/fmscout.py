@@ -29,6 +29,7 @@ from fmscoutlib.felles import (arbeidsmappe, feil, si, storrelse,      # noqa: E
 from fmscoutlib.kalibrer import Anker, kalibrer                        # noqa: E402
 from fmscoutlib.last import Okt, last, skjema_for, skjemamappe              # noqa: E402
 from fmscoutlib.profil import Profil                                   # noqa: E402
+from fmscoutlib.rapport import skriv_rapport                           # noqa: E402
 from fmscoutlib.spillere import FELT, FELT_FOR, STANDARDKOLONNER       # noqa: E402
 from fmscoutlib.tabeller import finn_evnekandidater, finn_tabeller     # noqa: E402
 from fmscoutlib.tekst import stikkprove                                # noqa: E402
@@ -155,7 +156,9 @@ def kommando_sjekk(args) -> int:
         si("Kandidater til CA og PA i den største tabellen:")
         for k in finn_evnekandidater(beholder.data(tabeller[0].blokk), tabeller[0]):
             si(f"  offset {k.offset:4d}  {k.slag.upper():2}  {k.beskrivelse}")
+    fil = skriv_rapport(sti, args.rapport, melding=lambda *_: None)
     si("")
+    si(f"Rapport skrevet: {fil}")
     si("Neste steg:  python3 fmscout.py kalibrer " + str(sti))
     return 0
 
@@ -250,6 +253,7 @@ def lag_parser() -> argparse.ArgumentParser:
     s.add_argument("fil")
     s.add_argument("--pakk-ut-på-nytt", "--pakk-ut-pa-nytt", dest="pakk_ut_pa_nytt",
                    action="store_true")
+    s.add_argument("--rapport", help="hvor rapporten skal skrives")
     s.set_defaults(funksjon=kommando_sjekk)
 
     k = under.add_parser("kalibrer", help="finn ut hvordan saven er satt sammen")

@@ -71,8 +71,8 @@ python3 fmscout.py åpne stall.html speiderliste.html frie-spillere.rtf
 
 ### 2. Selve saven – for CA og PA
 
-Velg `.fm`-fila i stedet. Den ligger under
-`~/Documents/Sports Interactive/Football Manager 2026/`.
+Velg `.fm`-fila i stedet. På FM26 ligger den under
+`~/Library/Application Support/Sports Interactive/Football Manager 26/games/`.
 
 Første gang tar det litt tid: fila pakkes ut og legges i et mellomlager under
 `~/Library/Caches/fmscout/`, så går det fort etterpå.
@@ -200,10 +200,14 @@ fram), `--skjema` (bruk et bestemt skjema), `--kalibrer-på-nytt`.
 
 ## Når noe ikke stemmer
 
-**«Fant ingen tabell som ser ut som spillere.»** Kjør `sjekk` på fila. Får du
-lesbare klubbnavn ut av blokkene, er saven pakket ut riktig, og det er
-tabellsøket som ikke traff – gi beskjed om hva `sjekk` viser. Får du bare
-støy, er saven trolig kryptert eller lagret i et format vi ikke er med på.
+**«Fant ingen tabell som ser ut som spillere.»** Da skriver verktøyet en
+rapport til skrivebordet av seg selv – `fmscout-rapport.txt`. Den sier hva
+fila faktisk inneholder: hvilke pakkemetoder som finnes i den, om blokkene lot
+seg pakke ut, om det står lesbar tekst i dem, og om tallmønstrene som pleier å
+være attributter finnes. Nederst står det hva funnene peker mot.
+
+Du kan lage den samme rapporten når som helst ved å dobbeltklikke
+**Lag feilrapport** i `Mac`-mappa og velge savefila.
 
 **Klubb og liga er byttet om.** Åpne skjemaet (`skjemaer` viser hvor det
 ligger) og bytt om de to offsetene. Det er en tekstfil, og den er ment å rettes

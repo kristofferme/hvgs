@@ -18,6 +18,7 @@ from .felles import arbeidsmappe, filnokkel, si
 from .kalibrer import Anker, kalibrer
 from .leseksport import les_eksport
 from .profil import Profil
+from .rapport import skriv_rapport
 
 EKSPORTENDELSER = {".html", ".htm", ".rtf", ".csv", ".tsv", ".txt"}
 
@@ -53,7 +54,16 @@ def last_save(sti: Path, *, skjema=None, ankere=None, tving_kalibrering: bool = 
             melding(f"Bruker skjemaet fra {lagret}")
         else:
             melding("Ingen skjema for denne saven ennå – kalibrerer.")
-            profil, rapport = kalibrer(beholder, ankere, melding=melding)
+            try:
+                profil, rapport = kalibrer(beholder, ankere, melding=melding)
+            except RuntimeError as e:
+                # Det hjelper ingen å bare få vite at det ikke gikk. Skriv ned
+                # hva som faktisk ligger i fila, så er det noe å gå videre på.
+                melding("Skriver en rapport om hva som ligger i fila …")
+                fil = skriv_rapport(sti, melding=melding)
+                raise RuntimeError(
+                    f"{e}\n\nJeg skrev en rapport om hva fila inneholder:\n{fil}"
+                ) from e
             profil.lagre(lagret)
             melding(f"Skjema lagret: {lagret}")
             merknader = rapport.get("merknader", [])

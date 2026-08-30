@@ -67,6 +67,10 @@ Last det ned fra python.org, installer, og start FM Scout på nytt." "Åpne pyth
   exit 1
 fi
 
+# Sett FMSCOUT_KOMMANDO=sjekk for å lage en rapport i stedet for å åpne
+# tabellen. Det er det «Lag feilrapport» ved siden av appen gjør.
+KOMMANDO="${FMSCOUT_KOMMANDO:-åpne}"
+
 # --- hvilken fil? -----------------------------------------------------------
 FIL="$(/usr/bin/osascript <<'AS' 2>/dev/null
 tell application "System Events" to activate
@@ -82,16 +86,41 @@ logg ""
 logg "=== $FIL"
 logg "kode: $KODE · python: $PY"
 
+RAPPORT="$HOME/Desktop/fmscout-rapport.txt"
+[ -d "$HOME/Desktop" ] || RAPPORT="$HOME/fmscout-rapport.txt"
+MERKE="$(mktemp)"          # for å se om rapporten er skrevet under denne kjøringa
+
 cd "$KODE" || exit 1
-"$PY" fmscout.py åpne "$FIL" >>"$LOGG" 2>&1
+"$PY" fmscout.py "$KOMMANDO" "$FIL" >>"$LOGG" 2>&1
 kode=$?
+
+if [ "$KOMMANDO" = "sjekk" ] && [ $kode -eq 0 ]; then
+  varsle "FM Scout" "Rapporten er skrevet:
+
+$RAPPORT
+
+Den ligger på skrivebordet. Send den videre, så er det mulig å se hva som stopper."
+  /usr/bin/open -R "$RAPPORT" 2>/dev/null
+  rm -f "$MERKE"
+  exit 0
+fi
 
 if [ $kode -ne 0 ] && [ $kode -ne 130 ]; then
   siste=$(tail -n 6 "$LOGG" | tr -d '"')
-  varsle "FM Scout" "Noe gikk galt.
+  if [ -f "$RAPPORT" ] && [ "$RAPPORT" -nt "$MERKE" ]; then
+    if sporr_ja_nei "FM Scout" "Noe gikk galt.
+
+$siste" "Vis rapporten"; then
+      /usr/bin/open -R "$RAPPORT" 2>/dev/null
+    fi
+  else
+    varsle "FM Scout" "Noe gikk galt.
 
 $siste
 
 Hele loggen: $LOGG"
+  fi
+  rm -f "$MERKE"
   exit $kode
 fi
+rm -f "$MERKE"

@@ -13,11 +13,14 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 
-# 0..20 er standardintervallet for FM-attributter. Noen versjoner lagrer dem
-# finere oppløst (0..100). Begge blir prøvd.
-OMRADER = ((1, 20), (1, 100))
+# 0..20 er standardintervallet for FM-attributter, men vi vet ikke sikkert
+# hvordan FM26 lagrer dem, så vi prøver flere oppløsninger. Jo videre
+# intervallet er, jo oftere treffer det tilfeldige data – derfor krever de
+# videre intervallene en lengre stripe før den teller. Tallene er valgt slik at
+# sjansen for et falskt treff holder seg lav: (200/256)^40 er rundt 1 av 100
+# millioner, mens (20/256)^16 er astronomisk lite.
+OMRADER = ((1, 20, 16), (1, 100, 24), (1, 200, 40))
 MIN_STRIPE = 16
-MAKS_STRIPE_HULL = 2
 
 
 def _maske(omrade: tuple[int, int]) -> bytes:
@@ -121,17 +124,17 @@ def finn_tabeller(beholder, *, min_antall: int = 50, melding=None) -> list[Tabel
     funn: list[Tabell] = []
     for blokk, data in beholder:
         rå = bytes(data)
-        for omrade in OMRADER:
-            striper = finn_striper(rå, omrade)
+        for lav, høy, minlengde in OMRADER:
+            striper = finn_striper(rå, (lav, høy), minlengde)
             if len(striper) < min_antall:
                 continue
-            tabell = _tabell_fra_striper(blokk.nr, striper, omrade, min_antall)
+            tabell = _tabell_fra_striper(blokk.nr, striper, (lav, høy), min_antall)
             if tabell:
                 funn.append(tabell)
                 if melding:
                     melding(
                         f"  blokk {blokk.nr}: {tabell.antall} records à {tabell.stride} B "
-                        f"(attributter {omrade[0]}–{omrade[1]})"
+                        f"(attributter {lav}–{høy})"
                     )
                 break
     funn.sort(key=lambda t: t.antall, reverse=True)

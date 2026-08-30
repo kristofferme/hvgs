@@ -1,11 +1,19 @@
 #!/bin/bash
 # Dobbeltklikk-starteren.
 #
-# Finner Python og verktøymappa, spør etter fila med den vanlige «velg fil»-ruta
+# Finner verktøymappa og Python, spør etter fila med den vanlige «velg fil»-ruta
 # på Mac, og starter tabellen i nettleseren. Ingen terminal involvert.
+#
+# Appen skal tåle å bli flyttet. Den leter seg oppover fra der den ligger, så i
+# de vanlige mappene, og finner den fortsatt ingenting, spør den pent om å få
+# vite hvor mappa er – og husker svaret.
 
 LOGG="$HOME/Library/Logs/fmscout.log"
-mkdir -p "$(dirname "$LOGG")"
+INNST="$HOME/Library/Application Support/fmscout"
+HUSKET="$INNST/mappe.txt"
+mkdir -p "$(dirname "$LOGG")" "$INNST"
+
+logg() { echo "$(date '+%Y-%m-%d %H:%M:%S')  $*" >>"$LOGG"; }
 
 varsle() {   # tittel, tekst
   /usr/bin/osascript \
@@ -16,24 +24,77 @@ varsle() {   # tittel, tekst
     -- "$1" "$2" >/dev/null 2>&1
 }
 
-# --- hvor ligger fmscout.py? ------------------------------------------------
-# Normalt to nivåer opp fra appen: fmscout/Mac/FM Scout.app
-APP="$(cd "$(dirname "$0")/../.." && pwd)"
-ROT="$(cd "$APP/../.." 2>/dev/null && pwd)"
+sporr_ja_nei() {   # tittel, tekst, ja-knapp -> 0 hvis ja
+  /usr/bin/osascript \
+    -e 'on run {tittel, tekst, ja}' \
+    -e 'tell application "System Events" to activate' \
+    -e 'display dialog tekst with title tittel buttons {"Avbryt", ja} default button 2' \
+    -e 'end run' \
+    -- "$1" "$2" "$3" >/dev/null 2>&1
+}
 
-if [ ! -f "$ROT/fmscout.py" ]; then
-  for kandidat in "$HOME/hvgs/fmscout" "$HOME/Downloads/hvgs/fmscout" \
-                  "$HOME/Documents/hvgs/fmscout" "$HOME"/Downloads/hvgs-*/fmscout; do
-    if [ -f "$kandidat/fmscout.py" ]; then ROT="$kandidat"; break; fi
+# Godtar både selve fmscout-mappa og mappa over den.
+mappe_ok() {
+  if [ -f "$1/fmscout.py" ]; then echo "$1"; return 0; fi
+  if [ -f "$1/fmscout/fmscout.py" ]; then echo "$1/fmscout"; return 0; fi
+  return 1
+}
+
+finn_mappa() {
+  local sti kandidat
+
+  # 1. Der vi fant den sist.
+  if [ -f "$HUSKET" ]; then
+    sti="$(cat "$HUSKET")"
+    if kandidat="$(mappe_ok "$sti")"; then echo "$kandidat"; return 0; fi
+  fi
+
+  # 2. Oppover fra appen. Normalt ligger fmscout.py fem nivåer opp
+  #    (MacOS → Contents → FM Scout.app → Mac → fmscout), men vi teller ikke –
+  #    vi går til vi finner den, så tåler den å ligge dypere eller grunnere.
+  sti="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
+  while [ -n "$sti" ] && [ "$sti" != "/" ]; do
+    if kandidat="$(mappe_ok "$sti")"; then echo "$kandidat"; return 0; fi
+    sti="$(dirname "$sti")"
   done
+
+  # 3. De vanlige stedene folk pakker ut ting.
+  for base in "$HOME/Downloads" "$HOME/Desktop" "$HOME/Documents" "$HOME/Developer" "$HOME"; do
+    [ -d "$base" ] || continue
+    sti="$(/usr/bin/find "$base" -maxdepth 4 -name fmscout.py \
+             -not -path "$HOME/Library/*" -not -path "*/.*" -print -quit 2>/dev/null)"
+    if [ -n "$sti" ]; then echo "$(dirname "$sti")"; return 0; fi
+  done
+  return 1
+}
+
+ROT="$(finn_mappa)"
+
+# 4. Fortsatt ingenting? Da spør vi.
+if [ -z "$ROT" ]; then
+  logg "fant ikke fmscout.py. Appen ligger i: $(dirname "$0")"
+  if ! sporr_ja_nei "FM Scout" "Fant ikke resten av verktøyet.
+
+Appen leter etter mappa som heter fmscout, den med fmscout.py i seg. Vil du vise meg hvor den er? Da husker jeg det til neste gang." "Vis meg mappa"; then
+    exit 0
+  fi
+  VALGT="$(/usr/bin/osascript <<'AS' 2>/dev/null
+tell application "System Events" to activate
+set valgt to choose folder with prompt "Velg fmscout-mappa"
+POSIX path of valgt
+AS
+)"
+  VALGT="${VALGT%/}"
+  if [ -n "$VALGT" ]; then ROT="$(mappe_ok "$VALGT")"; fi
+  if [ -z "$ROT" ]; then
+    varsle "FM Scout" "Fant ikke fmscout.py i den mappa.
+
+Velg mappa som heter fmscout – den som inneholder fmscout.py og mappa Mac."
+    exit 1
+  fi
 fi
 
-if [ ! -f "$ROT/fmscout.py" ]; then
-  varsle "FM Scout" "Fant ikke resten av verktøyet.
-
-Appen må ligge i Mac-mappa inni fmscout-mappa, sammen med fmscout.py. Flytt den tilbake dit, så virker den."
-  exit 1
-fi
+echo "$ROT" >"$HUSKET"
 
 # --- hvilken Python? --------------------------------------------------------
 PY=""
@@ -51,11 +112,12 @@ for kandidat in "${KANDIDATER[@]}"; do
 done
 
 if [ -z "$PY" ]; then
-  svar=$(/usr/bin/osascript -e 'tell application "System Events" to activate' \
-    -e 'display dialog "FM Scout trenger Python 3, og det ligger ikke på maskinen ennå.
+  logg "fant ingen brukbar python3"
+  if sporr_ja_nei "FM Scout" "FM Scout trenger Python 3, og det ligger ikke på maskinen ennå.
 
-Last det ned fra python.org, installer, og start FM Scout på nytt." with title "FM Scout" buttons {"Avbryt", "Åpne python.org"} default button 2' 2>/dev/null)
-  case "$svar" in *"Åpne python.org"*) /usr/bin/open "https://www.python.org/downloads/macos/" ;; esac
+Last det ned fra python.org, installer, og start FM Scout på nytt." "Åpne python.org"; then
+    /usr/bin/open "https://www.python.org/downloads/macos/"
+  fi
   exit 1
 fi
 
@@ -70,10 +132,9 @@ AS
 [ -z "$FIL" ] && exit 0        # Avbryt
 
 # --- i gang -----------------------------------------------------------------
-{
-  echo ""
-  echo "=== $(date '+%Y-%m-%d %H:%M') · $FIL"
-} >>"$LOGG"
+logg ""
+logg "=== $FIL"
+logg "mappe: $ROT · python: $PY"
 
 cd "$ROT" || exit 1
 "$PY" fmscout.py åpne "$FIL" >>"$LOGG" 2>&1

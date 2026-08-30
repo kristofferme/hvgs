@@ -25,9 +25,12 @@ App Store. Den er ikke signert – det koster penger – så det må du klarere 
   og trykk **Åpne likevel** ved siden av «FM Scout».
 * På eldre macOS: høyreklikk på appen → **Åpne** → **Åpne**.
 
-Etterpå starter den som en hvilken som helst app. Vil du flytte den, flytt hele
-`fmscout`-mappa – appen må bli liggende i `Mac`-mappa sammen med resten, ellers
-finner den ikke verktøyet.
+Etterpå starter den som en hvilken som helst app, og du kan legge den i Dock.
+
+Du kan gjerne flytte appen ut av mappa – til Programmer, Skrivebordet, hvor du
+vil. Den leter seg fram til resten av verktøyet på egen hånd. Finner den det
+ikke, spør den om å få vist `fmscout`-mappa én gang, og husker svaret. Selve
+`fmscout`-mappa må du derimot beholde: det er der programmet ligger.
 
 Appen trenger Python 3. Har du det ikke, sier den fra og tilbyr å åpne
 python.org for deg.
@@ -215,6 +218,10 @@ aksenter, og prøv med hele navnet slik det står i spillerprofilen.
 
 **CA og PA ser rare ut.** `sjekk` lister kandidatene med begrunnelse. Er det en
 annen byte som ser riktigere ut, sett offsetet inn i skjemaet.
+
+**«Fant ikke resten av verktøyet.»** Appen finner ikke `fmscout`-mappa. Trykk
+**Vis meg mappa** og pek på den – den som inneholder `fmscout.py` og mappa
+`Mac`. Det spørsmålet kommer bare én gang.
 
 **Det tar lang tid første gang.** Utpakkinga går gjennom hele fila. En stor
 save kan ta noen minutter. Etterpå ligger den i mellomlageret. Skal du rydde:

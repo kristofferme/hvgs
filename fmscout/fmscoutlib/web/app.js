@@ -33,13 +33,37 @@ let teller = 0;
 
 // ---------- oppstart ----------
 
-async function start() {
+async function lastMeta() {
   meta = await (await fetch("/api/meta")).json();
+  feltFor = {};
   meta.kolonner.forEach((k) => (feltFor[k.nokkel] = k));
   $("#kilde").textContent = meta.navn || meta.kilde || "";
   $("#kilde").title = meta.kilde || "";
   document.title = meta.navn ? `fmscout – ${meta.navn}` : "fmscout";
+  $("#varsel").classList.toggle("skjult", !(meta.ukalibrert && meta.kan_kalibreres));
+  $("#varseltekst").innerHTML = !meta.med_navn
+    ? "<b>Attributtene har ikke navn ennå.</b> Verdiene er riktige, men vi vet "
+      + "ikke hvilken kolonne som er Passing og hvilken som er Pace. Slå opp et "
+      + "par spillere i FM, så ordner det seg."
+    : `<b>${meta.uten_navn} attributter mangler fortsatt navn.</b> Legg inn en `
+      + "spiller til, eller flere tall på dem du har, så løsner det.";
+  $("#knapp-bytt").classList.toggle("skjult", !meta.kan_bytte_fil);
+}
 
+async function tegnPaNytt() {
+  await lastMeta();
+  tilstand.kolonner = tilstand.kolonner.filter((k) => feltFor[k]);
+  if (!tilstand.kolonner.length) tilstand.kolonner = meta.standardkolonner.slice();
+  tilstand.sortering = tilstand.sortering.filter((s) => feltFor[s.nokkel]);
+  if (!tilstand.sortering.length) tilstand.sortering = [{ nokkel: "ca", retning: "ned" }];
+  tilstand.attributtkrav = tilstand.attributtkrav.filter((k) => feltFor[k.nokkel]);
+  byggFiltre();
+  byggKolonnevalg();
+  utfor();
+}
+
+async function start() {
+  await lastMeta();
   hentLagret();
   if (!tilstand.kolonner.length) tilstand.kolonner = meta.standardkolonner.slice();
   tilstand.kolonner = tilstand.kolonner.filter((k) => feltFor[k]);
@@ -464,6 +488,166 @@ async function visSpiller(nr) {
   $("#detalj").classList.remove("skjult");
 }
 
+// ---------- kalibrering ----------
+
+const ANKERLAGER = "fmscout-ankere-v1";
+
+function hentAnkere() {
+  try {
+    const lagret = JSON.parse(localStorage.getItem(ANKERLAGER) || "null");
+    if (Array.isArray(lagret) && lagret.length) return lagret;
+  } catch (e) { /* ikke noe lagret */ }
+  return [{ attributter: {} }, { attributter: {} }, { attributter: {} }];
+}
+
+function lagreAnkere(ankere) {
+  try { localStorage.setItem(ANKERLAGER, JSON.stringify(ankere)); } catch (e) { /* går fint */ }
+}
+
+let ankere = null;
+
+function tegnAnkere() {
+  const rot = $("#ankere");
+  rot.textContent = "";
+  ankere.forEach((anker, nr) => {
+    const boks = lag("div", "anker");
+    const topp = lag("div", "ankertopp");
+    const felt = (nokkel, plassholder, klasse) => {
+      const inn = lag("input", klasse);
+      inn.placeholder = plassholder;
+      inn.value = anker[nokkel] || "";
+      inn.oninput = () => { anker[nokkel] = inn.value; lagreAnkere(ankere); };
+      return inn;
+    };
+    topp.append(
+      felt("navn", "Navn, nøyaktig som i FM", "navnefelt"),
+      felt("alder", "Alder"),
+      felt("klubb", "Klubb"),
+      felt("nasjonalitet", "Nasjonalitet"),
+      felt("posisjoner", "Posisjon, f.eks. M (C)")
+    );
+    if (ankere.length > 1) {
+      const bort = lag("button", "knapp liten", "×");
+      bort.title = "Fjern denne spilleren";
+      bort.onclick = () => { ankere.splice(nr, 1); lagreAnkere(ankere); tegnAnkere(); };
+      topp.append(bort);
+    }
+    boks.append(topp);
+
+    const grupper = {};
+    (meta.alle_attributter || []).forEach((a) => {
+      if (a.gruppe === "Skjult") return;          // står ikke i FM uansett
+      (grupper[a.gruppe] = grupper[a.gruppe] || []).push(a);
+    });
+    Object.entries(grupper).forEach(([gruppe, liste]) => {
+      boks.append(lag("div", "gruppetittel", gruppe));
+      const rutenett = lag("div", "attfelt");
+      liste.forEach((a) => {
+        const l = lag("label");
+        l.title = a.navn;
+        l.append(lag("span", null, a.kort));
+        const inn = lag("input");
+        inn.type = "number";
+        inn.min = 1; inn.max = 20; inn.placeholder = "–";
+        inn.value = anker.attributter[a.nokkel] ?? "";
+        inn.oninput = () => {
+          if (inn.value === "") delete anker.attributter[a.nokkel];
+          else anker.attributter[a.nokkel] = Number(inn.value);
+          lagreAnkere(ankere);
+        };
+        l.append(inn);
+        rutenett.append(l);
+      });
+      boks.append(rutenett);
+    });
+    rot.append(boks);
+  });
+}
+
+function apneKalibrering() {
+  if (!ankere) ankere = hentAnkere();
+  tegnAnkere();
+  $("#kalibreringsstatus").textContent = "";
+  $("#modal-kalibrer").classList.remove("skjult");
+}
+
+async function kjorKalibrering() {
+  const status = $("#kalibreringsstatus");
+  const knapp = $("#kjor-kalibrering");
+  const utfylte = ankere.filter((a) => (a.navn || "").trim());
+  if (!utfylte.length) {
+    status.textContent = "Skriv inn minst én spiller.";
+    return;
+  }
+  knapp.disabled = true;
+  status.className = "jobber";
+  status.textContent = "Leter gjennom saven … dette kan ta et minutt.";
+  try {
+    const svar = await (await fetch("/api/kalibrer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ankere: utfylte }),
+    })).json();
+    if (svar.feil) {
+      status.textContent = "Gikk ikke: " + svar.feil;
+      return;
+    }
+    const funnet = (svar.funnet || []).length;
+    if (!funnet) {
+      status.textContent =
+        "Fant ingen av spillerne i saven. Sjekk at navnene er skrevet " +
+        "nøyaktig som i FM – med aksenter og alt.";
+      return;
+    }
+    let melding = `Fant ${funnet} av ${utfylte.length} spillere og ga navn til `
+      + `${svar.navngitt} attributter.`;
+    const uklare = (svar.uklare || []).map((n) => {
+      const a = (meta.alle_attributter || []).find((x) => x.nokkel === n);
+      return a ? a.navn : n;
+    });
+    if (uklare.length) {
+      melding += ` Fortsatt uklare: ${uklare.slice(0, 6).join(", ")}`
+        + (uklare.length > 6 ? ` og ${uklare.length - 6} til` : "")
+        + ". Legg inn en spiller til, eller flere tall.";
+    }
+    status.textContent = melding;
+    const nye = svar.navngitte || [];
+    await tegnPaNytt();
+    const legges = nye.filter((k) => feltFor[k] && !tilstand.kolonner.includes(k));
+    if (legges.length) {
+      tilstand.kolonner = tilstand.kolonner
+        .filter((k) => (feltFor[k] || {}).gruppe !== "Ukjent")
+        .concat(legges);
+      byggKolonnevalg();
+      utfor();
+    }
+  } catch (e) {
+    status.textContent = "Gikk ikke: " + e;
+  } finally {
+    knapp.disabled = false;
+    status.className = "";
+  }
+}
+
+async function byttFil() {
+  const knapp = $("#knapp-bytt");
+  knapp.disabled = true;
+  const gammel = knapp.textContent;
+  knapp.textContent = "Åpner …";
+  try {
+    const svar = await (await fetch("/api/velg-fil", { method: "POST" })).json();
+    if (svar.ok) {
+      tilstand.side = 0;
+      await tegnPaNytt();
+    } else if (svar.feil) {
+      alert("Fikk ikke åpnet fila:\n\n" + svar.feil);
+    }
+  } finally {
+    knapp.disabled = false;
+    knapp.textContent = gammel;
+  }
+}
+
 // ---------- knapper og taster ----------
 
 function koble() {
@@ -501,6 +685,19 @@ function koble() {
 
   $("#lukk-detalj").onclick = () => $("#detalj").classList.add("skjult");
 
+  $("#knapp-kalibrer").onclick = apneKalibrering;
+  $("#lukk-kalibrer").onclick = () => $("#modal-kalibrer").classList.add("skjult");
+  $("#modal-kalibrer").onclick = (e) => {
+    if (e.target.id === "modal-kalibrer") $("#modal-kalibrer").classList.add("skjult");
+  };
+  $("#legg-til-anker").onclick = () => {
+    ankere.push({ attributter: {} });
+    lagreAnkere(ankere);
+    tegnAnkere();
+  };
+  $("#kjor-kalibrering").onclick = kjorKalibrering;
+  $("#knapp-bytt").onclick = byttFil;
+
   $("#knapp-csv").onclick = () => {
     const alle = confirm(
       "Vil du ha med alle kolonnene i fila?\n\n" +
@@ -516,6 +713,7 @@ function koble() {
     } else if (e.key === "Escape") {
       $("#detalj").classList.add("skjult");
       $("#modal-kolonner").classList.add("skjult");
+      $("#modal-kalibrer").classList.add("skjult");
     }
   });
 }

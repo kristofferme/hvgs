@@ -10,8 +10,11 @@ from collections import Counter
 from dataclasses import dataclass, field
 
 from .felles import flat
-from .spillere import (FELT, FELT_FOR, POSISJONSREKKEFOLGE, POSISJONSGRUPPER,
-                       STANDARDKOLONNER, tomme_kolonner)
+from .spillere import (FELT, FELT_FOR, Felt, POSISJONSREKKEFOLGE,
+                       POSISJONSGRUPPER, STANDARDKOLONNER, tomme_kolonner)
+
+# Nøkler vi bruker internt, og som ikke skal bli til kolonner i tabellen.
+INTERNE = {"_nr", "sok", "posisjonsliste", "valuta", "anslag"}
 
 FASETTFELT = ("klubb", "liga", "nasjonalitet", "personlighet", "nasjon_klubb")
 OMRADEFELT = ("alder", "ca", "pa", "rom", "rykte", "verdi", "lonn", "hoyde",
@@ -43,6 +46,9 @@ class Datasett:
             rad["_nr"] = nr
         self.tomme = tomme_kolonner(self.rader)
         self.kolonner = [f for f in FELT if f.nokkel not in self.tomme]
+        self.kolonner += self._ukjente_kolonner()
+        self.felt_for = {f.nokkel: f for f in self.kolonner}
+        self.ukalibrert = any(f.gruppe == "Ukjent" for f in self.kolonner)
         self._fasetter = {
             felt: Counter(r.get(felt) for r in self.rader if r.get(felt))
             for felt in FASETTFELT if felt not in self.tomme
@@ -59,15 +65,32 @@ class Datasett:
             if verdier:
                 self._grenser[felt] = [min(verdier), max(verdier)]
 
+    def _ukjente_kolonner(self) -> list[Felt]:
+        """Felt som finnes i dataene, men ikke i modellen.
+
+        Et ukalibrert skjema gir attributt_00, attributt_01 og utover. De skal
+        vises likevel – verdiene er riktige, det er bare navnet vi mangler.
+        """
+        sett: set[str] = set()
+        for rad in self.rader:
+            for nokkel, verdi in rad.items():
+                if (nokkel not in FELT_FOR and nokkel not in INTERNE
+                        and verdi not in (None, "", [])):
+                    sett.add(nokkel)
+        return [Felt(n, n.replace("_", " "), "Ukjent", "tall") for n in sorted(sett)]
+
     # -- det UI-et trenger å vite ----------------------------------------
 
     def meta(self) -> dict:
         standard = [k for k in STANDARDKOLONNER if k not in self.tomme]
+        if self.ukalibrert:
+            standard += [f.nokkel for f in self.kolonner if f.gruppe == "Ukjent"][:8]
         return {
             "navn": self.navn,
             "kilde": self.kilde,
             "antall": len(self.rader),
             "merknader": self.merknader,
+            "ukalibrert": self.ukalibrert,
             "kolonner": [
                 {"nokkel": f.nokkel, "navn": f.navn, "gruppe": f.gruppe,
                  "type": f.type, "hjelp": f.hjelp}
@@ -151,7 +174,7 @@ class Datasett:
         side = max(0, int(sporring.get("side") or 0))
         storrelse = min(500, max(10, int(sporring.get("sidestorrelse") or 100)))
         start = side * storrelse
-        kolonner = [k for k in (sporring.get("kolonner") or []) if k in FELT_FOR]
+        kolonner = [k for k in (sporring.get("kolonner") or []) if k in self.felt_for]
         if not kolonner:
             kolonner = [k for k in STANDARDKOLONNER if k not in self.tomme]
         utsnitt = treff[start:start + storrelse]

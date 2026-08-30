@@ -109,6 +109,33 @@ class Save(unittest.TestCase):
                        if lest.get(felt) == fasit.get(felt))
             self.assertEqual(like, ANTALL, f"{felt} stemmer bare for {like} av {ANTALL}")
 
+    def test_faa_ankere_gir_heller_ingen_navn_enn_feil_navn(self):
+        """To ankere med få tall skal la det tvetydige stå åpent, ikke gjette."""
+        ankere = [
+            Anker(p["navn"], {k: p[k] for k in DEMOATTRIBUTTER[:12]}, p["alder"],
+                  p["klubb"], p["nasjonalitet"], p["posisjoner"])
+            for p in (self.fasit[i] for i in (7, 123))
+        ]
+        profil, rapport = kalibrer(self.beholder, ankere, melding=lambda *_: None)
+        rader = list(profil.les(self.beholder))
+        navngitte = [n for n in profil.attributter if not n.startswith("attributt_")]
+        self.assertTrue(navngitte, "noe skal la seg navngi med to ankere")
+        for nokkel in navngitte:
+            like = sum(1 for lest, fasit in zip(rader, self.fasit)
+                       if lest.get(nokkel) == fasit.get(nokkel))
+            self.assertEqual(like, ANTALL, f"{nokkel} fikk feil navn")
+        self.assertTrue(rapport["tvil"], "det uavklarte skal rapporteres")
+
+    def test_tre_ankere_holder_til_full_navngiving(self):
+        ankere = [
+            Anker(p["navn"], {k: p[k] for k in DEMOATTRIBUTTER[:12]}, p["alder"],
+                  p["klubb"], p["nasjonalitet"], p["posisjoner"])
+            for p in (self.fasit[i] for i in (7, 123, 55))
+        ]
+        _, rapport = kalibrer(self.beholder, ankere, melding=lambda *_: None)
+        self.assertEqual(rapport["attributter_navngitt"], 12)
+        self.assertEqual(rapport["tvil"], [])
+
     def test_kalibrering_uten_ankere_gir_nummererte_attributter(self):
         profil, rapport = kalibrer(self.beholder, [], melding=lambda *_: None)
         self.assertEqual(rapport["attributter_navngitt"], 0)
@@ -294,8 +321,9 @@ class Tjeneren(unittest.TestCase):
         import threading
         from http.server import ThreadingHTTPServer
 
+        from fmscoutlib.last import Okt
         from fmscoutlib.tjener import Handler, ledig_port
-        Handler.datasett = Datasett(lag_demospillere(120), navn="test.fm", kilde="test.fm")
+        Handler.okt = Okt(Datasett(lag_demospillere(120), navn="test.fm", kilde="test.fm"))
         cls.port = ledig_port(0)
         cls.tjener = ThreadingHTTPServer(("127.0.0.1", cls.port), Handler)
         cls.tråd = threading.Thread(target=cls.tjener.serve_forever, daemon=True)

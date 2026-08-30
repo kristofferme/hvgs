@@ -3,27 +3,46 @@
 En speider for Football Manager-saver. Åpne fila, få alle spillerne i én
 tabell du kan sortere, filtrere og eksportere til CSV.
 
-Laget for Mac. Det eneste du trenger er Python 3, som allerede ligger der.
-Ingen pakker skal installeres, og ingenting sendes ut av maskinen – tabellen
-kjører på `127.0.0.1` og saven blir liggende der den ligger.
-
-```
-python3 fmscout.py demo              prøv den med oppdiktede spillere
-python3 fmscout.py åpne save.fm      din egen save
-```
+Laget for Mac. Ingenting sendes ut av maskinen – tabellen kjører på
+`127.0.0.1`, og saven blir liggende der den ligger.
 
 <img width="900" alt="" src="doc/skjermbilde.png">
 
-## Kom i gang
+## Kom i gang uten terminal
+
+1. Last ned mappa: gå til
+   [repoet på GitHub](https://github.com/kristofferme/hvgs/tree/claude/fm26-savegame-scout-cs38kh),
+   trykk den grønne **Code**-knappen og velg **Download ZIP**.
+2. Dobbeltklikk ZIP-fila i Nedlastinger så den pakkes ut.
+3. Gå inn i `fmscout` → `Mac` og dobbeltklikk **FM Scout**.
+4. Velg saven din i ruta som kommer opp. Tabellen åpner seg i nettleseren.
+
+Første gang sier macOS trolig at appen ikke kan åpnes fordi den ikke er fra
+App Store. Den er ikke signert – det koster penger – så det må du klarere selv
+én gang:
+
+* **Systeminnstillinger → Personvern og sikkerhet**, bla ned til *Sikkerhet*,
+  og trykk **Åpne likevel** ved siden av «FM Scout».
+* På eldre macOS: høyreklikk på appen → **Åpne** → **Åpne**.
+
+Etterpå starter den som en hvilken som helst app. Vil du flytte den, flytt hele
+`fmscout`-mappa – appen må bli liggende i `Mac`-mappa sammen med resten, ellers
+finner den ikke verktøyet.
+
+Appen trenger Python 3. Har du det ikke, sier den fra og tilbyr å åpne
+python.org for deg.
+
+## Eller fra terminalen
 
 ```bash
 cd fmscout
-python3 fmscout.py demo
+python3 fmscout.py demo              # 900 oppdiktede spillere, alt virker
+python3 fmscout.py åpne              # gir deg den samme «velg fil»-ruta
+python3 fmscout.py åpne save.fm      # eller si hvilken fil med en gang
 ```
 
-Nettleseren åpner seg med 900 oppdiktede spillere. Alt i tabellen virker –
-filtrene, kolonnevelgeren, CSV-eksporten – så du ser hva verktøyet er før du
-peker det mot din egen save.
+Demoen er verdt et minutt før du peker verktøyet mot din egen save: alt i
+tabellen virker der, så du ser hva dette er.
 
 ## To veier inn
 
@@ -33,28 +52,24 @@ Det er to måter å få spillere inn i tabellen på, og de gir deg ulike ting.
 
 I FM: gå til en spillerliste (stallen, et søk, en speiderrapport), marker alt
 med ⌘A, trykk ⌘P og velg **Web Page (.html)**. Alle kolonnene du har i
-visninga blir med i fila.
-
-```bash
-python3 fmscout.py åpne ~/Downloads/stall.html
-```
+visninga blir med i fila. Velg den fila i FM Scout på vanlig måte.
 
 Dette virker alltid, uansett FM-versjon. Ulempen er at FM ikke viser CA og PA
-noe sted, så de kolonnene får du ikke med. Du kan gjerne åpne flere filer på
-én gang – da slås de sammen, og en spiller som står i to av dem beholder den
-oppføringa med flest utfylte felt:
+noe sted, så de kolonnene får du ikke med. `.html`, `.rtf` og `.csv` går alle
+sammen inn her.
+
+Vil du slå sammen flere lister – stallen, speiderrapporten og de frie
+spillerne – må det gjøres fra terminalen. Da beholder en spiller som står i to
+av dem oppføringa med flest utfylte felt:
 
 ```bash
 python3 fmscout.py åpne stall.html speiderliste.html frie-spillere.rtf
 ```
 
-`.html`, `.rtf` og `.csv` går alle sammen inn her.
-
 ### 2. Selve saven – for CA og PA
 
-```bash
-python3 fmscout.py åpne ~/Documents/Sports\ Interactive/Football\ Manager\ 2026/mitt-lag.fm
-```
+Velg `.fm`-fila i stedet. Den ligger under
+`~/Documents/Sports Interactive/Football Manager 2026/`.
 
 Første gang tar det litt tid: fila pakkes ut og legges i et mellomlager under
 `~/Library/Caches/fmscout/`, så går det fort etterpå.
@@ -88,34 +103,30 @@ versjonen. Blir noe feil, er det skjemaet som skal rettes, ikke koden – og
 
 ## Kalibrering – gi attributtene riktig navn
 
-Slå opp to–fem spillere i FM og skriv av verdiene deres. Da vet verktøyet hva
-det ser på.
+Åpner du en save og attributtkolonnene heter `attributt 00`, `attributt 01` og
+utover, er det som forventet. Verdiene er riktige – vi vet bare ikke hvilken av
+dem som er Passing og hvilken som er Pace, for rekkefølgen står ingen steder i
+fila. Det ordner du i nettsida:
+
+<img width="900" alt="" src="doc/kalibrering.png">
+
+Trykk **Gi attributtene navn** i den grønne stripa. Slå opp **tre spillere** i
+FM og skriv av det du ser. Navnet må stå nøyaktig som i spillet, med aksenter og
+alt. Ti–tolv tall per spiller holder – du trenger ikke fylle ut hele skjemaet.
+
+Hvorfor tre? Med to spillere blir flere attributter stående uten navn, og det er
+med vilje. To spillere gir ofte flere mulige plasser for samme attributt, og da
+lar verktøyet det heller stå åpent enn å gjette. Et navn du ikke kan stole på,
+er verre enn `attributt 07`. Med tre spillere løser det seg som regel helt.
+
+Det du skriver inn blir husket i nettleseren, så du slipper å skrive det på nytt
+om du vil legge til en spiller til.
+
+Fra terminalen går det også:
 
 ```bash
 python3 fmscout.py kalibrer --lag-ankermal ankere.json
-```
-
-Fyll ut fila – navnet må stå nøyaktig som i FM:
-
-```json
-[
-  {
-    "navn": "Martin Ødegård",
-    "alder": 24,
-    "klubb": "Hustadvika FK",
-    "nasjonalitet": "Norge",
-    "posisjoner": "M (C), AM (C)",
-    "attributter": {"Pas": 15, "Tec": 14, "Dec": 13, "Acc": 12, "Sta": 15}
-  }
-]
-```
-
-Både forkortelsene fra FM (`Pas`, `OtB`, `1v1`) og de fulle navna (`Passing`,
-`Off the Ball`) går an. Jo flere attributter du skriver av, jo flere kolonner
-får navn – og med to–tre spillere blir det sjelden tvil om hvilken som er
-hvilken.
-
-```bash
+# fyll ut fila, og så:
 python3 fmscout.py kalibrer mitt-lag.fm --ankere ankere.json
 ```
 
@@ -147,6 +158,7 @@ hvilke bytes som er kandidater til CA og PA.
   Nøkkeltall, Teknisk, Mental, Fysisk, Keeper, Skjult, Alt.
 * Klikk på en overskrift for å sortere. Shift-klikk legger til et nivå til.
 * Klikk på en rad for å se hele spilleren i panelet til høyre.
+* **Åpne annen fil** øverst til høyre bytter save uten at noe må startes om.
 
 Filtrene og kolonnevalget huskes til neste gang du åpner samme fil.
 
@@ -173,7 +185,7 @@ uten å spørre om noe. Skal tallene rett inn i pandas eller R, bruk
 | Kommando | Gjør |
 | --- | --- |
 | `demo` | lager en oppdiktet save og åpner tabellen |
-| `åpne <fil …>` | åpner tabellen for en save eller en eller flere eksporter |
+| `åpne [fil …]` | åpner tabellen; uten filnavn får du «velg fil»-ruta |
 | `eksporter <fil …> -o ut.csv` | skriver rett til CSV |
 | `sjekk <save.fm>` | viser hva som ligger i fila |
 | `kalibrer <save.fm>` | finner ut hvordan saven er satt sammen |
@@ -194,9 +206,12 @@ støy, er saven trolig kryptert eller lagret i et format vi ikke er med på.
 ligger) og bytt om de to offsetene. Det er en tekstfil, og den er ment å rettes
 på.
 
-**Attributtene heter `attributt_07`.** Da er ingen ankere brukt, eller navnene
-i ankerfila stemmer ikke med saven. Legg inn flere spillere og kjør `kalibrer`
-på nytt.
+**Attributtene heter `attributt 07`.** Da er de ikke kalibrert ennå – trykk
+**Gi attributtene navn** i den grønne stripa. Står noen igjen etterpå, sier
+statuslinja hvilke, og da trenger de flere tall eller en spiller til.
+
+**«Fant ingen av spillerne i saven.»** Navnet må stå nøyaktig som i FM. Sjekk
+aksenter, og prøv med hele navnet slik det står i spillerprofilen.
 
 **CA og PA ser rare ut.** `sjekk` lister kandidatene med begrunnelse. Er det en
 annen byte som ser riktigere ut, sett offsetet inn i skjemaet.
@@ -211,5 +226,7 @@ save kan ta noen minutter. Etterpå ligger den i mellomlageret. Skal du rydde:
 python3 -m unittest discover -s tester
 ```
 
-30 tester som dekker utpakking, tabellsøk, kalibrering, import av
-FM-eksporter, filtrering, CSV og tjeneren.
+32 tester som dekker utpakking, tabellsøk, kalibrering, import av
+FM-eksporter, filtrering, CSV og tjeneren. To av dem holder kalibreringa i
+ørene: at tre ankere med tolv tall gir navn på alt, og at to ankere heller lar
+det tvetydige stå åpent enn å sette et navn som kan være feil.

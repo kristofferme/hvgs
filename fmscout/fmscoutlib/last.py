@@ -2,16 +2,20 @@
 
 Filendelsen bestemmer hva som skjer. .fm går gjennom beholderen og et skjema,
 alt annet leses som en eksport fra FM.
+
+Økt-klassen holder på det som er åpent akkurat nå, slik at nettsida kan bytte
+fil og kalibrere på nytt uten at noe må startes om.
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from .beholder import Beholder
 from .datasett import Datasett
 from .felles import arbeidsmappe, filnokkel, si
-from .kalibrer import kalibrer
+from .kalibrer import Anker, kalibrer
 from .leseksport import les_eksport
 from .profil import Profil
 
@@ -29,8 +33,15 @@ def skjema_for(sti: Path) -> Path:
     return skjemamappe() / f"{sti.stem}-{filnokkel(sti)}.json"
 
 
+def _rader(profil: Profil, beholder: Beholder, grense, melding) -> list[dict]:
+    rader = list(profil.les(beholder, grense=grense, melding=melding))
+    if not rader:
+        raise RuntimeError("Skjemaet ga ingen spillere. Kalibrer saven på nytt.")
+    return rader
+
+
 def last_save(sti: Path, *, skjema=None, ankere=None, tving_kalibrering: bool = False,
-              grense: int | None = None, melding=si) -> Datasett:
+              grense: int | None = None, melding=si) -> tuple[Datasett, Beholder]:
     beholder = Beholder.apne(sti, melding=melding)
     merknader: list[str] = []
     if skjema:
@@ -46,10 +57,9 @@ def last_save(sti: Path, *, skjema=None, ankere=None, tving_kalibrering: bool = 
             profil.lagre(lagret)
             melding(f"Skjema lagret: {lagret}")
             merknader = rapport.get("merknader", [])
-    rader = list(profil.les(beholder, grense=grense, melding=melding))
-    if not rader:
-        raise RuntimeError("Skjemaet ga ingen spillere. Kjør «kalibrer» på nytt.")
-    return Datasett(rader, navn=sti.name, kilde=str(sti), merknader=merknader)
+    datasett = Datasett(_rader(profil, beholder, grense, melding),
+                        navn=sti.name, kilde=str(sti), merknader=merknader)
+    return datasett, beholder
 
 
 def last_eksport(stier: list[Path], *, melding=si) -> Datasett:
@@ -69,6 +79,8 @@ def last_eksport(stier: list[Path], *, melding=si) -> Datasett:
             )
         rader.extend(del_)
         navn.append(sti.name)
+    if not rader:
+        raise RuntimeError("Fant ingen spillere i fila.")
     # Samme spiller i to eksporter: behold den med flest utfylte felt.
     beste: dict[tuple, dict] = {}
     for rad in rader:
@@ -83,16 +95,62 @@ def last_eksport(stier: list[Path], *, melding=si) -> Datasett:
                     merknader=merknader)
 
 
-def last(stier, *, skjema=None, ankere=None, tving_kalibrering=False,
-         grense=None, melding=si) -> Datasett:
-    stier = [Path(s).expanduser() for s in (stier if isinstance(stier, (list, tuple)) else [stier])]
+def _rydd(stier) -> list[Path]:
+    stier = [Path(s).expanduser() for s in
+             (stier if isinstance(stier, (list, tuple)) else [stier])]
     for sti in stier:
         if not sti.exists():
             raise FileNotFoundError(f"Fant ikke {sti}")
     saver = [s for s in stier if s.suffix.lower() == ".fm"]
     if saver and len(stier) > 1:
         raise RuntimeError("Åpne én save om gangen (eksportfiler kan du gjerne slå sammen).")
-    if saver:
-        return last_save(saver[0], skjema=skjema, ankere=ankere,
-                         tving_kalibrering=tving_kalibrering, grense=grense, melding=melding)
+    return stier
+
+
+def last(stier, *, skjema=None, ankere=None, tving_kalibrering=False,
+         grense=None, melding=si) -> Datasett:
+    stier = _rydd(stier)
+    if stier[0].suffix.lower() == ".fm":
+        return last_save(stier[0], skjema=skjema, ankere=ankere,
+                         tving_kalibrering=tving_kalibrering,
+                         grense=grense, melding=melding)[0]
     return last_eksport(stier, melding=melding)
+
+
+@dataclass
+class Okt:
+    """Det som er åpent nå. Nettsida bytter fil og kalibrerer gjennom denne."""
+
+    datasett: Datasett
+    sti: Path | None = None
+    beholder: Beholder | None = None
+    logg: list[str] = field(default_factory=list)
+
+    @classmethod
+    def apne(cls, stier, *, skjema=None, grense=None, melding=si) -> "Okt":
+        stier = _rydd(stier)
+        if stier[0].suffix.lower() == ".fm":
+            datasett, beholder = last_save(stier[0], skjema=skjema,
+                                           grense=grense, melding=melding)
+            return cls(datasett, stier[0], beholder)
+        return cls(last_eksport(stier, melding=melding), stier[0])
+
+    @property
+    def kan_kalibreres(self) -> bool:
+        return self.beholder is not None
+
+    def bytt_fil(self, stier, *, melding=si) -> "Okt":
+        ny = Okt.apne(stier, melding=melding)
+        self.datasett, self.sti, self.beholder = ny.datasett, ny.sti, ny.beholder
+        return self
+
+    def kalibrer_med(self, ankere: list[Anker], *, melding=si) -> dict:
+        """Kjører kalibreringa på nytt med nye ankere og laster spillerne om."""
+        if not self.kan_kalibreres:
+            raise RuntimeError("Kalibrering gjelder bare .fm-filer.")
+        profil, rapport = kalibrer(self.beholder, ankere, melding=melding)
+        profil.lagre(skjema_for(self.sti))
+        self.datasett = Datasett(_rader(profil, self.beholder, None, melding),
+                                 navn=self.sti.name, kilde=str(self.sti),
+                                 merknader=rapport.get("merknader", []))
+        return rapport

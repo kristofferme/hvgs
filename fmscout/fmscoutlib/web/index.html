@@ -15,6 +15,7 @@
     <input id="tekstsok" type="search" placeholder="Søk etter navn, klubb, nasjon …  (/)" autocomplete="off">
   </div>
   <div class="knapper">
+    <button id="knapp-bytt" class="knapp skjult">Åpne annen fil</button>
     <button id="knapp-kolonner" class="knapp">Kolonner</button>
     <button id="knapp-csv" class="knapp primær">Eksporter CSV</button>
   </div>
@@ -43,6 +44,10 @@
         <button id="neste" class="knapp liten">›</button>
       </div>
     </div>
+    <div id="varsel" class="varsel skjult">
+      <div id="varseltekst"></div>
+      <button class="knapp primær" id="knapp-kalibrer">Gi attributtene navn</button>
+    </div>
     <div id="sammendrag" class="sammendrag"></div>
     <div class="tabellramme">
       <table id="tabell">
@@ -70,6 +75,29 @@
     <div class="modalbunn">
       <span id="kolonnetelling"></span>
       <button class="knapp primær" id="bruk-kolonner">Ferdig</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal skjult" id="modal-kalibrer">
+  <div class="modalboks">
+    <div class="modaltopp">
+      <h2>Gi attributtene navn</h2>
+      <button class="lukk" id="lukk-kalibrer">×</button>
+    </div>
+    <div class="modalhjelp">
+      Rekkefølgen på attributtene står ikke i lagringsfila, så den må vi finne ut
+      av. Slå opp <b>tre spillere</b> i FM og skriv av det du ser. Navnet må stå
+      nøyaktig som i spillet. Du trenger ikke fylle ut alt – <b>ti–tolv tall per
+      spiller</b> er nok til å få navn på alle kolonnene. Med bare to spillere
+      blir flere av dem stående uten navn, og det er med vilje: et navn vi ikke
+      er sikre på, er verre enn ingen.
+    </div>
+    <div class="ankere" id="ankere"></div>
+    <div class="modalbunn">
+      <button class="lenkeknapp" id="legg-til-anker">+ Legg til en spiller til</button>
+      <span id="kalibreringsstatus"></span>
+      <button class="knapp primær" id="kjor-kalibrering">Kalibrer</button>
     </div>
   </div>
 </div>

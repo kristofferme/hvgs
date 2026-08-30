@@ -266,38 +266,56 @@ def navngi_attributter(records, tabell: Tabell, ankere: list[Anker],
                        ankerrader: dict[str, int]) -> tuple[dict, list[str]]:
     """Kobler posisjonene i attributtstripa til FM-navn, ut fra ankerne.
 
-    En posisjon får et navn bare hvis den stemmer for *alle* ankerne som har
-    oppgitt den attributten. Det som fortsatt er tvetydig, blir stående som
-    attributt_NN – da trenger du flere ankere.
+    En posisjon er mulig for en attributt bare hvis verdien stemmer for *alle*
+    ankerne som har oppgitt den. Med få ankere blir flere posisjoner mulige for
+    samme attributt, og da hjelper det å se dem i sammenheng: har en attributt
+    bare én posisjon igjen etter at de sikre har tatt sin, er den gitt. Det
+    kjøres om igjen til ingenting mer løsner.
+
+    Den motsatte regelen – «bare én attributt kan ha denne posisjonen, altså er
+    det den» – ser fristende ut, men holder ikke her. Den forutsetter at den
+    rette eieren av posisjonen er blant attributtene du har fylt ut, og fyller
+    du ut tolv av seksti, er den som regel ikke det. Prøvekjøring med to ankere
+    ga tolv navn der tre var feil. Et navn vi ikke er sikre på, er verre enn
+    attributt_07, så den regelen er med vilje utelatt.
     """
     a0, lengde = tabell.stripeoffset, tabell.stripelengde
-    kart: dict[str, int] = {}
     tvil: list[str] = []
-    brukte: set[int] = set()
-
     aktuelle = [(a, ankerrader[a.navn]) for a in ankere if a.navn in ankerrader]
     if not aktuelle:
-        return kart, ["ingen av ankerne ble funnet i tabellen"]
+        return {}, ["ingen av ankerne ble funnet i tabellen"]
 
+    kandidater: dict[str, set[int]] = {}
     for nokkel in ATTRIBUTTNOKLER:
         onsket = [(rec_nr, anker.attributter[nokkel])
                   for anker, rec_nr in aktuelle if nokkel in anker.attributter]
         if not onsket:
             continue
-        treff = []
-        for i in range(lengde):
-            off = a0 + i
-            if off in brukte:
-                continue
-            if all(records[rec_nr][off] == verdi for rec_nr, verdi in onsket):
-                treff.append(off)
-        if len(treff) == 1:
-            kart[nokkel] = treff[0]
-            brukte.add(treff[0])
-        elif len(treff) > 1:
-            tvil.append(f"{nokkel}: {len(treff)} mulige plasser")
-        else:
+        mulige = {a0 + i for i in range(lengde)
+                  if all(records[rec_nr][a0 + i] == verdi for rec_nr, verdi in onsket)}
+        if not mulige:
             tvil.append(f"{nokkel}: ingen plass passer med verdiene du oppga")
+            continue
+        kandidater[nokkel] = mulige
+
+    kart: dict[str, int] = {}
+    endret = True
+    while endret and kandidater:
+        endret = False
+        # Én mulighet igjen for en attributt.
+        for nokkel, mulige in list(kandidater.items()):
+            mulige -= set(kart.values())
+            if len(mulige) == 1:
+                kart[nokkel] = mulige.pop()
+                del kandidater[nokkel]
+                endret = True
+            elif not mulige:
+                del kandidater[nokkel]
+                tvil.append(f"{nokkel}: plassen er tatt av en annen attributt")
+                endret = True
+
+    for nokkel, mulige in kandidater.items():
+        tvil.append(f"{nokkel}: {len(mulige)} mulige plasser")
     return kart, tvil
 
 
@@ -485,6 +503,7 @@ def kalibrer(beholder, ankere: list[Anker] | None = None, *, melding=si) -> tupl
                  if tabell.stripeoffset + i not in set(kart.values())]
     for off in unavngitt:
         profil.attributter[f"attributt_{off - tabell.stripeoffset:02d}"] = off
+    rapport["navngitte"] = sorted(kart, key=lambda n: kart[n])
     rapport["attributter_navngitt"] = len(kart)
     rapport["attributter_ukjent"] = len(unavngitt)
     rapport["tvil"] = tvil

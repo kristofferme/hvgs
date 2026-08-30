@@ -1,0 +1,90 @@
+#!/bin/bash
+# Dobbeltklikk-starteren.
+#
+# Finner Python og verktøymappa, spør etter fila med den vanlige «velg fil»-ruta
+# på Mac, og starter tabellen i nettleseren. Ingen terminal involvert.
+
+LOGG="$HOME/Library/Logs/fmscout.log"
+mkdir -p "$(dirname "$LOGG")"
+
+varsle() {   # tittel, tekst
+  /usr/bin/osascript \
+    -e 'on run {tittel, tekst}' \
+    -e 'tell application "System Events" to activate' \
+    -e 'display dialog tekst with title tittel buttons {"OK"} default button 1 with icon caution' \
+    -e 'end run' \
+    -- "$1" "$2" >/dev/null 2>&1
+}
+
+# --- hvor ligger fmscout.py? ------------------------------------------------
+# Normalt to nivåer opp fra appen: fmscout/Mac/FM Scout.app
+APP="$(cd "$(dirname "$0")/../.." && pwd)"
+ROT="$(cd "$APP/../.." 2>/dev/null && pwd)"
+
+if [ ! -f "$ROT/fmscout.py" ]; then
+  for kandidat in "$HOME/hvgs/fmscout" "$HOME/Downloads/hvgs/fmscout" \
+                  "$HOME/Documents/hvgs/fmscout" "$HOME"/Downloads/hvgs-*/fmscout; do
+    if [ -f "$kandidat/fmscout.py" ]; then ROT="$kandidat"; break; fi
+  done
+fi
+
+if [ ! -f "$ROT/fmscout.py" ]; then
+  varsle "FM Scout" "Fant ikke resten av verktøyet.
+
+Appen må ligge i Mac-mappa inni fmscout-mappa, sammen med fmscout.py. Flytt den tilbake dit, så virker den."
+  exit 1
+fi
+
+# --- hvilken Python? --------------------------------------------------------
+PY=""
+KANDIDATER=(/opt/homebrew/bin/python3 /usr/local/bin/python3)
+# /usr/bin/python3 er bare et skall før Xcode-verktøya er installert – å kjøre
+# det da spretter opp en installasjonsrute. Derfor sjekker vi først.
+if /usr/bin/xcode-select -p >/dev/null 2>&1; then
+  KANDIDATER+=(/usr/bin/python3)
+fi
+for kandidat in "${KANDIDATER[@]}"; do
+  if [ -x "$kandidat" ] && "$kandidat" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 9) else 1)' >/dev/null 2>&1; then
+    PY="$kandidat"
+    break
+  fi
+done
+
+if [ -z "$PY" ]; then
+  svar=$(/usr/bin/osascript -e 'tell application "System Events" to activate' \
+    -e 'display dialog "FM Scout trenger Python 3, og det ligger ikke på maskinen ennå.
+
+Last det ned fra python.org, installer, og start FM Scout på nytt." with title "FM Scout" buttons {"Avbryt", "Åpne python.org"} default button 2' 2>/dev/null)
+  case "$svar" in *"Åpne python.org"*) /usr/bin/open "https://www.python.org/downloads/macos/" ;; esac
+  exit 1
+fi
+
+# --- hvilken fil? -----------------------------------------------------------
+FIL="$(/usr/bin/osascript <<'AS' 2>/dev/null
+tell application "System Events" to activate
+set valgt to choose file with prompt "Velg FM-saven (.fm) eller en eksport fra FM"
+POSIX path of valgt
+AS
+)"
+
+[ -z "$FIL" ] && exit 0        # Avbryt
+
+# --- i gang -----------------------------------------------------------------
+{
+  echo ""
+  echo "=== $(date '+%Y-%m-%d %H:%M') · $FIL"
+} >>"$LOGG"
+
+cd "$ROT" || exit 1
+"$PY" fmscout.py åpne "$FIL" >>"$LOGG" 2>&1
+kode=$?
+
+if [ $kode -ne 0 ] && [ $kode -ne 130 ]; then
+  siste=$(tail -n 6 "$LOGG" | tr -d '"')
+  varsle "FM Scout" "Noe gikk galt.
+
+$siste
+
+Hele loggen: $LOGG"
+  exit $kode
+fi

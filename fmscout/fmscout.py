@@ -25,7 +25,7 @@ from fmscoutlib.datasett import Datasett                               # noqa: E
 from fmscoutlib.demo import lag_demosave                               # noqa: E402
 from fmscoutlib.felles import feil, si, storrelse, tallformat          # noqa: E402
 from fmscoutlib.kalibrer import Anker, kalibrer                        # noqa: E402
-from fmscoutlib.last import last, skjema_for, skjemamappe              # noqa: E402
+from fmscoutlib.last import Okt, last, skjema_for, skjemamappe              # noqa: E402
 from fmscoutlib.profil import Profil                                   # noqa: E402
 from fmscoutlib.spillere import FELT, FELT_FOR, STANDARDKOLONNER       # noqa: E402
 from fmscoutlib.tabeller import finn_evnekandidater, finn_tabeller     # noqa: E402
@@ -84,22 +84,29 @@ def kommando_demo(args) -> int:
     si(f"  {sti}  ({storrelse(sti.stat().st_size)})")
     si(f"  skjema: {skjema}")
     si("")
-    datasett = last(sti, melding=si)
     if args.bare_fil:
         si("Åpne den med:  python3 fmscout.py åpne " + str(sti))
         return 0
-    tjener.start(datasett, port=args.port, apne=not args.ikke_apne)
+    tjener.start(Okt.apne(sti, melding=si), port=args.port, apne=not args.ikke_apne)
     return 0
 
 
 def kommando_apne(args) -> int:
-    datasett = last(args.fil, skjema=args.skjema,
-                    ankere=les_ankere(args.ankere) if args.ankere else None,
-                    tving_kalibrering=args.kalibrer_pa_nytt,
-                    grense=args.grense, melding=si)
-    for merknad in datasett.merknader:
+    filer = args.fil
+    if not filer:
+        valgt = tjener.velg_fil_dialog()
+        if not valgt:
+            return 0
+        filer = [valgt]
+    if args.kalibrer_pa_nytt or args.ankere:
+        # Tving fram ny kalibrering før økta settes opp.
+        last(filer, skjema=args.skjema,
+             ankere=les_ankere(args.ankere) if args.ankere else None,
+             tving_kalibrering=True, grense=args.grense, melding=si)
+    okt = Okt.apne(filer, skjema=args.skjema, grense=args.grense, melding=si)
+    for merknad in okt.datasett.merknader:
         si(f"  ⚠︎ {merknad}")
-    tjener.start(datasett, port=args.port, apne=not args.ikke_apne)
+    tjener.start(okt, port=args.port, apne=not args.ikke_apne)
     return 0
 
 
@@ -215,7 +222,7 @@ def lag_parser() -> argparse.ArgumentParser:
 
     for navn in ("åpne", "apne", "open"):
         a = under.add_parser(navn, help="åpne en save eller en FM-eksport i nettleseren")
-        a.add_argument("fil", nargs="+")
+        a.add_argument("fil", nargs="*", help="uten filnavn får du en «velg fil»-rute")
         a.add_argument("--skjema", help="skjemafil eller navn (bare for .fm)")
         a.add_argument("--ankere", help="json med kjente spillere, til kalibrering")
         a.add_argument("--kalibrer-på-nytt", "--kalibrer-pa-nytt", dest="kalibrer_pa_nytt",

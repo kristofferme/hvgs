@@ -10,9 +10,14 @@
 
 name: Hent arbeidsboka
 
+# PAUSET – den faste henting er slått av. Jobben kjører nå bare når du
+# trykker «Run workflow» selv.
+#
+# Skru den på igjen: fjern kommentartegnene på de to schedule-linjene under.
+
 on:
-  schedule:
-    - cron: "*/15 5-16 * * 1-5"    # hvert kvarter, hverdager ca. 07–18 norsk tid
+  # schedule:
+  #   - cron: "*/15 5-16 * * 1-5"  # hvert kvarter, hverdager ca. 07–18 norsk tid
   workflow_dispatch:               # og når du trykker «Run workflow»
 
 permissions:

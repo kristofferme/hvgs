@@ -197,6 +197,8 @@ def lag_rapport(sti, *, melding=si) -> str:
         _linje(r, "  Ingen striper i det hele tatt.")
     _linje(r)
 
+    _skjemadelen(r, sti, beholder, detaljer)
+
     _linje(r, "HVA DETTE PEKER MOT")
     for tekst in _tolkning(rå_fil, fant_tekst, detaljer, noe_funnet, beste_stride):
         _linje(r, f"  {tekst}")
@@ -204,6 +206,79 @@ def lag_rapport(sti, *, melding=si) -> str:
     _linje(r, "Send denne rapporten videre, så er det mulig å gjøre noe med det.")
     beholder.lukk()
     return "\n".join(r)
+
+
+def _hexdump(rå: bytes, bredde: int = 32) -> list[str]:
+    ut = []
+    for i in range(0, len(rå), bredde):
+        bit = rå[i:i + bredde]
+        tegn = "".join(chr(b) if 32 <= b < 127 else "." for b in bit)
+        ut.append(f"    {i:4d}  {bit.hex(' '):<{bredde * 3}} {tegn}")
+    return ut
+
+
+def _skjemadelen(r: list[str], sti: Path, beholder, detaljer) -> None:
+    """Hva kalibreringa kom fram til, og hva det gir når det leses.
+
+    Dette er delen som avgjør om tabellen som ble funnet faktisk *er*
+    spillerne. Står det klubbnavn og rimelige alderstall her, er vi inne. Står
+    det tull, er det feil tabell – og da sier de rå bytene under hvorfor.
+    """
+    from .last import skjema_for            # her, for å unngå ringimport
+    from .profil import Profil
+
+    skjema = skjema_for(sti)
+    if not skjema.exists():
+        return
+    try:
+        profil = Profil.last(skjema)
+    except Exception as e:                  # noqa: BLE001
+        _linje(r, f"SKJEMA  kunne ikke leses: {e}")
+        _linje(r)
+        return
+
+    _linje(r, "SKJEMAET SOM BLE BRUKT")
+    _linje(r, f"  blokk {profil.blokk}, start {profil.start}, "
+              f"{tallformat(profil.antall)} records à {profil.stride} bytes")
+    _linje(r, f"  strengblokk {profil.strengblokk}")
+    for nokkel, d in sorted(profil.felt.items(), key=lambda kv: kv[1].get("offset", 0)):
+        ekstra = "".join(f" {k}={v}" for k, v in d.items()
+                         if k not in ("offset", "type"))
+        _linje(r, f"    {nokkel:<14} offset {d.get('offset'):>4}  {d.get('type')}{ekstra}")
+    navngitte = [n for n in profil.attributter if not n.startswith("attributt_")]
+    _linje(r, f"  attributter: {len(profil.attributter)} funnet, "
+              f"{len(navngitte)} med navn")
+    _linje(r)
+
+    _linje(r, "SLIK BLIR DE FØRSTE SPILLERNE LEST")
+    try:
+        rader = list(profil.les(beholder, grense=6))
+    except Exception as e:                  # noqa: BLE001
+        rader = []
+        _linje(r, f"  gikk ikke: {e}")
+    for rad in rader:
+        deler = [str(rad.get(n)) for n in
+                 ("navn", "alder", "klubb", "nasjonalitet", "posisjoner", "ca", "pa")]
+        _linje(r, "  " + " · ".join(d for d in deler if d and d != "None"))
+    if rader:
+        atts = [f"{n}={rader[0][n]}" for n in list(profil.attributter)[:10]
+                if isinstance(rader[0].get(n), int)]
+        _linje(r, "  attributter hos den første: " + ", ".join(atts))
+    _linje(r)
+
+    _linje(r, "DE FØRSTE RECORDENE, RÅ")
+    _linje(r, "  Står navnene og tallene på andre plasser enn skjemaet tror,")
+    _linje(r, "  er det her det synes.")
+    try:
+        data = beholder.data(profil.blokk)
+        for nr in range(2):
+            p = profil.start + nr * profil.stride
+            rå = bytes(data[p:p + min(profil.stride, 192)])
+            _linje(r, f"  record {nr} (offset {p}):")
+            r.extend(_hexdump(rå))
+    except Exception as e:                  # noqa: BLE001
+        _linje(r, f"  gikk ikke: {e}")
+    _linje(r)
 
 
 def _tolkning(rå_fil: bool, fant_tekst: bool, detaljer, noe_funnet: bool,

@@ -10,7 +10,7 @@
 
 name: Hent arbeidsboka
 
-# PAUSET – den faste henting er slått av. Jobben kjører nå bare når du
+# PAUSET – den faste hentingen er slått av. Jobben kjører nå bare når du
 # trykker «Run workflow» selv.
 #
 # Skru den på igjen: fjern kommentartegnene på de to schedule-linjene under.

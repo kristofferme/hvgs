@@ -94,6 +94,32 @@ cd "$KODE" || exit 1
 "$PY" fmscout.py "$KOMMANDO" "$FIL" >>"$LOGG" 2>&1
 kode=$?
 
+# Sluttkode 3 betyr at saven er pakket med zstd og maskinen mangler noe som
+# kan pakke den ut. Det er én liten pakke, og vi kan hente den her og nå.
+if [ $kode -eq 3 ]; then
+  if sporr_ja_nei "FM Scout" "Denne saven er pakket med zstd, og maskinen mangler foreløpig noe som kan pakke den ut.
+
+Det er én liten pakke som skal hentes. Det tar noen sekunder, og krever nett." "Hent den"; then
+    "$PY" fmscout.py hent-zstd >>"$LOGG" 2>&1
+    if [ $? -eq 0 ]; then
+      "$PY" fmscout.py "$KOMMANDO" "$FIL" >>"$LOGG" 2>&1
+      kode=$?
+    else
+      siste=$(tail -n 5 "$LOGG" | tr -d '"')
+      varsle "FM Scout" "Fikk ikke hentet den.
+
+$siste
+
+Har du Homebrew, virker dette også, i Terminal: brew install zstd"
+      rm -f "$MERKE"
+      exit 3
+    fi
+  else
+    rm -f "$MERKE"
+    exit 0
+  fi
+fi
+
 if [ "$KOMMANDO" = "sjekk" ] && [ $kode -eq 0 ]; then
   varsle "FM Scout" "Rapporten er skrevet:
 

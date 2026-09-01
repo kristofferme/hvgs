@@ -28,6 +28,7 @@ from fmscoutlib.felles import (arbeidsmappe, feil, si, storrelse,      # noqa: E
                                tallformat)
 from fmscoutlib.kalibrer import Anker, kalibrer                        # noqa: E402
 from fmscoutlib.last import Okt, last, skjema_for, skjemamappe              # noqa: E402
+from fmscoutlib.pakking import IngenZstd, installer_zstandard, tilgjengelig  # noqa: E402
 from fmscoutlib.profil import Profil                                   # noqa: E402
 from fmscoutlib.rapport import skriv_rapport                           # noqa: E402
 from fmscoutlib.spillere import FELT, FELT_FOR, STANDARDKOLONNER       # noqa: E402
@@ -195,6 +196,21 @@ def kommando_kalibrer(args) -> int:
     return 0
 
 
+def kommando_hent_zstd(args) -> int:
+    """FM26 pakker saven med zstd, og det følger ikke med Python ennå."""
+    if tilgjengelig():
+        si(f"Zstd er allerede på plass ({tilgjengelig()}).")
+        return 0
+    si("Saven din er pakket med zstd, og maskinen mangler noe som kan pakke")
+    si("den ut. Det er én pakke som skal hentes, og den er liten.")
+    si("")
+    if installer_zstandard(si):
+        return 0
+    si("")
+    si("Gikk ikke. Har du Homebrew, virker dette også:  brew install zstd")
+    return 1
+
+
 def kommando_skjemaer(args) -> int:
     mappe = skjemamappe()
     filer = sorted(mappe.glob("*.json"))
@@ -266,6 +282,8 @@ def lag_parser() -> argparse.ArgumentParser:
 
     under.add_parser("skjemaer", help="list skjemaene du har").set_defaults(
         funksjon=kommando_skjemaer)
+    under.add_parser("hent-zstd", help="hent det som trengs for å lese FM26-saver"
+                     ).set_defaults(funksjon=kommando_hent_zstd)
     return p
 
 
@@ -279,6 +297,11 @@ def main(argv=None) -> int:
     except KeyboardInterrupt:
         si("")
         return 130
+    except IngenZstd as e:
+        # Egen sluttkode, så starteren kan tilby å hente det som mangler.
+        feil(f"Feil: {e}")
+        feil("Kjør «python3 fmscout.py hent-zstd», så ordner det seg.")
+        return 3
     except (FileNotFoundError, RuntimeError, ValueError) as e:
         feil(f"Feil: {e}")
         return 1

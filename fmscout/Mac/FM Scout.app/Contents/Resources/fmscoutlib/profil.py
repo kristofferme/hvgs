@@ -9,6 +9,7 @@ ikke koden.
 from __future__ import annotations
 
 import json
+import re
 import struct
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -31,30 +32,47 @@ class Strengpool:
 
     Både offsetet og rekkefølgen er nyttig: noen felt peker rett på et offset,
     andre lagrer nummeret til strengen i en liste.
+
+    En save på et par hundre megabyte har millioner av strenger, og å gå
+    gjennom den byte for byte i Python tar minutter. Derfor plukkes kandidatene
+    først ut med et regexuttrykk – det går i C – og bare de blir sett nærmere
+    på. Et lengdeprefiks på fire bytes for en kort streng er lett å kjenne
+    igjen: ett lite tall og tre nuller.
     """
 
     def __init__(self, data, prefiks: int = 4, maks: int = 96):
         self.strenger: list[str] = []
         self.offsets: list[int] = []
         self._ved_offset: dict[int, str] = {}
+        rå_data = bytes(data) if not isinstance(data, bytes) else data
+        n = len(rå_data)
+        if prefiks == 4:
+            kandidater = re.compile(
+                rb"[\x01-%c]\x00\x00\x00" % maks).finditer(rå_data)
+            starter = (m.start() for m in kandidater)
+        else:
+            starter = range(0, max(0, n - prefiks))
         format_ = {1: "B", 2: "<H", 4: "<I"}[prefiks]
-        i, n = 0, len(data)
-        while i + prefiks < n:
-            (lengde,) = struct.unpack_from(format_, data, i)
-            if 1 <= lengde <= maks and i + prefiks + lengde <= n:
-                rå = bytes(data[i + prefiks:i + prefiks + lengde])
-                if b"\x00" not in rå:
-                    try:
-                        tekst = rå.decode("utf-8")
-                    except UnicodeDecodeError:
-                        tekst = None
-                    if tekst and tekst.strip():
-                        self._ved_offset[i] = tekst
-                        self.offsets.append(i)
-                        self.strenger.append(tekst)
-                        i += prefiks + lengde
-                        continue
-            i += 1
+        neste_tillatt = 0
+        for i in starter:
+            if i < neste_tillatt or i + prefiks >= n:
+                continue
+            (lengde,) = struct.unpack_from(format_, rå_data, i)
+            if not (1 <= lengde <= maks) or i + prefiks + lengde > n:
+                continue
+            rå = rå_data[i + prefiks:i + prefiks + lengde]
+            if b"\x00" in rå:
+                continue
+            try:
+                tekst = rå.decode("utf-8")
+            except UnicodeDecodeError:
+                continue
+            if not tekst.strip():
+                continue
+            self._ved_offset[i] = tekst
+            self.offsets.append(i)
+            self.strenger.append(tekst)
+            neste_tillatt = i + prefiks + lengde
 
     def __len__(self) -> int:
         return len(self.strenger)

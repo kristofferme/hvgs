@@ -111,9 +111,10 @@ def _tabell_fra_striper(blokk: int, striper: list[tuple[int, int]],
     første = offsets[beste_start]
     lengder = Counter(l for o, l in striper[beste_start:beste_start + beste_lengde])
     stripelengde = lengder.most_common(1)[0][0]
-    # Recorden begynner et sted før stripa; vi vet ikke hvor mye før, så vi
-    # legger starten på nærmeste hele stride bakover fra første stripe.
-    stripeoffset = første % stride
+    # Recorden begynner et sted før stripa. Nøyaktig hvor, sier ikke fila noe
+    # om – men rammen vi legger på må i det minste ha plass til hele stripa,
+    # ellers leser vi ut over kanten av recorden.
+    stripeoffset = min(første % stride, max(0, stride - stripelengde))
     start = første - stripeoffset
     return Tabell(blokk, start, stride, beste_lengde, stripeoffset, stripelengde,
                   omrade, offsets[beste_start:beste_start + beste_lengde])

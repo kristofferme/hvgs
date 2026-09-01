@@ -31,6 +31,7 @@ from fmscoutlib.demo import (DEMOATTRIBUTTER, lag_demosave,         # noqa: E402
 from fmscoutlib.felles import flat, les_penger, les_tall            # noqa: E402
 from fmscoutlib.kalibrer import Anker, kalibrer                     # noqa: E402
 from fmscoutlib.leseksport import les_eksport                       # noqa: E402
+from fmscoutlib import pakking                                      # noqa: E402
 from fmscoutlib.profil import Profil, Strengpool                    # noqa: E402
 from fmscoutlib.spillere import fullfor, les_posisjoner             # noqa: E402
 from fmscoutlib.tabeller import finn_evnekandidater, finn_tabeller  # noqa: E402
@@ -149,6 +150,94 @@ class Save(unittest.TestCase):
         igjen = Profil.last(sti)
         self.assertEqual(igjen.stride, 160)
         self.assertEqual(igjen.attributter, self.profil["attributter"])
+
+
+@unittest.skipIf(pakking.tilgjengelig() is None, "ingen zstd på denne maskinen")
+class Zstdsave(unittest.TestCase):
+    """FM26 pakker med zstd, i tusenvis av små rammer.
+
+    Det som skiller denne fra zlib-saven er at rammene til sammen er én lang
+    strøm. Settes de ikke sammen igjen, blir spillertabellen klippet i biter på
+    hver rammegrense – og da finnes den ikke.
+    """
+
+    ANTALL = 3000
+
+    @classmethod
+    def setUpClass(cls):
+        cls.mappe = Path(tempfile.mkdtemp(prefix="fmscout-zstd-"))
+        cls.sti, cls.profil = lag_demosave(cls.mappe / "fm26.fm",
+                                           antall=cls.ANTALL, metode="zstd")
+        cls.fasit = lag_demospillere(cls.ANTALL)
+        cls.beholder = Beholder.apne(cls.sti, tving=True, melding=lambda *_: None)
+
+    def test_fila_ser_ut_som_en_fm26save(self):
+        hode = self.sti.open("rb").read(6)
+        self.assertEqual(hode[2:6], b"fmf.")
+
+    def test_rammene_settes_sammen_til_en_blokk(self):
+        self.assertEqual(len(self.beholder), 1)
+        blokk = self.beholder.blokker[0]
+        self.assertEqual(blokk.metode, "zstd")
+        self.assertGreater(blokk.rammer, 10, "fila skal bestå av mange rammer")
+        self.assertGreater(blokk.storrelse, self.ANTALL * 160)
+
+    def test_skjemaet_leser_alle_spillerne(self):
+        rader = list(Profil.fra_dict(self.profil).les(self.beholder))
+        self.assertEqual(len(rader), self.ANTALL)
+        for lest, fasit in zip(rader, self.fasit):
+            self.assertEqual(lest["navn"], fasit["navn"])
+            self.assertEqual(lest["ca"], fasit["ca"])
+            self.assertEqual(lest["passing"], fasit["passing"])
+
+    def test_kalibrering_finner_spillerne(self):
+        ankere = [
+            Anker(p["navn"], {k: p[k] for k in DEMOATTRIBUTTER[:12]}, p["alder"],
+                  p["klubb"], p["nasjonalitet"], p["posisjoner"])
+            for p in (self.fasit[i] for i in (7, 1230, self.ANTALL - 1))
+        ]
+        profil, rapport = kalibrer(self.beholder, ankere, melding=lambda *_: None)
+        rader = list(profil.les(self.beholder))
+        self.assertEqual(len(rader), self.ANTALL)
+        # Alt som får navn skal være riktig – heller unavngitt enn feil.
+        navngitte = [n for n in profil.attributter if not n.startswith("attributt_")]
+        self.assertGreaterEqual(len(navngitte), 8)
+        for nokkel in navngitte + ["navn", "klubb", "nasjonalitet", "alder", "ca"]:
+            like = sum(1 for lest, fasit in zip(rader, self.fasit)
+                       if lest.get(nokkel) == fasit.get(nokkel))
+            self.assertEqual(like, self.ANTALL, f"{nokkel} stemmer bare for {like}")
+
+    def test_anker_i_halen_forveksles_ikke_med_navnebror(self):
+        """Den siste spilleren har navnebrødre lenger framme i tabellen.
+
+        Attributtverdiene alene skiller dem ikke – tolv tall mellom 1 og 20
+        treffer like godt hos en tilfeldig navnebror. Klubben gjør det.
+        """
+        siste = self.fasit[self.ANTALL - 1]
+        ankere = [
+            Anker(p["navn"], {k: p[k] for k in DEMOATTRIBUTTER[:12]}, p["alder"],
+                  p["klubb"], p["nasjonalitet"], p["posisjoner"])
+            for p in (self.fasit[7], self.fasit[1230], siste)
+        ]
+        profil, rapport = kalibrer(self.beholder, ankere, melding=lambda *_: None)
+        self.assertEqual(len(rapport["ankere_funnet"]), 3)
+        rader = list(profil.les(self.beholder))
+        self.assertEqual(rader[self.ANTALL - 1]["navn"], siste["navn"])
+        self.assertEqual(rader[self.ANTALL - 1]["klubb"], siste["klubb"])
+
+
+class Pakkemetoder(unittest.TestCase):
+    def test_zstd_finnes_eller_sies_klart_ifra(self):
+        navn = pakking.tilgjengelig()
+        self.assertTrue(navn is None or isinstance(navn, str))
+
+    @unittest.skipIf(pakking.tilgjengelig() is None, "ingen zstd på denne maskinen")
+    def test_ramme_gir_eksakt_lengde(self):
+        motor = pakking.motor()
+        pakket = motor.komprimer(b"fmscout " * 500)
+        ramme = pakking.pakk_ut_ramme(pakket + b"etterslep", 0)
+        self.assertEqual(ramme.data, b"fmscout " * 500)
+        self.assertEqual(ramme.brukt, len(pakket))
 
 
 class Strenger(unittest.TestCase):

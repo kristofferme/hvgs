@@ -100,10 +100,12 @@ def _navnepoeng(verdier: list[str]) -> float:
     return (treff / len(verdier)) * (0.5 + 0.5 * unike)
 
 
-def finn_navnefelt(records, pool: Strengpool, stride: int) -> dict | None:
+def finn_navnefelt(records, pool: Strengpool, stride: int, hopp=()) -> dict | None:
     """Byten i recorden som peker på spillernavnet – som offset eller nummer."""
     beste = None
     for off in range(0, stride - 1):
+        if off in hopp:
+            continue
         for type_, bredde in (("peker", 4), ("indeks32", 4), ("indeks16", 2)):
             if off + bredde > stride:
                 continue
@@ -292,7 +294,9 @@ def navngi_attributter(records, tabell: Tabell, ankere: list[Anker],
         if not onsket:
             continue
         mulige = {a0 + i for i in range(lengde)
-                  if all(records[rec_nr][a0 + i] == verdi for rec_nr, verdi in onsket)}
+                  if all(a0 + i < len(records[rec_nr])
+                         and records[rec_nr][a0 + i] == verdi
+                         for rec_nr, verdi in onsket)}
         if not mulige:
             tvil.append(f"{nokkel}: ingen plass passer med verdiene du oppga")
             continue
@@ -319,15 +323,46 @@ def navngi_attributter(records, tabell: Tabell, ankere: list[Anker],
     return kart, tvil
 
 
-def _ankerpoeng(rec: bytes, tabell: Tabell, anker: "Anker") -> int:
-    """Hvor mange av ankerets oppgitte verdier som finnes i attributtstripa."""
+def _naabare_tekster(rec: bytes, pool: Strengpool, stride: int) -> set[str]:
+    """Alle strenger recorden kan peke på, uansett hvordan vi leser tallene."""
+    ut: set[str] = set()
+    for off in range(stride - 1):
+        for type_, bredde in (("indeks16", 2), ("indeks32", 4), ("peker", 4)):
+            if off + bredde > len(rec):
+                continue
+            rå = _u(rec, off, bredde)
+            if rå is None:
+                continue
+            tekst = pool.ved_offset(rå) if type_ == "peker" else pool.ved_indeks(rå)
+            if tekst:
+                ut.add(flat(tekst))
+    return ut
+
+
+def _ankerpoeng(rec: bytes, tabell: Tabell, anker: "Anker",
+                pool: Strengpool | None = None) -> int:
+    """Hvor godt en record passer med det du oppga om spilleren.
+
+    Attributtverdiene alene holder ikke. De teller uten hensyn til plassering,
+    og med tolv tall mellom 1 og 20 spredt over en stripe på seksti bytes
+    treffer en tilfeldig navnebror like mange. Klubb og nasjonalitet er derimot
+    vanskelige å treffe ved uhell, så de veier tungt når de er oppgitt.
+    """
     stripe = Counter(rec[tabell.stripeoffset:tabell.stripeoffset + tabell.stripelengde])
     poeng = 0
-    for verdi in Counter(anker.attributter.values()).items():
-        ønsket, antall = verdi
+    for ønsket, antall in Counter(anker.attributter.values()).items():
         poeng += min(antall, stripe.get(ønsket, 0))
-    if anker.alder:
-        poeng += 2 if anker.alder in set(rec) else 0
+    if anker.alder and anker.alder in set(rec):
+        poeng += 2
+    if pool is not None:
+        nåbare = _naabare_tekster(rec, pool, tabell.stride)
+        for verdi in (anker.klubb, anker.nasjonalitet):
+            if verdi and flat(verdi) in nåbare:
+                poeng += 8
+        if anker.posisjoner:
+            ønsket = posisjonsnokkel(anker.posisjoner)
+            if ønsket and any(posisjonsnokkel(t) == ønsket for t in nåbare):
+                poeng += 4
     return poeng
 
 
@@ -337,7 +372,7 @@ def _finn_ankere(tabell, data, pool, definisjon, ankere, prover, rapport, meldin
     ankerrader: dict[str, int] = {}
     bredde = 2 if definisjon["type"] == "indeks16" else 4
     ønsket = {flat(a.navn): a for a in ankere}
-    treff: dict[str, list[bytes]] = {}
+    treff: dict[str, tuple[list[bytes], list[int]]] = {}
     for nr in range(tabell.antall):
         rec = bytes(tabell.record(data, nr))
         if len(rec) < tabell.stride:
@@ -346,12 +381,36 @@ def _finn_ankere(tabell, data, pool, definisjon, ankere, prover, rapport, meldin
         tekst = (pool.ved_offset(rå) if definisjon["type"] == "peker"
                  else pool.ved_indeks(rå))
         if tekst and flat(tekst) in ønsket:
-            treff.setdefault(flat(tekst), []).append(rec)
+            records, plasser = treff.setdefault(flat(tekst), ([], []))
+            records.append(rec)
+            plasser.append(nr)
     # FM har navnebrødre. Når flere records har samme navn, velger vi den der
     # attributtverdiene du oppga faktisk finnes i stripa.
-    for nokkel, records in treff.items():
+    for nokkel, (records, plasser) in treff.items():
         anker = ønsket[nokkel]
-        beste = max(records, key=lambda rec: _ankerpoeng(rec, tabell, anker))
+        # FM har navnebrødre, så flere records kan ha samme navn. Vi tar den
+        # der attributtverdiene du oppga faktisk står i stripa.
+        poengene = [_ankerpoeng(rec, tabell, anker, pool) for rec in records]
+        beste_poeng = max(poengene)
+        beste = records[poengene.index(beste_poeng)]
+        poeng = beste_poeng
+        if poengene.count(beste_poeng) > 1:
+            rapport["merknader"].append(
+                f"«{anker.navn}» finnes flere ganger i saven, og de er like "
+                "sannsynlige ut fra det du oppga. Legg inn klubb og "
+                "nasjonalitet på ankeret, så blir det riktig spiller."
+            )
+        krav = max(2, int(0.6 * len(anker.attributter)))
+        if anker.attributter and poeng < krav:
+            # Navnet finnes, men tallene står ikke der de skulle. Å bruke
+            # ankeret likevel ville gitt attributtene feil navn, og det er
+            # verre enn å la dem stå unavngitt.
+            rapport["merknader"].append(
+                f"«{anker.navn}» ble funnet i saven, men attributtverdiene du "
+                "oppga står ikke i den recorden. Sjekk at tallene er skrevet av "
+                "riktig, og at det er samme spiller."
+            )
+            continue
         if len(records) > 1:
             rapport["merknader"].append(
                 f"«{anker.navn}» finnes {len(records)} ganger i saven – valgte den "
@@ -407,7 +466,7 @@ def kalibrer(beholder, ankere: list[Anker] | None = None, *, melding=si) -> tupl
     ankerrader: dict[str, int] = {}
     if pool and len(pool) > 10:
         melding("Leter etter navnefeltet …")
-        navnefelt = finn_navnefelt(prover, pool, tabell.stride)
+        navnefelt = finn_navnefelt(prover, pool, tabell.stride, brukt)
         if navnefelt:
             profil.felt["navn"] = {"offset": navnefelt["offset"], "type": navnefelt["type"]}
             brukt.update(range(navnefelt["offset"],

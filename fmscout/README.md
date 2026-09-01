@@ -75,15 +75,26 @@ Velg `.fm`-fila i stedet. På FM26 ligger den under
 `~/Library/Application Support/Sports Interactive/Football Manager 26/games/`.
 
 Første gang tar det litt tid: fila pakkes ut og legges i et mellomlager under
-`~/Library/Caches/fmscout/`, så går det fort etterpå.
+`~/Library/Caches/fmscout/`, så går det fort etterpå. En save på drøyt 100 MB
+blir til noen hundre megabyte utpakket, så det tar litt plass.
+
+**FM26 trenger zstd.** Det følger ikke med Python ennå, og ikke med macOS
+heller. Verktøyet leter etter det på fire–fem måter, og finner det ingen av
+dem, spør appen om den skal hente det – ett klikk, noen sekunder, og du
+slipper terminalen. Fra terminalen: `python3 fmscout.py hent-zstd`. Har du
+Homebrew, virker `brew install zstd` like godt.
 
 **Vær klar over hva dette er.** Sports Interactive dokumenterer ikke formatet
 på lagringsfilene sine, og de endrer det mellom versjoner. Verktøyet har
 derfor ingen ferdige tall for FM26 liggende i koden – det *leter* dem opp i
 akkurat den fila du gir det:
 
-* En save er mange deflate-komprimerte blokker etter hverandre. Vi går gjennom
-  fila og pakker ut alt vi finner, uten å bry oss om hvordan indeksen ser ut.
+* En save er mange komprimerte biter etter hverandre. Vi går gjennom fila og
+  pakker ut alt vi finner, uten å bry oss om hvordan indeksen ser ut. FM26
+  bruker **zstd** og deler saven i tusenvis av små rammer på noen titalls
+  kilobyte – altså én lang strøm som er hakket opp, ikke selvstendige deler,
+  så de settes sammen igjen. Eldre FM-versjoner brukte zlib, og det leses
+  fortsatt.
 * Attributtene til en spiller ligger etter hverandre, og alle er tall mellom 1
   og 20. En stripe på 16 eller flere slike bytes på rad skjer nesten aldri
   ellers – men den skjer én gang per spiller. Stripene gir tabellen, og
@@ -237,7 +248,17 @@ save kan ta noen minutter. Etterpå ligger den i mellomlageret. Skal du rydde:
 python3 -m unittest discover -s tester
 ```
 
-32 tester som dekker utpakking, tabellsøk, kalibrering, import av
-FM-eksporter, filtrering, CSV og tjeneren. To av dem holder kalibreringa i
-ørene: at tre ankere med tolv tall gir navn på alt, og at to ankere heller lar
-det tvetydige stå åpent enn å sette et navn som kan være feil.
+39 tester som dekker utpakking (både zlib og zstd), tabellsøk, kalibrering,
+import av FM-eksporter, filtrering, CSV og tjeneren.
+
+Noen av dem holder kalibreringa i ørene, for det er der det er lettest å ta
+feil uten å merke det:
+
+* Tre ankere med tolv tall skal gi navn på alt.
+* To ankere skal heller la det tvetydige stå åpent enn å sette et navn som
+  kan være feil.
+* Et anker sist i tabellen skal ikke forveksles med en navnebror lenger
+  framme. Attributtverdiene alene skiller dem ikke – tolv tall mellom 1 og 20
+  treffer like godt hos en tilfeldig navnebror – så klubben må gjøre jobben.
+* Zstd-rammene skal settes sammen igjen. Gjør de ikke det, blir
+  spillertabellen klippet i biter på hver rammegrense.

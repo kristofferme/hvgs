@@ -12,6 +12,7 @@ import struct
 import zlib
 from pathlib import Path
 
+from . import pakking
 from .spillere import ATTRIBUTTNOKLER, KEEPER, fullfor
 
 FORNAVN = [
@@ -110,11 +111,16 @@ ATTRIBUTTSTART = 48
 DEMOATTRIBUTTER = ATTRIBUTTNOKLER[:56]
 
 
-def lag_demosave(sti, antall: int = 900, fro: int = 26) -> tuple[Path, dict]:
+def lag_demosave(sti, antall: int = 900, fro: int = 26,
+                 metode: str = "zlib") -> tuple[Path, dict]:
     """Skriver en fil med samme form som en FM-save: header + zlib-blokker.
 
     Returnerer stien og skjemaet fila er skrevet med – testene bruker skjemaet
     som fasit, og «demo»-kommandoen lagrer det ved siden av fila.
+
+    Med metode «zstd» lages en fil som ligner på FM26 sine: en kort header og
+    så tusenvis av små zstd-rammer som til sammen utgjør én lang strøm. Da
+    krysser spillertabellen rammegrensene, akkurat som i en ekte save.
     """
     sti = Path(sti)
     rader = lag_demospillere(antall, fro)
@@ -169,6 +175,9 @@ def lag_demosave(sti, antall: int = 900, fro: int = 26) -> tuple[Path, dict]:
             rec[ATTRIBUTTSTART + i] = max(1, min(20, int(rad.get(nokkel) or 1)))
         tabell.extend(rec)
 
+    if metode == "zstd":
+        return _skriv_zstd(sti, pool, tabell, rader, basis, r)
+
     hode = bytearray(b"FMDEMO\x00\x00")
     hode.extend(struct.pack("<II", len(rader), STRIDE))
     hode.extend(r.randbytes(48))
@@ -194,6 +203,53 @@ def lag_demosave(sti, antall: int = 900, fro: int = 26) -> tuple[Path, dict]:
         "stride": STRIDE,
         "antall": len(rader),
         "merknad": "Skjema for den oppdiktede demofila.",
+        "felt": {
+            "id": {"offset": 0, "type": "u32"},
+            "navn": {"offset": 4, "type": "peker"},
+            "ca": {"offset": 8, "type": "u8"},
+            "pa": {"offset": 9, "type": "u8"},
+            "alder": {"offset": 10, "type": "u8"},
+            "rykte": {"offset": 11, "type": "u8"},
+            "hoyde": {"offset": 12, "type": "u8", "pluss": 120},
+            "vekt": {"offset": 13, "type": "u8", "pluss": 40},
+            "klubb": {"offset": 14, "type": "indeks16", "startindeks": basis["klubber"]},
+            "posisjoner": {"offset": 16, "type": "indeks16", "startindeks": basis["posisjoner"]},
+            "nasjonalitet": {"offset": 18, "type": "indeks16", "startindeks": basis["nasjoner"]},
+        },
+        "attributter": {n: ATTRIBUTTSTART + i for i, n in enumerate(DEMOATTRIBUTTER)},
+    }
+    return sti, profil
+
+
+RAMME = 32 << 10           # så store biter FM26 ser ut til å hakke strømmen i
+
+
+def _skriv_zstd(sti: Path, pool: bytearray, tabell: bytearray, rader: list[dict],
+                basis: dict, r: random.Random) -> tuple[Path, dict]:
+    """Skriver en fil på FM26-form: kort header, så mange små zstd-rammer."""
+    motor = pakking.motor()
+    if motor is None:
+        raise pakking.IngenZstd("kan ikke lage en zstd-demofil uten en zstd-motor")
+
+    strom = bytes(pool) + bytes(tabell) + bytes(r.randbytes(4096))
+    hode = bytearray(b"\x02\x01fmf.")
+    hode.extend(struct.pack("<I", len(strom)))
+    hode.extend(bytes(18))
+
+    with sti.open("wb") as f:
+        f.write(bytes(hode))
+        for i in range(0, len(strom), RAMME):
+            f.write(motor.komprimer(strom[i:i + RAMME]))
+
+    profil = {
+        "navn": "demo-zstd",
+        "kilde": "demofil",
+        "blokk": 0,
+        "strengblokk": 0,
+        "start": len(pool),
+        "stride": STRIDE,
+        "antall": len(rader),
+        "merknad": "Skjema for den oppdiktede demofila i FM26-form.",
         "felt": {
             "id": {"offset": 0, "type": "u32"},
             "navn": {"offset": 4, "type": "peker"},

@@ -1,0 +1,237 @@
+/* ------------------------------------------------------------------
+   Fiske og fangst Vg2 – grunnmur
+   Identiteten er hentet fra sjøkartet: dypvannshvitt, grunne blåtoner,
+   landgult, kartmagenta for all navigasjonsinformasjon og overlevings-
+   oransje for sikkerhet. Natt-temaet følger broas nattpalett: mørkt,
+   dempet og uten skarpe hvitflater som ødelegger nattsynet.
+   ------------------------------------------------------------------ */
+
+:root {
+  color-scheme: light;
+
+  /* Flater */
+  --papir: #f5f8f9;          /* dypt vann – kartets hvite */
+  --flate: #ffffff;
+  --flate-2: #eef3f5;
+  --grunt: #d9eaf3;          /* grunt vann, 0–10 m */
+  --grunt-2: #b9d7e8;        /* grunnere */
+  --land: #ecdcab;           /* land på sjøkartet */
+  --land-2: #d8c285;
+
+  /* Blekk */
+  --blekk: #0f1c27;
+  --blekk-2: #3b4c5a;
+  --blekk-3: #5a6a77;
+  --linje: #c8d5dd;
+  --linje-2: #a7b8c3;
+
+  /* Signal */
+  --magenta: #a0106c;        /* kartmagenta: fyr, merknader, kurslinje */
+  --magenta-flate: #f6e3ef;
+  --oransje: #f0561d;        /* overlevingsdrakt, redningsutstyr */
+  --oransje-tekst: #b33b0b;
+  --oransje-flate: #fde8de;
+  --babord: #c8102e;
+  --babord-flate: #fbe4e7;
+  --styrbord: #0b7a4b;
+  --styrbord-flate: #dff2e8;
+  --gul: #f4c20d;            /* kardinalmerker, faresymbol */
+  --paabud: #1f5fa8;         /* ISO 7010 påbudsskilt */
+
+  /* Illustrasjon */
+  --skrog: #22405e;
+  --bunnstoff: #a83a2e;
+  --overbygg: #ffffff;
+  --dekk: #9aa9b3;
+  --tau: #c9a25b;
+  --garn: #3d6f5a;
+  --fisk: #8c9aa3;
+  --fisk-lys: #dfe5e8;
+  --sjo: #cfe4f0;
+  --sjo-dyp: #9cc3db;
+  --bunn: #c9b98d;
+  --natt: #0c1620;
+
+  /* Typografi */
+  --f-display: "Barlow Condensed", "Roboto Condensed", "Arial Narrow", sans-serif-condensed, sans-serif;
+  --f-tekst: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --f-sjablong: "Big Shoulders Stencil Display", "Barlow Condensed", Impact, sans-serif;
+
+  --t-xs: 0.75rem;
+  --t-s: 0.875rem;
+  --t-b: 1.0625rem;
+  --t-m: 1.25rem;
+  --t-l: 1.625rem;
+  --t-xl: clamp(1.9rem, 3.4vw, 2.5rem);
+  --t-xxl: clamp(2.6rem, 6.2vw, 4.9rem);
+
+  /* Mellomrom */
+  --m1: 4px; --m2: 8px; --m3: 12px; --m4: 16px; --m5: 24px; --m6: 32px; --m7: 48px; --m8: 72px; --m9: 112px;
+
+  --maal: 68ch;
+  --side: 1240px;
+  --r: 3px;
+  --skygge: 0 1px 0 rgba(15, 28, 39, .06), 0 6px 18px -8px rgba(15, 28, 39, .18);
+  --fart: 160ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --papir: #091017;
+    --flate: #0f1922;
+    --flate-2: #14212c;
+    --grunt: #132b3a;
+    --grunt-2: #1b3b50;
+    --land: #3a3423;
+    --land-2: #5a4f30;
+    --blekk: #dfe8ee;
+    --blekk-2: #a6b6c2;
+    --blekk-3: #7d8e9a;
+    --linje: #22323f;
+    --linje-2: #2f4352;
+    --magenta: #ef7ac0;
+    --magenta-flate: #3a1730;
+    --oransje: #ff7a44;
+    --oransje-tekst: #ff9a6e;
+    --oransje-flate: #3a1d10;
+    --babord: #ff6b7d;
+    --babord-flate: #3b1419;
+    --styrbord: #4fd39a;
+    --styrbord-flate: #10301f;
+    --gul: #e9bd2a;
+    --paabud: #5b9be6;
+    --skrog: #5c7d9d;
+    --bunnstoff: #b35a4f;
+    --overbygg: #c7d3db;
+    --dekk: #52636f;
+    --tau: #a88a50;
+    --garn: #5e9a80;
+    --fisk: #7d8f9b;
+    --fisk-lys: #3b4a55;
+    --sjo: #10283a;
+    --sjo-dyp: #0b1d2b;
+    --bunn: #4b4430;
+    --natt: #03070b;
+    --skygge: 0 1px 0 rgba(0, 0, 0, .4), 0 8px 24px -10px rgba(0, 0, 0, .6);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --papir: #091017;
+  --flate: #0f1922;
+  --flate-2: #14212c;
+  --grunt: #132b3a;
+  --grunt-2: #1b3b50;
+  --land: #3a3423;
+  --land-2: #5a4f30;
+  --blekk: #dfe8ee;
+  --blekk-2: #a6b6c2;
+  --blekk-3: #7d8e9a;
+  --linje: #22323f;
+  --linje-2: #2f4352;
+  --magenta: #ef7ac0;
+  --magenta-flate: #3a1730;
+  --oransje: #ff7a44;
+  --oransje-tekst: #ff9a6e;
+  --oransje-flate: #3a1d10;
+  --babord: #ff6b7d;
+  --babord-flate: #3b1419;
+  --styrbord: #4fd39a;
+  --styrbord-flate: #10301f;
+  --gul: #e9bd2a;
+  --paabud: #5b9be6;
+  --skrog: #5c7d9d;
+  --bunnstoff: #b35a4f;
+  --overbygg: #c7d3db;
+  --dekk: #52636f;
+  --tau: #a88a50;
+  --garn: #5e9a80;
+  --fisk: #7d8f9b;
+  --fisk-lys: #3b4a55;
+  --sjo: #10283a;
+  --sjo-dyp: #0b1d2b;
+  --bunn: #4b4430;
+  --natt: #03070b;
+  --skygge: 0 1px 0 rgba(0, 0, 0, .4), 0 8px 24px -10px rgba(0, 0, 0, .6);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: 88px;
+}
+
+body {
+  margin: 0;
+  background: var(--papir);
+  color: var(--blekk);
+  font-family: var(--f-tekst);
+  font-size: var(--t-b);
+  line-height: 1.6;
+  font-feature-settings: "kern";
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+img, svg { max-width: 100%; }
+svg { display: block; }
+[hidden] { display: none !important; }
+
+h1, h2, h3, h4 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p { margin: 0; }
+p + p { margin-top: 0.85em; }
+
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { color: var(--magenta); }
+
+button { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--magenta);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+::selection { background: var(--magenta); color: #fff; }
+
+.mono { font-family: var(--f-mono); font-feature-settings: "tnum"; letter-spacing: 0; }
+.tall { font-variant-numeric: tabular-nums; }
+
+.etikett {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: var(--t-s);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  line-height: 1.2;
+}
+
+.skjult-visuelt {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

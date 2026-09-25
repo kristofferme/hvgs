@@ -1,0 +1,27 @@
+EGNE BILDER I LÆREMIDDELET
+==========================
+
+Legg bilder fra deres egne turer i denne mappa. De blir en del av
+læremiddelet neste gang du kjører:
+
+    python3 bygg.py
+
+Filnavnet bestemmer hvor bildet vises. Start navnet med modulkoden,
+så kommer bildet i en egen seksjon «Fra våre turer» i den modulen.
+Resten av filnavnet blir bildeteksten.
+
+    fr-08-garnlenka-klar-til-setting.jpg   ->  FR·08 Redskaper
+    fk-04-bløgging-om-bord.jpg              ->  FK·04 Fangstbehandling
+    fr-03-kranen-på-skolebåten.jpg          ->  FR·03 Fartøyet
+    yf-01-utplassering-på-snurrevadbåt.jpg  ->  YFF·01 Praksis
+
+Modulkodene: fr-01 til fr-10, fk-01 til fk-07 og yf-01.
+
+Tips
+- Skaler bildene ned til omtrent 1600 piksler bredde før du legger dem
+  inn. Hele fila blir tyngre for hvert bilde.
+- JPG passer best for foto. PNG og WEBP virker også.
+- Ha samtykke fra dem som er med på bildet, og bruk ikke bilder av
+  elever uten at de har sagt ja.
+- Bilder fra NDLA og Wikimedia kan brukes etter lisensen (ofte CC BY-SA).
+  Skriv fotograf og lisens i filnavnet eller i undervisningen.

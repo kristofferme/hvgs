@@ -1,0 +1,9 @@
+# Netlify: Base directory = fiskeogfangst
+[build]
+  publish = "publisert"
+  command = "python3 bygg.py"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

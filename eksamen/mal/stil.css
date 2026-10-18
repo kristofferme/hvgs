@@ -1,0 +1,918 @@
+/* ── Fargar og mål ───────────────────────────────────
+   Same profil som vekeplanen: papir, blekk og skulen sin blåfarge. */
+:root{
+  --ark:#E7EBE8;
+  --kort:#FFFFFF;
+  --blekk:#16212A;
+  --blekk-svak:#5B6A72;
+  --linje:rgba(22,33,42,.16);
+  --linje-svak:rgba(22,33,42,.08);
+  --profil:#0093C9;
+  --naa:color-mix(in oklab,var(--profil) 72%,var(--blekk));
+  --frist:#A93A2C;
+  --ok:#1F6E5B;
+  --gul:#C98A12;
+  --felt:#FFFFFF;
+  --innhald:rgba(22,33,42,.05);
+  --skugge:var(--blekk);
+  --klatt:.20;
+  --r:4px;
+  --topp-h:64px;
+  --botn-h:64px;
+  --aksent:var(--naa);
+  --mjuk:cubic-bezier(.2,.75,.3,1);
+  --sprett:cubic-bezier(.3,1.5,.5,1);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ark:#121A1F;
+    --kort:#1A242B;
+    --blekk:#E8EDEA;
+    --blekk-svak:#93A2A8;
+    --linje:rgba(232,237,234,.22);
+    --linje-svak:rgba(232,237,234,.10);
+    --naa:color-mix(in oklab,var(--profil) 68%,white);
+    --frist:#E88374;
+    --ok:#5FC1A2;
+    --gul:#F0BE55;
+    --felt:#222E36;
+    --innhald:rgba(232,237,234,.06);
+    --skugge:rgba(0,0,0,.85);
+    --klatt:.26;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ark:#121A1F;
+  --kort:#1A242B;
+  --blekk:#E8EDEA;
+  --blekk-svak:#93A2A8;
+  --linje:rgba(232,237,234,.22);
+  --linje-svak:rgba(232,237,234,.10);
+  --naa:color-mix(in oklab,var(--profil) 68%,white);
+  --frist:#E88374;
+  --ok:#5FC1A2;
+  --gul:#F0BE55;
+  --felt:#222E36;
+  --innhald:rgba(232,237,234,.06);
+  --skugge:rgba(0,0,0,.85);
+  --klatt:.26;
+  color-scheme:dark;
+}
+
+/* Kapittelfargane er dei same som fagfargane i vekeplanen. I mørk modus
+   blir dei lysna, så dei held kontrasten. */
+[data-farge="blaa"]{--k:var(--naa)}
+[data-farge="marine"]{--k:#2F4B7C}
+[data-farge="gron"]{--k:#1F6E5B}
+[data-farge="rust"]{--k:#A6432C}
+[data-farge="oliven"]{--k:#4F7020}
+[data-farge="plomme"]{--k:#6B3A63}
+[data-farge="teal"]{--k:#1D6D82}
+[data-farge="brun"]{--k:#8A4B2A}
+[data-farge="baer"]{--k:#8C3A52}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) [data-farge]:not([data-farge="blaa"]){--k:var(--k-lys)}
+}
+:root[data-theme="dark"] [data-farge]:not([data-farge="blaa"]){--k:var(--k-lys)}
+[data-farge="marine"]{--k-lys:#93A9DA}
+[data-farge="gron"]{--k-lys:#6CC9A9}
+[data-farge="rust"]{--k-lys:#EE937A}
+[data-farge="oliven"]{--k-lys:#A8C977}
+[data-farge="plomme"]{--k-lys:#D59ACB}
+[data-farge="teal"]{--k-lys:#6CC3D8}
+[data-farge="brun"]{--k-lys:#E0A27E}
+[data-farge="baer"]{--k-lys:#E893AC}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;height:100%}
+body{
+  margin:0;height:100%;overflow:hidden;
+  background:var(--ark);color:var(--blekk);
+  font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  transition:background-color .4s,color .4s;
+}
+button{font:inherit;color:inherit}
+a{color:var(--naa);text-underline-offset:3px}
+:where(button,input,a,summary,[tabindex]):focus-visible{outline:2.5px solid var(--naa);outline-offset:3px;border-radius:3px}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.mono{font-family:"DM Mono",ui-monospace,monospace}
+
+/* ── Bakgrunn: tre mjuke klattar som flyttar seg mellom lysbileta ── */
+.bakgrunn{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.klatt{
+  position:absolute;width:52vmax;height:52vmax;border-radius:50%;
+  filter:blur(70px);opacity:var(--klatt);
+  transition:transform 1.4s var(--mjuk),background-color 1.2s;
+  will-change:transform;
+}
+.klatt.k1{left:-12vmax;top:-18vmax;background:var(--aksent);transform:translate(var(--x1,0),var(--y1,0))}
+.klatt.k2{right:-20vmax;bottom:-26vmax;background:var(--profil);transform:translate(var(--x2,0),var(--y2,0))}
+.klatt.k3{left:30vw;top:40vh;width:30vmax;height:30vmax;background:var(--gul);opacity:calc(var(--klatt) * .55);transform:translate(var(--x3,0),var(--y3,0))}
+.rutenett{
+  position:absolute;inset:0;
+  background-image:linear-gradient(var(--linje-svak) 1px,transparent 1px),linear-gradient(90deg,var(--linje-svak) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse at 50% 40%,#000 0%,transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 40%,#000 0%,transparent 75%);
+  opacity:.7;
+}
+
+/* ── Topplinja ─────────────────────────────────────── */
+.topplinje{
+  position:fixed;top:0;left:0;right:0;height:var(--topp-h);z-index:20;
+  display:flex;align-items:center;gap:16px;padding:0 clamp(16px,3vw,36px);
+}
+.skulemerke{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;color:inherit}
+.skulemerke .prikk{width:30px;height:30px;border-radius:50%;background:var(--profil);display:grid;place-items:center;color:#fff;flex:none;box-shadow:2px 2px 0 var(--skugge)}
+.skulemerke .prikk svg{width:16px;height:16px}
+.skulemerke b{font-family:"DM Mono",monospace;font-weight:500;font-size:12px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skulemerke span{font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--aksent);white-space:nowrap;transition:color .6s}
+.kapittelnamn{font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--blekk-svak);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kapittelnamn::before{content:"/";margin-right:12px;opacity:.5}
+.verktoy{display:flex;gap:8px;margin-left:auto}
+.ikonknapp{
+  width:40px;height:40px;display:grid;place-items:center;cursor:pointer;
+  background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);
+  box-shadow:2px 2px 0 var(--skugge);
+  transition:transform .16s var(--mjuk),box-shadow .16s,background .2s,color .2s;
+}
+.ikonknapp svg{width:18px;height:18px}
+.ikonknapp:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--skugge)}
+.ikonknapp:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--skugge)}
+.ikonknapp[aria-pressed="true"]{background:var(--blekk);color:var(--ark)}
+
+/* ── Botnlinja: framdrift ──────────────────────────── */
+.botnlinje{
+  position:fixed;left:0;right:0;bottom:0;height:var(--botn-h);z-index:20;
+  display:flex;align-items:center;gap:14px;padding:0 clamp(16px,3vw,36px);
+}
+.pilknapp{
+  height:42px;min-width:42px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+  font:600 14px/1 "Instrument Sans",sans-serif;
+  background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:3px 3px 0 var(--skugge);
+  transition:transform .16s var(--mjuk),box-shadow .16s,opacity .2s;
+}
+.pilknapp svg{width:18px;height:18px}
+.pilknapp:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--skugge)}
+.pilknapp:active:not(:disabled){transform:translate(2px,2px);box-shadow:0 0 0 var(--skugge)}
+.pilknapp:disabled{opacity:.3;cursor:default}
+.pilknapp.neste{background:var(--blekk);color:var(--ark)}
+.kapittelstolpe{flex:1;display:flex;gap:4px;height:22px;align-items:center;min-width:0}
+.kapittelstolpe button{
+  flex:var(--n,1);height:6px;border:0;padding:0;cursor:pointer;border-radius:99px;
+  background:var(--innhald);position:relative;overflow:hidden;
+  transition:height .2s var(--mjuk);
+}
+.kapittelstolpe button:hover{height:10px}
+.kapittelstolpe button i{position:absolute;inset:0 auto 0 0;width:var(--fylt,0%);background:var(--k,var(--naa));border-radius:99px;transition:width .5s var(--mjuk)}
+.kapittelstolpe button .tips{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%) translateY(4px);opacity:0;pointer-events:none;
+  font:500 11px/1 "DM Mono",monospace;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;
+  background:var(--blekk);color:var(--ark);padding:6px 8px;border-radius:3px;transition:opacity .15s,transform .15s;
+}
+.kapittelstolpe button:hover .tips,.kapittelstolpe button:focus-visible .tips{opacity:1;transform:translateX(-50%)}
+.kapittelstolpe button{overflow:visible}
+.teljar{font-family:"DM Mono",monospace;font-size:13px;color:var(--blekk-svak);white-space:nowrap;min-width:64px;text-align:center}
+.teljar b{color:var(--blekk);font-weight:500}
+
+/* ── Scena og lysbileta ────────────────────────────── */
+/* Scena er ein container: storleikar inni lysbileta følgjer scena (cqw/cqh),
+   så dei skalerer rett også når scena blir zooma på store skjermar. */
+.scene{position:fixed;top:var(--topp-h);bottom:var(--botn-h);left:0;right:0;z-index:5;container-type:size}
+.lysbilete{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+  padding:clamp(8px,2.5cqh,32px) clamp(16px,5cqw,72px) clamp(16px,3cqh,40px);
+  display:grid;align-content:safe center;justify-items:center;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateX(56px) scale(.985);
+  transition:opacity .45s var(--mjuk),transform .7s var(--mjuk),visibility 0s .7s;
+  scrollbar-width:thin;
+}
+.lysbilete.forbi{transform:translateX(-56px) scale(.985)}
+.lysbilete.aktiv{
+  opacity:1;visibility:visible;pointer-events:auto;transform:none;
+  transition:opacity .55s var(--mjuk) .08s,transform .8s var(--mjuk) .04s,visibility 0s;
+}
+.innhald{width:min(1240px,100%);position:relative}
+.smal{width:min(980px,100%)}
+
+/* Element som glir inn når lysbiletet blir aktivt */
+[data-inn]{
+  opacity:0;transform:translateY(22px);
+  transition:opacity .6s var(--mjuk),transform .75s var(--mjuk);
+  transition-delay:0s;
+}
+[data-inn="venstre"]{transform:translateX(-36px)}
+[data-inn="hogre"]{transform:translateX(36px)}
+[data-inn="skala"]{transform:scale(.86)}
+[data-inn="snu"]{transform:perspective(800px) rotateX(-40deg) translateY(16px);transform-origin:50% 0}
+.aktiv [data-inn]{opacity:1;transform:none;transition-delay:calc(var(--n,0) * 70ms + 160ms)}
+
+/* ── Typografi ─────────────────────────────────────── */
+.stikk{
+  display:inline-flex;align-items:center;gap:10px;margin:0 0 14px;
+  font-family:"DM Mono",monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--k,var(--naa));
+}
+.stikk::before{content:"";width:22px;height:2px;background:currentColor;border-radius:2px}
+.tittel{
+  font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:800;
+  font-size:clamp(34px,3.2cqw + 2.6cqh,78px);line-height:.98;letter-spacing:-.035em;margin:0 0 .35em;text-wrap:balance;
+}
+.tittel em{font-style:normal;color:var(--k,var(--naa))}
+.ingress{font-size:clamp(17px,.7cqw + 1.1cqh,23px);line-height:1.45;color:var(--blekk-svak);max-width:62ch;margin:0 0 clamp(16px,3cqh,34px);text-wrap:pretty}
+.ingress b{color:var(--blekk);font-weight:600}
+h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.1;margin:0 0 .4em;font-size:clamp(19px,1cqw + .8cqh,26px)}
+p{margin:0 0 .8em}
+.liten{font-size:14px;color:var(--blekk-svak)}
+.merk{
+  display:inline-block;font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 9px;border-radius:99px;border:1px solid currentColor;white-space:nowrap;vertical-align:middle;
+}
+.merk.raud{color:var(--frist)}
+.merk.gron{color:var(--ok)}
+.merk.blaa{color:var(--naa)}
+.merk.fylt{background:var(--blekk);color:var(--ark);border-color:var(--blekk)}
+.merk.sjekk{color:var(--gul)}
+
+/* ── Kort og knappar ───────────────────────────────── */
+.kort{
+  background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);
+  box-shadow:5px 5px 0 var(--skugge);padding:clamp(16px,2cqw,26px);position:relative;
+}
+.kort.mjukt{border-color:var(--linje);box-shadow:none}
+.kort .band{position:absolute;left:-1.5px;right:-1.5px;top:-1.5px;height:7px;background:var(--k,var(--naa));border-radius:var(--r) var(--r) 0 0}
+.knapp{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;text-decoration:none;
+  font:600 15px/1 "Instrument Sans",sans-serif;color:var(--blekk);
+  background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);
+  padding:12px 18px;box-shadow:3px 3px 0 var(--skugge);
+  transition:transform .16s var(--mjuk),box-shadow .16s,background .2s,color .2s;
+}
+.knapp svg{width:18px;height:18px}
+.knapp:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--skugge)}
+.knapp:active:not(:disabled){transform:translate(2px,2px);box-shadow:0 0 0 var(--skugge)}
+.knapp:disabled{opacity:.4;cursor:default}
+.knapp.primar{background:var(--blekk);color:var(--ark)}
+.knapp.aksent{background:var(--k,var(--naa));border-color:var(--blekk);color:#fff}
+.knapp.liten{padding:8px 12px;font-size:13px}
+.knapprad{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.brikke{
+  font-family:"Bricolage Grotesque","Instrument Sans",sans-serif;font-weight:700;font-size:17px;letter-spacing:-.01em;
+  color:var(--blekk);background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);
+  padding:9px 15px;cursor:pointer;box-shadow:3px 3px 0 var(--skugge);
+  transition:transform .16s var(--mjuk),box-shadow .16s,background .16s,color .16s;
+}
+.brikke:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--skugge)}
+.brikke[aria-pressed="true"]{background:var(--blekk);color:var(--ark);transform:translate(2px,2px);box-shadow:0 0 0 var(--skugge)}
+
+.rutenett-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(14px,2cqw,26px)}
+.rutenett-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2cqw,24px)}
+.rutenett-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,1.6cqw,20px)}
+.delt{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(20px,4cqw,64px);align-items:center}
+.delt-breiare{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:start}
+.tipsrutenett{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+
+/* ── 1 Tittel ──────────────────────────────────────── */
+.forside{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.9fr);gap:clamp(24px,4cqw,60px);align-items:center}
+.stortittel{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;
+  font-size:clamp(64px,8.4cqw + 3cqh,184px);line-height:.84;letter-spacing:-.055em;margin:0 0 .12em;
+}
+.stortittel .bokstav{display:inline-block;opacity:0;transform:translateY(.5em) rotate(8deg);transition:opacity .5s var(--mjuk),transform .9s var(--sprett)}
+.aktiv .stortittel .bokstav{opacity:1;transform:none;transition-delay:calc(var(--b) * 55ms + 200ms)}
+.stortittel .aar{display:block;color:var(--naa);font-size:.52em;letter-spacing:-.04em;margin-top:.12em}
+.forside .ingress{font-size:clamp(18px,.8cqw + 1.2cqh,25px)}
+.nedteljing-mini{
+  display:inline-flex;flex-wrap:wrap;align-items:center;gap:14px 18px;padding:14px 18px;margin:0 0 22px;
+  background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:5px 5px 0 var(--skugge);
+}
+.nedteljing-mini .etikett{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--blekk-svak);display:block}
+.nedteljing-mini .verdi{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(26px,2.4cqw,38px);letter-spacing:-.03em;line-height:1}
+.nedteljing-mini .eining{font-family:"DM Mono",monospace;font-size:12px;color:var(--blekk-svak);margin-left:3px}
+.pulsprikk{width:10px;height:10px;border-radius:50%;background:var(--frist);box-shadow:0 0 0 0 var(--frist);animation:puls 1.8s infinite}
+@keyframes puls{0%{box-shadow:0 0 0 0 color-mix(in oklab,var(--frist) 60%,transparent)}70%{box-shadow:0 0 0 12px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.starthint{display:flex;align-items:center;gap:12px;font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--blekk-svak);margin-top:6px}
+.tast{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 7px;border:1.5px solid var(--blekk);border-radius:5px;box-shadow:0 2px 0 var(--skugge);font-family:"DM Mono",monospace;font-size:12px;color:var(--blekk);background:var(--felt);text-transform:none;letter-spacing:0}
+.starthint .tast{animation:dytt 2.4s var(--mjuk) infinite}
+@keyframes dytt{0%,70%,100%{transform:none}80%{transform:translateX(5px)}90%{transform:translateX(-1px)}}
+
+/* Eksamensarket på forsida */
+.ark-illustrasjon{position:relative;aspect-ratio:4/5;width:min(100%,420px);justify-self:center}
+.ark-illustrasjon .papir{
+  position:absolute;inset:6% 8% 4% 6%;background:var(--kort);border:1.5px solid var(--blekk);border-radius:6px;box-shadow:8px 8px 0 var(--skugge);
+  transform:rotate(-4deg);transition:transform .8s var(--mjuk);
+}
+.ark-illustrasjon .papir.bak{transform:rotate(5deg) translate(14px,6px);opacity:.7;box-shadow:none}
+.ark-illustrasjon svg{position:absolute;inset:6% 8% 4% 6%;width:86%;height:90%;transform:rotate(-4deg);overflow:visible}
+.ark-illustrasjon .strek{fill:none;stroke:var(--blekk);stroke-width:3;stroke-linecap:round;stroke-dasharray:var(--l);stroke-dashoffset:var(--l);opacity:.7}
+.aktiv .ark-illustrasjon .strek{animation:teikn 1s var(--mjuk) forwards;animation-delay:calc(var(--n) * 140ms + 700ms)}
+.ark-illustrasjon .hake{fill:none;stroke:var(--ok);stroke-width:9;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:160;stroke-dashoffset:160}
+.aktiv .ark-illustrasjon .hake{animation:teikn .7s var(--sprett) forwards 2.3s}
+.ark-illustrasjon .overskrift{fill:var(--naa)}
+@keyframes teikn{to{stroke-dashoffset:0}}
+.flytar{animation:flyt 6s ease-in-out infinite}
+@keyframes flyt{0%,100%{translate:0 0}50%{translate:0 -10px}}
+.blyant{position:absolute;right:-2%;bottom:14%;width:46%;transform:rotate(-38deg);filter:drop-shadow(4px 4px 0 var(--skugge))}
+.aktiv .blyant{animation:skriv 3.6s ease-in-out infinite 1.2s}
+@keyframes skriv{0%,100%{translate:0 0}25%{translate:-14px 6px}50%{translate:-4px -4px}75%{translate:-18px 2px}}
+
+/* ── Innhaldsliste ─────────────────────────────────── */
+.agenda{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(10px,1.4cqw,16px)}
+.agendapunkt{
+  text-align:left;cursor:pointer;background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);
+  padding:16px 16px 18px;box-shadow:4px 4px 0 var(--skugge);position:relative;overflow:hidden;
+  transition:transform .2s var(--mjuk),box-shadow .2s;
+}
+.agendapunkt::after{content:"";position:absolute;inset:auto 0 0 0;height:5px;background:var(--k);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--mjuk)}
+.agendapunkt:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--skugge)}
+.agendapunkt:hover::after{transform:none}
+.agendapunkt .nr{font-family:"DM Mono",monospace;font-size:12px;color:var(--k);letter-spacing:.1em}
+.agendapunkt b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:clamp(17px,1.2cqw,21px);letter-spacing:-.015em;margin:6px 0 4px;line-height:1.15}
+.agendapunkt span{font-size:13.5px;color:var(--blekk-svak);line-height:1.35;display:block}
+.agendapunkt .ikon{position:absolute;right:12px;top:12px;width:30px;height:30px;color:var(--k);opacity:.9;transition:transform .35s var(--sprett)}
+.agendapunkt:hover .ikon{transform:rotate(-10deg) scale(1.15)}
+
+/* ── Nytt i 2027 ───────────────────────────────────── */
+.nyheiter{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,1.6cqw,22px)}
+.nyheit{
+  perspective:900px;min-height:clamp(170px,26cqh,250px);cursor:pointer;
+  background:none;border:0;padding:0;text-align:left;
+}
+.nyheit,.myte{display:block;width:100%}
+.nyheit .snu,.myte .snu{display:block}
+.nyheit .snu{position:relative;width:100%;height:100%;min-height:inherit;transform-style:preserve-3d;transition:transform .7s var(--mjuk)}
+.nyheit[aria-pressed="true"] .snu{transform:rotateY(180deg)}
+.nyheit .side{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:5px 5px 0 var(--skugge);
+  padding:clamp(16px,1.6cqw,22px);display:flex;flex-direction:column;overflow:hidden;
+}
+.nyheit .bakside{transform:rotateY(180deg);background:var(--blekk);color:var(--ark)}
+.nyheit .bakside p{font-size:clamp(14px,.5cqw + .9cqh,16.5px);line-height:1.45;margin:0}
+.nyheit .stortal{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(34px,2.6cqw + 1cqh,54px);line-height:.9;letter-spacing:-.04em;color:var(--k);margin:auto 0 8px}
+.nyheit h3{margin:0;font-size:clamp(17px,.8cqw + .8cqh,22px)}
+.nyheit .snuhint{position:absolute;right:14px;top:14px;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--linje);display:grid;place-items:center;color:var(--blekk-svak);transition:transform .4s var(--sprett)}
+.nyheit:hover .snuhint{transform:rotate(180deg)}
+.nyheit .snuhint svg{width:14px;height:14px}
+.nyheit .ikonstor{width:42px;height:42px;color:var(--k)}
+
+/* ── Nedteljing ────────────────────────────────────── */
+.nedteljing{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(10px,1.4cqw,18px);margin:0 0 clamp(18px,3cqh,30px)}
+.tidsboks{background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:5px 5px 0 var(--skugge);padding:clamp(14px,2cqh,24px) 12px;text-align:center;overflow:hidden;position:relative}
+.tidsboks .tal{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(44px,4.6cqw + 2cqh,118px);line-height:1;letter-spacing:-.05em;font-variant-numeric:tabular-nums;display:flex;justify-content:center;height:1em;overflow:hidden}
+.tidsboks .siffer{display:inline-block;width:.62em;position:relative}
+.tidsboks .siffer.rull{animation:rull .45s var(--mjuk)}
+@keyframes rull{from{transform:translateY(-60%);opacity:0}to{transform:none;opacity:1}}
+.tidsboks .eining{font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--blekk-svak);margin-top:8px;display:block}
+.malval{display:flex;flex-wrap:wrap;gap:10px}
+.nedteljing-status{text-align:center;font-family:"DM Mono",monospace;font-size:13px;letter-spacing:.08em;color:var(--blekk-svak);margin:14px 0 0}
+
+/* ── Tidslinja ─────────────────────────────────────── */
+.tidslinje{position:relative;padding:clamp(70px,13cqh,120px) 0 clamp(70px,13cqh,120px);margin:0 0 10px}
+.tidslinje .bane{position:absolute;left:0;right:0;top:50%;height:4px;background:var(--innhald);border-radius:4px}
+.tidslinje .bane i{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,var(--naa),var(--k,var(--naa)));border-radius:4px;transition:width 1.6s var(--mjuk) .3s}
+.tidslinje .idag{
+  position:absolute;top:50%;left:0;transform:translate(-50%,-50%);z-index:3;transition:left 1.6s var(--mjuk) .3s;
+  width:20px;height:20px;border-radius:50%;background:var(--frist);border:3px solid var(--ark);
+}
+.tidslinje .idag::before{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px solid var(--frist);animation:ring 1.8s infinite}
+.tidslinje .idag span{display:none}
+@keyframes ring{from{transform:scale(.6);opacity:1}to{transform:scale(1.6);opacity:0}}
+.milepael{
+  position:absolute;top:50%;transform:translate(-50%,-50%);z-index:2;
+  width:24px;height:24px;padding:0;cursor:pointer;background:none;border:0;border-radius:50%;
+}
+.milepael::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--kort);border:3px solid var(--k,var(--blekk));transition:transform .25s var(--sprett),background .2s}
+.milepael:hover::before,.milepael[aria-expanded="true"]::before{transform:scale(1.35);background:var(--k,var(--blekk))}
+.milepael.ferdig::before{background:var(--k,var(--blekk))}
+.milepael[aria-expanded="true"] .lapp{color:var(--k,var(--blekk))}
+.milepael .lapp{
+  position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:150px;text-align:center;pointer-events:none;
+  font:600 13px/1.2 "Instrument Sans",sans-serif;color:var(--blekk);
+}
+.milepael .lapp small{display:block;font:500 11px/1.2 "DM Mono",monospace;letter-spacing:.06em;color:var(--k,var(--blekk-svak));margin-bottom:3px;text-transform:uppercase}
+.milepael.opp .lapp{bottom:36px}
+.milepael.ned .lapp{top:36px}
+.milepael .lapp::after{content:"";position:absolute;left:50%;width:1.5px;height:9px;background:var(--linje)}
+.milepael.opp .lapp::after{bottom:-12px}
+.milepael.ned .lapp::after{top:-12px}
+.tidslinje .milepael{opacity:0;scale:.3;transition:opacity .4s,scale .6s var(--sprett)}
+.aktiv .tidslinje .milepael{opacity:1;scale:1;transition-delay:calc(var(--n) * 90ms + 400ms)}
+.milepaeldetalj{
+  min-height:110px;background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:5px 5px 0 var(--skugge);
+  padding:18px 22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 22px;align-items:start;
+}
+.milepaeldetalj .dato{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(28px,2.4cqw,42px);line-height:.95;letter-spacing:-.03em;color:var(--k,var(--naa));grid-row:span 2;min-width:4.2em}
+.milepaeldetalj .dato small{display:block;font:500 12px/1.3 "DM Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--blekk-svak);margin-top:6px}
+.milepaeldetalj h3{margin:0}
+.milepaeldetalj p{margin:0;color:var(--blekk-svak)}
+.milepaeldetalj.byt{animation:byt .45s var(--mjuk)}
+@keyframes byt{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.tidslinje-liste{display:none}
+
+/* ── Kva gjeld for meg ─────────────────────────────── */
+.klassevelgar{display:flex;flex-wrap:wrap;gap:14px 28px;margin:0 0 clamp(16px,3cqh,28px)}
+.klassevelgar .gruppe{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#trekk-klassar{gap:9px}
+.klassevelgar .gruppe>small{width:100%;font:500 10.5px/1 "DM Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--blekk-svak);margin-bottom:2px}
+.profilvising{min-height:clamp(240px,38cqh,360px)}
+.profil-tom{border:1.5px dashed var(--linje);border-radius:var(--r);min-height:inherit;display:grid;place-items:center;text-align:center;color:var(--blekk-svak);padding:24px}
+.profil-tom svg{width:54px;height:54px;margin:0 auto 10px;display:block;animation:flyt 3s ease-in-out infinite}
+.profil{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:clamp(16px,3cqw,40px);align-items:start}
+.profil.byt{animation:byt .5s var(--mjuk)}
+.profil h3{font-size:clamp(24px,1.6cqw + 1cqh,36px)}
+.billettar{display:grid;gap:14px}
+.billett{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;
+  background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:5px 5px 0 var(--skugge);
+  padding:16px 20px;position:relative;
+  animation:billett .6s var(--sprett) backwards;animation-delay:calc(var(--n) * 110ms);
+}
+@keyframes billett{from{opacity:0;transform:translateX(30px) rotate(1.5deg)}to{opacity:1;transform:none}}
+.billett::before,.billett::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:var(--ark);border:1.5px solid var(--blekk);left:calc(var(--hakk,74px) - 9px)}
+.billett::before{top:-10px;clip-path:inset(50% 0 0 0)}
+.billett::after{bottom:-10px;clip-path:inset(0 0 50% 0)}
+.billett .nummer{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:38px;line-height:1;color:var(--k,var(--naa));width:44px;text-align:center;border-right:1.5px dashed var(--linje);padding-right:18px;box-sizing:content-box}
+.billett b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:19px;letter-spacing:-.015em;line-height:1.2}
+.billett span{font-size:14.5px;color:var(--blekk-svak);display:block;margin-top:2px}
+.stempel{
+  font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;
+  padding:6px 10px;border:2px solid currentColor;border-radius:4px;transform:rotate(-6deg);white-space:nowrap;
+  animation:stemple .5s var(--sprett) backwards;animation-delay:calc(var(--n) * 110ms + 350ms);
+}
+@keyframes stemple{from{opacity:0;transform:rotate(-6deg) scale(2.2)}to{opacity:1;transform:rotate(-6deg) scale(1)}}
+.stempel.alle{color:var(--frist)}
+.stempel.kanskje{color:var(--naa)}
+.sjanse{display:flex;align-items:center;gap:18px;margin:16px 0 0}
+.sjanse svg{width:96px;height:96px;flex:none;transform:rotate(-90deg)}
+.sjanse circle{fill:none;stroke-width:12}
+.sjanse .spor{stroke:var(--innhald)}
+.sjanse .del{stroke:var(--k,var(--naa));stroke-linecap:round;stroke-dasharray:0 302;transition:stroke-dasharray 1.2s var(--mjuk) .2s}
+.sjanse b{font-family:"Bricolage Grotesque",sans-serif;font-size:40px;font-weight:800;line-height:1;letter-spacing:-.03em;display:block}
+.sjanse span{font-size:14px;color:var(--blekk-svak)}
+
+/* ── Trekkmaskina ──────────────────────────────────── */
+.maskin{
+  background:var(--blekk);color:var(--ark);border-radius:10px;padding:clamp(16px,2.4cqw,30px);
+  box-shadow:8px 8px 0 var(--naa);position:relative;
+}
+.maskin .lys{display:flex;gap:8px;margin:0 0 14px}
+.maskin .lys i{width:10px;height:10px;border-radius:50%;background:color-mix(in oklab,var(--ark) 25%,transparent)}
+.maskin.spinn .lys i{animation:blink .5s infinite alternate;background:var(--gul)}
+.maskin.spinn .lys i:nth-child(2){animation-delay:.15s}
+.maskin.spinn .lys i:nth-child(3){animation-delay:.3s}
+@keyframes blink{to{opacity:.2}}
+.hjul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.hjulramme{background:var(--ark);color:var(--blekk);border-radius:6px;height:132px;overflow:hidden;position:relative}
+.hjulramme::before,.hjulramme::after{content:"";position:absolute;left:0;right:0;height:38px;z-index:2;pointer-events:none}
+.hjulramme::before{top:0;background:linear-gradient(var(--ark),transparent)}
+.hjulramme::after{bottom:0;background:linear-gradient(transparent,var(--ark))}
+.hjulramme .tittelrad{position:absolute;top:6px;left:0;right:0;text-align:center;z-index:3;font:500 10px/1 "DM Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--blekk-svak)}
+.remse{position:absolute;left:0;right:0;top:0;will-change:transform}
+.remse div{height:132px;display:grid;place-items:center;text-align:center;padding:16px 10px 0;overflow-wrap:anywhere;hyphens:manual;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(15px,1.2cqw,21px);line-height:1.1;letter-spacing:-.01em}
+.maskin.spinn .remse{filter:blur(1.2px)}
+.trekkresultat{min-height:56px;margin:16px 0 0;font-size:16px;color:color-mix(in oklab,var(--ark) 80%,transparent)}
+.trekkresultat b{color:var(--ark)}
+.trekkresultat.vis{animation:byt .5s var(--mjuk)}
+.spak{
+  background:var(--gul);color:#16212A;border:1.5px solid #16212A;box-shadow:3px 3px 0 #000;font-weight:700;
+}
+
+/* ── Skriftleg eksamen: PC som blir låst ───────────── */
+.pc{position:relative;width:min(100%,460px);justify-self:center}
+.pc .skjerm{
+  aspect-ratio:16/10;background:var(--kort);border:10px solid var(--blekk);border-radius:12px 12px 4px 4px;position:relative;overflow:hidden;
+}
+.pc .fot{height:14px;width:108%;margin-left:-4%;background:var(--blekk);border-radius:0 0 14px 14px}
+.pc .app{position:absolute;width:20%;aspect-ratio:1;border-radius:18%;display:grid;place-items:center;color:#fff;font:700 12px/1 "DM Mono",monospace;animation:app-ut 6s infinite}
+.pc .app:nth-child(1){left:8%;top:12%;background:#6B3A63}
+.pc .app:nth-child(2){left:40%;top:12%;background:#1F6E5B;animation-delay:.08s}
+.pc .app:nth-child(3){left:72%;top:12%;background:#A6432C;animation-delay:.16s}
+.pc .app:nth-child(4){left:8%;top:56%;background:#2F4B7C;animation-delay:.24s}
+.pc .app:nth-child(5){left:72%;top:56%;background:#8A4B2A;animation-delay:.32s}
+@keyframes app-ut{0%,22%{opacity:1;transform:none}32%,88%{opacity:0;transform:scale(.4) rotate(-12deg)}100%{opacity:1;transform:none}}
+.pc .laas{position:absolute;left:50%;top:50%;width:30%;transform:translate(-50%,-50%);color:var(--naa);animation:laas-inn 6s infinite}
+@keyframes laas-inn{0%,24%{opacity:0;transform:translate(-50%,-30%) scale(.6)}34%,86%{opacity:1;transform:translate(-50%,-50%) scale(1)}96%,100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
+.pc .laas .boge{transform-origin:70% 100%;animation:boge 6s infinite}
+@keyframes boge{0%,38%{transform:translateY(-8px)}46%,86%{transform:none}}
+.pc .skjermtekst{position:absolute;left:0;right:0;bottom:10%;text-align:center;font:500 12px/1 "DM Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--blekk-svak);animation:laas-inn-tekst 6s infinite}
+@keyframes laas-inn-tekst{0%,30%{opacity:0}40%,86%{opacity:1}96%,100%{opacity:0}}
+.punktliste{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.punktliste li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;font-size:clamp(15.5px,.5cqw + .9cqh,18.5px);line-height:1.45}
+.punktliste li .i{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:color-mix(in oklab,var(--k,var(--naa)) 16%,var(--kort));color:var(--k,var(--naa));border:1.5px solid color-mix(in oklab,var(--k,var(--naa)) 40%,transparent)}
+.punktliste li .i svg{width:17px;height:17px}
+.punktliste b{font-weight:600}
+
+/* ── Matematikk: todelt ────────────────────────────── */
+.todelt{display:grid;grid-template-columns:2fr 3fr;border:1.5px solid var(--blekk);border-radius:var(--r);overflow:hidden;box-shadow:6px 6px 0 var(--skugge);margin:0 0 22px}
+.todelt>div{padding:clamp(16px,2cqw,26px);position:relative;overflow:hidden}
+.todelt .del1{background:var(--kort);border-right:1.5px solid var(--blekk)}
+.todelt .del2{background:color-mix(in oklab,var(--k) 12%,var(--kort))}
+.todelt .storbokstav{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(46px,4cqw + 1cqh,80px);line-height:.85;letter-spacing:-.04em;color:var(--k);margin:0 0 10px}
+.todelt ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.todelt li{display:flex;gap:10px;align-items:baseline;font-size:clamp(15px,.5cqw + .8cqh,17.5px)}
+.todelt li::before{content:"";flex:none;width:8px;height:8px;border-radius:2px;background:var(--k);transform:translateY(-2px)}
+.todelt li.nei::before{background:var(--frist);border-radius:50%}
+.todelt .fylling{position:absolute;inset:auto 0 0 0;height:6px;background:var(--k);transform:scaleX(0);transform-origin:left}
+.aktiv .todelt .del1 .fylling{animation:fyll 1.2s var(--mjuk) forwards .6s}
+.aktiv .todelt .del2 .fylling{animation:fyll 1.6s var(--mjuk) forwards 1.6s}
+@keyframes fyll{to{transform:none}}
+.krysspc{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--frist)}
+.krysspc svg{width:22px;height:22px}
+
+/* ── Hjelpemiddel-sortering ────────────────────────── */
+.faner{display:inline-flex;flex-wrap:wrap;background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);overflow:hidden;margin:0 0 18px}
+.faner button{font:600 14px/1 "Instrument Sans",sans-serif;background:transparent;border:0;padding:11px 16px;cursor:pointer;transition:background .2s,color .2s}
+.faner button[aria-selected="true"]{background:var(--blekk);color:var(--ark)}
+.sorter{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1fr);gap:16px;align-items:start}
+.korg{border:2px dashed var(--linje);border-radius:8px;padding:12px;min-height:240px;transition:border-color .2s,background .2s}
+.korg h3{display:flex;align-items:center;gap:8px;font-size:17px}
+.korg h3 svg{width:22px;height:22px}
+.korg.lov h3{color:var(--ok)}
+.korg.nei h3{color:var(--frist)}
+.korg.over{border-color:var(--blekk);background:var(--innhald)}
+.korg .boks{display:flex;flex-direction:column;gap:7px}
+.haug{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;justify-content:center;min-height:240px;padding:12px;border-radius:8px;background:var(--innhald)}
+.ting{
+  display:inline-flex;align-items:center;gap:8px;user-select:none;-webkit-user-select:none;touch-action:none;
+  background:var(--kort);border:1.5px solid var(--blekk);border-radius:99px;padding:7px 8px 7px 12px;
+  font-size:14.5px;font-weight:500;box-shadow:2px 2px 0 var(--skugge);cursor:grab;
+  transition:transform .2s var(--mjuk),box-shadow .2s,background .3s,border-color .3s;
+}
+.ting:active{cursor:grabbing}
+.ting .val{display:inline-flex;gap:4px}
+.ting .val button{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--linje);background:var(--felt);cursor:pointer;display:grid;place-items:center;padding:0;transition:transform .15s,background .2s,border-color .2s}
+.ting .val button svg{width:13px;height:13px}
+.ting .val button:hover{transform:scale(1.12)}
+.ting .val .ja:hover{background:var(--ok);border-color:var(--ok);color:#fff}
+.ting .val .nei:hover{background:var(--frist);border-color:var(--frist);color:#fff}
+.korg .ting{width:100%;justify-content:space-between;cursor:default;padding:8px 12px}
+.korg .ting .val{display:none}
+.ting.rett{border-color:var(--ok);background:color-mix(in oklab,var(--ok) 12%,var(--kort))}
+.ting.feil{border-color:var(--frist);background:color-mix(in oklab,var(--frist) 12%,var(--kort));animation:rist .5s}
+.ting .forklaring{display:block;font-size:12.5px;color:var(--blekk-svak);font-weight:400;margin-top:2px}
+.ting.dreg{position:fixed;z-index:100;pointer-events:none;transform:rotate(-3deg) scale(1.06);box-shadow:6px 6px 0 var(--skugge)}
+.ting.plasshaldar{opacity:.25}
+@keyframes rist{0%,100%{translate:0}20%{translate:-7px}40%{translate:6px}60%{translate:-4px}80%{translate:3px}}
+.sorterstatus{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap}
+.sorterstatus .poeng{font-family:"DM Mono",monospace;font-size:13px;color:var(--blekk-svak)}
+
+/* ── Eksamensdagen ─────────────────────────────────── */
+.dagen{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:clamp(20px,4cqw,56px);align-items:center}
+.klokke{width:clamp(180px,22cqw,290px);aspect-ratio:1;position:relative}
+.klokke svg{width:100%;height:100%;overflow:visible}
+.klokke .skive{fill:var(--kort);stroke:var(--blekk);stroke-width:3}
+.klokke .strek{stroke:var(--blekk);stroke-width:2.5;stroke-linecap:round}
+.klokke .strek.tynn{stroke-width:1.2;opacity:.5}
+.klokke .viser{stroke:var(--blekk);stroke-linecap:round;transform-origin:100px 100px;transition:transform .9s var(--mjuk)}
+.klokke .viser.time{stroke-width:6}
+.klokke .viser.min{stroke-width:4}
+.klokke .boge{fill:none;stroke:var(--k);stroke-width:12;opacity:.28}
+.klokke .midt{fill:var(--frist)}
+.klokke .digital{position:absolute;left:0;right:0;bottom:-38px;text-align:center;font:500 22px/1 "DM Mono",monospace;letter-spacing:.06em}
+.dagliste{list-style:none;margin:0;padding:0;position:relative}
+.dagliste::before{content:"";position:absolute;left:62px;top:8px;bottom:8px;width:2px;background:var(--linje)}
+.dagliste li{display:grid;grid-template-columns:52px 22px minmax(0,1fr);gap:10px;align-items:start;padding:7px 8px;border-radius:6px;cursor:pointer;transition:background .25s,opacity .3s}
+.dagliste li:hover{background:var(--innhald)}
+.dagliste time{font-family:"DM Mono",monospace;font-size:14px;color:var(--blekk-svak);padding-top:2px}
+.dagliste .prikk{width:14px;height:14px;border-radius:50%;background:var(--kort);border:2.5px solid var(--blekk);margin:4px 0 0 1px;position:relative;z-index:1;transition:background .3s,transform .3s var(--sprett)}
+.dagliste b{display:block;font-weight:600;font-size:clamp(15px,.4cqw + .8cqh,17px);line-height:1.3}
+.dagliste span{display:block;font-size:14px;color:var(--blekk-svak);line-height:1.4;max-height:0;overflow:hidden;opacity:0;transition:max-height .4s var(--mjuk),opacity .3s}
+.dagliste li.no{background:color-mix(in oklab,var(--k) 12%,transparent)}
+.dagliste li.no .prikk{background:var(--k);border-color:var(--k);transform:scale(1.3)}
+.dagliste li.no span{max-height:90px;opacity:1}
+.dagliste li.gjort .prikk{background:var(--blekk)}
+.dagliste.speler li:not(.no):not(.gjort){opacity:.45}
+
+/* ── Sjekkliste ────────────────────────────────────── */
+.sjekk{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(20px,4cqw,60px);align-items:center}
+.sjekkliste{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px}
+.sjekkliste label{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:6px;cursor:pointer;background:var(--kort);border:1.5px solid var(--linje);transition:border-color .2s,background .25s,transform .15s}
+.sjekkliste label:hover{border-color:var(--blekk)}
+.sjekkliste label:active{transform:scale(.98)}
+.sjekkliste input{position:absolute;opacity:0;width:1px;height:1px}
+.sjekkliste .boks{flex:none;width:24px;height:24px;border-radius:6px;border:2px solid var(--linje);background:var(--felt);display:grid;place-items:center;transition:background .2s,border-color .2s}
+.sjekkliste .boks::after{content:"";width:12px;height:7px;border-left:3px solid #fff;border-bottom:3px solid #fff;transform:rotate(-45deg) scale(0);margin-top:-3px;transition:transform .25s var(--sprett)}
+.sjekkliste input:checked+.boks{background:var(--ok);border-color:var(--ok)}
+.sjekkliste input:checked+.boks::after{transform:rotate(-45deg) scale(1)}
+.sjekkliste input:focus-visible+.boks{outline:2.5px solid var(--naa);outline-offset:2px}
+.sjekkliste input:checked~.tekst{opacity:.55;text-decoration:line-through;text-decoration-thickness:1.5px}
+.sjekkliste .tekst{font-size:15.5px;line-height:1.3;transition:opacity .25s}
+.sjekkliste .tekst small{display:block;font-size:12.5px;color:var(--blekk-svak);text-decoration:none}
+.ring{position:relative;width:clamp(150px,16cqw,220px);aspect-ratio:1}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:14}
+.ring .spor{stroke:var(--innhald)}
+.ring .fyll{stroke:var(--ok);stroke-linecap:round;transition:stroke-dashoffset .6s var(--mjuk)}
+.ring .midt{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .midt b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(34px,3cqw,52px);line-height:1;letter-spacing:-.03em}
+.ring .midt span{font:500 11px/1.3 "DM Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--blekk-svak)}
+.ring.ferdig{animation:hopp .6s var(--sprett)}
+@keyframes hopp{40%{transform:scale(1.1)}}
+
+/* ── Munnleg ───────────────────────────────────────── */
+.steg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;position:relative;margin:0 0 clamp(18px,3cqh,30px)}
+.steg::before{content:"";position:absolute;left:12%;right:12%;top:32px;height:3px;background:var(--linje);border-radius:3px}
+.steg::after{content:"";position:absolute;left:12%;right:12%;top:32px;height:3px;background:var(--k);border-radius:3px;transform:scaleX(0);transform-origin:left;transition:transform 1.8s var(--mjuk) .4s}
+.aktiv .steg::after{transform:scaleX(1)}
+.steg>div{text-align:center;padding:0 10px;position:relative}
+.steg .sirkel{width:64px;height:64px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;background:var(--kort);border:2.5px solid var(--blekk);font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:24px;position:relative;z-index:1;transition:background .4s,color .4s}
+.aktiv .steg .sirkel{animation:sirkel-paa .5s var(--sprett) forwards;animation-delay:calc(var(--n) * 450ms + 400ms)}
+@keyframes sirkel-paa{to{background:var(--k);color:#fff;border-color:var(--k)}}
+.steg b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:clamp(16px,.6cqw + .8cqh,20px);letter-spacing:-.01em;line-height:1.2}
+.steg span{display:block;font-size:14px;color:var(--blekk-svak);margin-top:4px;line-height:1.4}
+.timar{display:flex;align-items:center;gap:clamp(16px,2.4cqw,30px);flex-wrap:wrap}
+.timar .ring{width:clamp(130px,12cqw,170px)}
+.timar .ring .fyll{stroke:var(--k);transition:stroke-dashoffset 1s linear}
+.timar .ring.slutt .fyll{stroke:var(--frist)}
+.timar .ring .midt b{font-variant-numeric:tabular-nums;font-size:clamp(28px,2.4cqw,40px)}
+
+/* ── Fusk: kortstokk ───────────────────────────────── */
+.stokk{position:relative;height:clamp(230px,34cqh,300px);width:min(100%,440px);justify-self:center}
+.fuskkort{
+  position:absolute;inset:0;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none;background:var(--kort);border:1.5px solid var(--blekk);border-radius:12px;box-shadow:6px 6px 0 var(--skugge);
+  padding:26px;display:flex;flex-direction:column;justify-content:center;text-align:center;
+  transition:transform .55s var(--mjuk),opacity .45s;
+}
+.fuskkort:nth-last-child(2){transform:translateY(10px) scale(.96) rotate(1.5deg)}
+.fuskkort:nth-last-child(3){transform:translateY(20px) scale(.92) rotate(-1.5deg)}
+.fuskkort:nth-last-child(n+4){opacity:0;transform:translateY(24px) scale(.9)}
+.fuskkort .spm{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(20px,1.3cqw + .8cqh,28px);letter-spacing:-.02em;line-height:1.2}
+.fuskkort .svar{display:none;margin-top:14px;font-size:15.5px;line-height:1.45}
+.fuskkort.vist .svar{display:block;animation:byt .4s var(--mjuk)}
+.fuskkort.vist .spm{font-size:clamp(17px,1cqw + .6cqh,22px)}
+.fuskkort .dom{display:inline-block;margin:0 auto 10px;font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:5px 10px;border-radius:4px;border:2px solid currentColor;transform:rotate(-4deg)}
+.fuskkort .dom.fusk{color:var(--frist)}
+.fuskkort .dom.lov{color:var(--ok)}
+.fuskkort.ute{z-index:5;pointer-events:none}
+.fuskkort.ut-venstre{transform:translateX(-130%) rotate(-18deg)!important;opacity:0}
+.fuskkort.ut-hogre{transform:translateX(130%) rotate(18deg)!important;opacity:0}
+.fuskkort.sluttkort{cursor:default;animation:billett .6s var(--sprett)}
+.sluttal{font:800 clamp(64px,6cqw,96px)/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.05em;color:var(--k);margin:0 0 8px}
+.sluttal small{font-size:.42em;color:var(--blekk-svak);letter-spacing:-.02em}
+.fuskknappar{display:flex;gap:12px;justify-content:center;margin-top:38px}
+.fuskknappar .knapp.fusk{color:var(--frist);border-color:var(--frist)}
+.fuskknappar .knapp.lov{color:var(--ok);border-color:var(--ok)}
+.konsekvens{display:grid;gap:10px;counter-reset:k}
+.konsekvens div{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--r);background:color-mix(in oklab,var(--frist) 9%,var(--kort));border:1.5px solid color-mix(in oklab,var(--frist) 40%,transparent);font-size:clamp(15px,.5cqw + .8cqh,18px)}
+.konsekvens div::before{counter-increment:k;content:counter(k);flex:none;width:30px;height:30px;border-radius:50%;background:var(--frist);color:#fff;display:grid;place-items:center;font:700 14px/1 "DM Mono",monospace}
+
+/* ── Sjuk: flytskjema ──────────────────────────────── */
+.flyt{display:grid;gap:8px}
+.flytsteg{
+  display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;align-items:start;
+  background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:4px 4px 0 var(--skugge);padding:12px 16px;
+  animation:flytinn .5s var(--sprett) backwards;
+}
+@keyframes flytinn{from{opacity:0;transform:translateY(-14px) scale(.97)}to{opacity:1;transform:none}}
+.flytsteg .ikon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:color-mix(in oklab,var(--k) 15%,var(--kort));color:var(--k)}
+.flytsteg .ikon svg{width:21px;height:21px}
+.flytsteg.varsel .ikon{background:color-mix(in oklab,var(--frist) 15%,var(--kort));color:var(--frist)}
+.flytsteg.bra .ikon{background:color-mix(in oklab,var(--ok) 15%,var(--kort));color:var(--ok)}
+.flytsteg h3{font-size:17px;margin:1px 0 2px}
+.flytsteg p{margin:0;color:var(--blekk-svak);font-size:14.5px;line-height:1.4}
+.flytsteg .knapprad{margin-top:12px}
+.flytpil{width:2px;height:10px;background:var(--linje);margin:-4px 0 -4px 36px}
+
+/* ── Klage ─────────────────────────────────────────── */
+.klagesteg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.klagesteg .kort{padding-top:30px}
+.klagesteg .stortal{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(40px,3cqw + 1cqh,64px);line-height:.9;letter-spacing:-.04em;color:var(--k);margin:0 0 10px}
+.klagesteg p{font-size:clamp(14.5px,.4cqw + .8cqh,16.5px);color:var(--blekk-svak);margin:0}
+.terning{display:flex;gap:10px;align-items:center;margin-top:10px}
+.terning button{width:46px;height:46px;border-radius:8px;border:1.5px solid var(--blekk);background:var(--felt);font:800 20px/1 "Bricolage Grotesque",sans-serif;cursor:pointer;box-shadow:2px 2px 0 var(--skugge);transition:transform .15s}
+.terning button:hover{transform:translateY(-2px)}
+.klageutfall{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.klageutfall .utfall{flex:1 1 110px;text-align:center;padding:12px 8px;border-radius:var(--r);border:1.5px solid var(--linje);background:var(--kort);transition:transform .3s var(--sprett),border-color .3s,background .3s}
+.klageutfall .utfall b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:26px;line-height:1}
+.klageutfall .utfall span{font-size:13px;color:var(--blekk-svak)}
+.klageutfall .utfall.valt{transform:translateY(-6px) scale(1.04);border-color:var(--blekk);background:color-mix(in oklab,var(--k) 14%,var(--kort))}
+
+/* ── Myte eller fakta ──────────────────────────────── */
+.myter{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.myte{perspective:900px;min-height:clamp(150px,22cqh,210px);background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.myte .snu{position:relative;width:100%;height:100%;min-height:inherit;transform-style:preserve-3d;transition:transform .7s var(--sprett)}
+.myte[aria-pressed="true"] .snu{transform:rotateY(180deg)}
+.myte .side{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:4px 4px 0 var(--skugge);padding:16px;display:flex;flex-direction:column;background:var(--kort)}
+.myte .framside p{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(15.5px,.6cqw + .7cqh,19px);line-height:1.25;letter-spacing:-.01em;margin:0}
+.myte .framside small{margin-top:auto;font:500 11px/1 "DM Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--blekk-svak)}
+.myte .bakside{transform:rotateY(180deg)}
+.myte .bakside.myt{background:color-mix(in oklab,var(--frist) 12%,var(--kort))}
+.myte .bakside.fakta{background:color-mix(in oklab,var(--ok) 12%,var(--kort))}
+.myte .bakside b{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:26px;letter-spacing:-.02em;line-height:1;margin-bottom:8px}
+.myte .bakside.myt b{color:var(--frist)}
+.myte .bakside.fakta b{color:var(--ok)}
+.myte .bakside p{font-size:14px;line-height:1.4;margin:0}
+
+/* ── Quiz ──────────────────────────────────────────── */
+.quiz{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:clamp(20px,3cqw,44px);align-items:start}
+.quizframdrift{display:flex;gap:6px;margin:0 0 18px}
+.quizframdrift i{flex:1;height:6px;border-radius:99px;background:var(--innhald);transition:background .3s}
+.quizframdrift i.rett{background:var(--ok)}
+.quizframdrift i.feil{background:var(--frist)}
+.quizframdrift i.no{background:var(--blekk)}
+.sporsmal{display:none}
+.sporsmal.vis{display:block;animation:byt .45s var(--mjuk)}
+.sporsmal h3{font-size:clamp(22px,1.4cqw + 1cqh,34px);margin:0 0 18px;text-wrap:balance}
+.alternativ{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.alternativ button{
+  text-align:left;display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;
+  background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:3px 3px 0 var(--skugge);
+  font-size:clamp(15px,.4cqw + .8cqh,17.5px);font-weight:500;line-height:1.3;
+  transition:transform .15s var(--mjuk),box-shadow .15s,background .25s,border-color .25s,opacity .25s;
+}
+.alternativ button:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--skugge)}
+.alternativ button .bokstav{flex:none;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--linje);display:grid;place-items:center;font:500 13px/1 "DM Mono",monospace}
+.alternativ button.rett{background:color-mix(in oklab,var(--ok) 18%,var(--kort));border-color:var(--ok);animation:hopp .5s var(--sprett)}
+.alternativ button.rett .bokstav{background:var(--ok);border-color:var(--ok);color:#fff}
+.alternativ button.feil{background:color-mix(in oklab,var(--frist) 14%,var(--kort));border-color:var(--frist);animation:rist .45s}
+.alternativ button.feil .bokstav{background:var(--frist);border-color:var(--frist);color:#fff}
+.alternativ button:disabled{cursor:default}
+.alternativ button.dimma{opacity:.45}
+.quizforklaring{margin:16px 0 0;padding:14px 16px;border-left:4px solid var(--k);background:var(--innhald);border-radius:0 var(--r) var(--r) 0;font-size:15.5px;display:none}
+.quizforklaring.vis{display:block;animation:byt .4s var(--mjuk)}
+.poengtavle{text-align:center;background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:5px 5px 0 var(--skugge);padding:22px 16px}
+.poengtavle b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:72px;line-height:1;letter-spacing:-.04em;color:var(--k)}
+.poengtavle b.sprett{animation:hopp .5s var(--sprett)}
+.poengtavle span{font:500 12px/1.3 "DM Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--blekk-svak)}
+.quizslutt{display:none;text-align:center;padding:10px 0}
+.quizslutt.vis{display:block;animation:byt .5s var(--mjuk)}
+.quizslutt .resultat{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(60px,6cqw,110px);line-height:1;letter-spacing:-.05em;color:var(--k)}
+
+/* ── Spørsmål og svar ──────────────────────────────── */
+.sok{position:relative;margin:0 0 16px;max-width:520px}
+.sok input{width:100%;font:500 17px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);padding:14px 16px 14px 46px;box-shadow:3px 3px 0 var(--skugge)}
+.sok input::placeholder{color:var(--blekk-svak)}
+.sok svg{position:absolute;left:15px;top:50%;width:20px;height:20px;transform:translateY(-50%);color:var(--blekk-svak)}
+.faq{columns:3 300px;column-gap:14px}
+.faq details{break-inside:avoid;margin:0 0 10px;background:var(--kort);border:1.5px solid var(--linje);border-radius:var(--r);transition:border-color .2s,box-shadow .2s}
+.faq details[open]{border-color:var(--blekk);box-shadow:4px 4px 0 var(--skugge)}
+.faq summary{list-style:none;cursor:pointer;padding:12px 44px 12px 15px;font-weight:600;font-size:15.5px;line-height:1.35;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:14px;top:50%;width:24px;height:24px;margin-top:-12px;border-radius:50%;border:1.5px solid var(--linje);display:grid;place-items:center;font:500 16px/1 "DM Mono",monospace;transition:transform .3s var(--sprett),background .2s}
+.faq details[open] summary::after{transform:rotate(45deg);background:var(--blekk);color:var(--ark);border-color:var(--blekk)}
+.faq .svar{padding:0 16px 14px;color:var(--blekk-svak);font-size:15px;line-height:1.5}
+.faq details[open] .svar{animation:byt .35s var(--mjuk)}
+.faq mark{background:color-mix(in oklab,var(--gul) 40%,transparent);color:inherit;border-radius:2px;padding:0 1px}
+.faq .ingen{display:none;color:var(--blekk-svak);padding:20px;border:1.5px dashed var(--linje);border-radius:var(--r)}
+
+/* ── Små tillegg ───────────────────────────────────── */
+.ting .forklaring[hidden]{display:none}
+.liten-brikke{font-size:14px;padding:7px 11px;box-shadow:2px 2px 0 var(--skugge)}
+.liten-brikke[aria-pressed="true"]{transform:translate(2px,2px)}
+.stolpe-vis{height:12px;background:var(--innhald);border-radius:99px;overflow:hidden}
+.stolpe-vis i{display:block;height:100%;width:0;background:var(--f);border-radius:99px;transition:width 1.4s var(--mjuk) .5s}
+.aktiv .stolpe-vis i{width:var(--b)}
+.tips{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;align-items:start;padding:16px 18px}
+.tips .tipsikon{grid-row:span 2;width:28px;height:28px;color:var(--k,var(--naa));margin-top:1px;transition:transform .35s var(--sprett)}
+.tips h3{margin:0 0 4px}
+.tips:hover .tipsikon{transform:rotate(-8deg) scale(1.12)}
+.tips h3{font-size:clamp(17px,.6cqw + .7cqh,20px)}
+.skala{display:flex;align-items:flex-end;gap:10px;height:clamp(130px,20cqh,190px);margin:14px 0 12px}
+.skala button{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;gap:6px;background:none;border:0;padding:0;cursor:pointer}
+.skala i{display:block;height:0;border-radius:6px 6px 2px 2px;background:color-mix(in oklab,var(--k) calc(var(--g) * 14% + 10%),var(--kort));border:1.5px solid var(--blekk);transition:height 1s var(--sprett),transform .2s var(--mjuk),background .2s}
+.aktiv .skala i{height:calc(var(--g) * 15%);transition-delay:calc(var(--g) * 80ms + 300ms),0s,0s}
+.skala button:first-child i{background:color-mix(in oklab,var(--frist) 30%,var(--kort))}
+.skala b{font-family:"Bricolage Grotesque",sans-serif;font-size:22px;font-weight:800;text-align:center;line-height:1}
+.skala button:hover i,.skala button.valt i{transform:translateY(-6px);background:var(--k)}
+.skala button:first-child:hover i,.skala button:first-child.valt i{background:var(--frist)}
+.skalatekst{min-height:3em;margin:0;font-size:15.5px}
+.datofelt{font:500 16px/1 "Instrument Sans",sans-serif;color:var(--blekk);background:var(--felt);border:1.5px solid var(--blekk);border-radius:var(--r);padding:10px 12px;box-shadow:3px 3px 0 var(--skugge)}
+.klagesvar.byt{animation:byt .4s var(--mjuk)}
+.klagesvar b{color:var(--k)}
+
+/* ── Hugs ──────────────────────────────────────────── */
+.hugs{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(18px,3cqw,40px);align-items:start}
+.datoliste{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.datoliste li{display:grid;grid-template-columns:118px minmax(0,1fr);gap:14px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--linje-svak)}
+.datoliste time{font-family:"DM Mono",monospace;font-size:14px;color:var(--k,var(--naa));font-weight:500}
+.reglar{counter-reset:r;list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.reglar li{display:flex;gap:14px;align-items:baseline;font-size:clamp(15.5px,.4cqw + .9cqh,18px)}
+.reglar li::before{counter-increment:r;content:counter(r);flex:none;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:28px;line-height:1;color:var(--k,var(--naa));min-width:22px}
+.kjelder{margin-top:22px;padding-top:14px;border-top:1px solid var(--linje);font-size:13.5px;color:var(--blekk-svak)}
+.kjelder a{color:inherit}
+
+/* ── Oversikt, hjelp og laser ──────────────────────── */
+.lag{position:fixed;inset:0;z-index:60;background:color-mix(in oklab,var(--ark) 86%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow:auto;padding:clamp(20px,4vw,56px);opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+.lag.ope{opacity:1;visibility:visible;transition:opacity .3s,visibility 0s}
+.lag .lagtopp{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 auto 24px;max-width:1300px}
+.lag .lagtopp h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(28px,3vw,44px);letter-spacing:-.03em;margin:0}
+.miniatyrar{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;max-width:1300px;margin:0 auto}
+.miniatyr{
+  text-align:left;cursor:pointer;aspect-ratio:16/10;background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);
+  padding:14px;display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:3px 3px 0 var(--skugge);
+  transition:transform .2s var(--mjuk),box-shadow .2s;opacity:0;transform:translateY(16px);
+}
+.lag.ope .miniatyr{opacity:1;transform:none;transition:transform .45s var(--mjuk),box-shadow .2s,opacity .35s;transition-delay:calc(var(--n) * 22ms)}
+.lag.ope .miniatyr:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--skugge);transition-delay:0s}
+.miniatyr::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:var(--k)}
+.miniatyr .nr{font:500 12px/1 "DM Mono",monospace;color:var(--k);margin-top:4px}
+.miniatyr b{font-family:"Bricolage Grotesque",sans-serif;font-size:19px;letter-spacing:-.02em;line-height:1.1;margin-top:auto}
+.miniatyr small{font:500 10.5px/1.2 "DM Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--blekk-svak);margin-top:6px}
+.miniatyr[aria-current="true"]{outline:3px solid var(--naa);outline-offset:3px}
+.hjelpeboks{max-width:620px;margin:0 auto;background:var(--kort);border:1.5px solid var(--blekk);border-radius:var(--r);box-shadow:8px 8px 0 var(--skugge);padding:clamp(20px,3vw,34px)}
+.hjelpeboks dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 18px;margin:0;align-items:center}
+.hjelpeboks dt{display:flex;gap:6px;flex-wrap:wrap}
+.hjelpeboks dd{margin:0;color:var(--blekk-svak)}
+.laser{position:fixed;left:0;top:0;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#ff2a2a;box-shadow:0 0 12px 4px rgba(255,42,42,.7),0 0 30px 10px rgba(255,42,42,.35);z-index:200;pointer-events:none;display:none}
+body.laser-paa{cursor:none}
+body.laser-paa .laser{display:block}
+.konfetti{position:fixed;inset:0;z-index:150;pointer-events:none;width:100%;height:100%}
+.toast{position:fixed;left:50%;bottom:calc(var(--botn-h) + 14px);transform:translate(-50%,20px);z-index:70;background:var(--blekk);color:var(--ark);padding:10px 16px;border-radius:var(--r);font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s,transform .35s var(--sprett)}
+.toast.vis{opacity:1;transform:translate(-50%,0)}
+
+/* ── Tilpassing til mindre skjermar ────────────────── */
+@media (max-width: 1100px){
+  .agenda{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .myter{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .klagesteg{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sorter{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .sorter .haug{grid-column:1 / -1;order:-1;min-height:0}
+  .korg{min-height:140px}
+}
+@media (max-width: 860px){
+  :root{--topp-h:56px;--botn-h:60px}
+  body{font-size:16px}
+  .lysbilete{align-content:start;padding-top:18px;padding-bottom:36px}
+  .forside,.delt,.delt-breiare,.profil,.dagen,.sjekk,.quiz,.hugs{grid-template-columns:minmax(0,1fr)}
+  .ark-illustrasjon{width:min(64%,260px);order:-1;margin-bottom:-10px}
+  .nyheiter,.rutenett-3{grid-template-columns:minmax(0,1fr)}
+  .nyheit{min-height:170px}
+  .rutenett-2,.rutenett-4{grid-template-columns:minmax(0,1fr)}
+  .agenda{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .nedteljing{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sjekkliste{grid-template-columns:minmax(0,1fr)}
+  .alternativ{grid-template-columns:minmax(0,1fr)}
+  .quiz .poengtavle{order:-1;display:flex;align-items:center;justify-content:center;gap:14px;padding:10px 14px}
+  .quiz .poengtavle b{font-size:40px}
+  .steg{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 0}
+  .steg::before,.steg::after{display:none}
+  .todelt{grid-template-columns:minmax(0,1fr)}
+  .todelt .del1{border-right:0;border-bottom:1.5px solid var(--blekk)}
+  .klokke{justify-self:center;margin-bottom:36px}
+  .kapittelnamn{display:none}
+  .tidslinje{display:none}
+  .tidslinje-liste{display:grid;gap:8px;list-style:none;margin:0 0 14px;padding:0}
+  .tidslinje-liste li{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;padding:10px 12px;border-radius:var(--r);background:var(--kort);border:1.5px solid var(--linje);border-left:5px solid var(--k,var(--naa))}
+  .tidslinje-liste li.ferdig{opacity:.55}
+  .tidslinje-liste time{font:500 13px/1.3 "DM Mono",monospace;color:var(--k,var(--naa))}
+  .tidslinje-liste b{display:block;font-size:15px}
+  .tidslinje-liste span{font-size:13.5px;color:var(--blekk-svak)}
+  .milepaeldetalj{display:none}
+  .pilknapp .tekst{display:none}
+  .billett{grid-template-columns:auto minmax(0,1fr);--hakk:62px}
+  .billett .stempel{grid-column:2;justify-self:start}
+  .billett .nummer{width:30px;font-size:30px;padding-right:12px}
+}
+@media (max-width: 520px){
+  .skulemerke b{display:none}
+  .agenda{grid-template-columns:minmax(0,1fr)}
+  .myter{grid-template-columns:minmax(0,1fr)}
+  .klagesteg{grid-template-columns:minmax(0,1fr)}
+  .sorter{grid-template-columns:minmax(0,1fr)}
+  .tipsrutenett{grid-template-columns:minmax(0,1fr)}
+  .hjul{gap:6px}
+  .remse div{font-size:14px;padding:16px 4px 0}
+  .ikonknapp{width:36px;height:36px}
+  .verktoy{gap:6px}
+  .verktoy .berre-stor{display:none}
+  .teljar{min-width:0}
+}
+@media (max-height: 760px) and (min-width: 861px){
+  :root{--topp-h:56px;--botn-h:56px}
+  .tittel{font-size:clamp(30px,2.4cqw + 2.8cqh,58px)}
+  .ingress{margin-bottom:16px}
+  .lysbilete{padding-top:4px}
+  .tidslinje{padding:76px 0 82px}
+}
+
+/* Store skjermar og prosjektorar: heile scena blir skalert opp */
+@media (min-width: 1600px) and (min-height: 900px){
+  .topplinje,.scene,.botnlinje{zoom:1.22}
+}
+@media (min-width: 2300px) and (min-height: 1300px){
+  .topplinje,.scene,.botnlinje{zoom:1.6}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important}
+  .klatt{display:none}
+}
+
+@media print{
+  @page{size:landscape;margin:12mm}
+  body{overflow:visible;height:auto;background:#fff;color:#16212A}
+  .topplinje,.botnlinje,.bakgrunn,.lag,.laser,.konfetti,.toast{display:none!important}
+  .scene{position:static;container-type:normal;zoom:1}
+  .lysbilete{position:relative;inset:auto;opacity:1!important;visibility:visible!important;transform:none!important;overflow:visible;break-after:page;min-height:auto;display:block}
+  [data-inn],.stortittel .bokstav,.tidslinje .milepael{opacity:1!important;transform:none!important;scale:1!important}
+  .kort,.billett,.nyheit .side,.myte .side{box-shadow:none!important}
+  .nyheit,.myte{min-height:0}
+  .nyheit .snu,.myte .snu{transform:none!important;min-height:0}
+  .nyheit .side,.myte .side{position:relative;transform:none!important;backface-visibility:visible;-webkit-backface-visibility:visible}
+  .nyheit .bakside,.myte .bakside{margin-top:6px}
+}

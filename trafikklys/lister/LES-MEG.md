@@ -1,5 +1,8 @@
 # Innmelding i Microsoft Lists
 
+> Bare aktuelt om skolen har klarert at elevstatus kan ligge i Teams.
+> Skal alt ligge i IOPsky, bruker dere arbeidsboka alene – se README.
+
 Dette er den varianten lærerne merker best: én liste i Teams, én rad per ting
 du melder inn. Flere kan skrive samtidig, det virker på mobilen, og lista
 holder selv styr på hvem som skrev hva og når.

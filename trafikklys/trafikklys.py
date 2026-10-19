@@ -49,18 +49,18 @@ def kommando_ny(args) -> int:
         skolear=demomodul.SKOLEAR if args.demo else _skolear(),
         klasser=demomodul.KLASSER if args.demo else None,
         elever=demomodul.ELEVAR if args.demo else None,
-        moter=demomodul.MOTER if args.demo else _forslag_til_moter(),
+        moter=demomodul.MOTER if args.demo else _forslag_til_moter(args.sprak or "bokmal"),
         innmeldingar=demomodul.innmeldingar() if args.demo else None,
         tiltak=demomodul.tiltak() if args.demo else None,
         sprak=args.sprak or (demomodul.SPRAK if args.demo else "bokmal"),
         logo=demomodul.LOGO if args.demo else "",
     )
     si(f"Arbeidsbok: {fil}")
-    si("Åpne den, start på arket «Start her», og kjør så:  python3 trafikklys.py bygg")
+    si("Åpne den og start på arket «Start her». Møtevisningen ligger i arket «Oversikt».")
     if not args.demo:
         si("")
         si("Arbeidsboka inneholder personopplysninger så snart du fyller den ut.")
-        si("Legg den i Teams, ikke i GitHub.")
+        si("Legg den der skolen oppbevarer taushetsbelagte dokumenter, f.eks. IOPsky – ikke i GitHub.")
     return 0
 
 
@@ -70,12 +70,12 @@ def _skolear() -> str:
     return f"{start}/{start + 1}"
 
 
-def _forslag_til_moter() -> list[tuple[str, dt.date]]:
+def _forslag_til_moter(sprak: str) -> list[tuple[str, dt.date]]:
     """Fire møter i året, som et utgangspunkt skolen flytter på."""
     i_dag = dt.date.today()
     start = i_dag.year if i_dag.month >= 8 else i_dag.year - 1
     return [
-        ("1 · Høst", dt.date(start, 9, 15)),
+        ("1 · Haust" if sprak.startswith("ny") else "1 · Høst", dt.date(start, 9, 15)),
         ("2 · Før jul", dt.date(start, 11, 24)),
         ("3 · Etter jul", dt.date(start + 1, 2, 3)),
         ("4 · Vår", dt.date(start + 1, 4, 21)),

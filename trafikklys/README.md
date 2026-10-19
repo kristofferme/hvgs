@@ -13,53 +13,79 @@ skolens profilfarge og logo. Alt sammen står i arkene og kan byttes.
 
 ```
 python3 trafikklys.py ny --demo    # arbeidsbok med et ferdig eksempel
-python3 trafikklys.py bygg         # lager møtevisningen
+python3 trafikklys.py ny           # tom arbeidsbok, klar til bruk
 ```
 
 Første gang: `pip install -r krav.txt` (openpyxl er det eneste som trengs).
+Python trengs bare for å *lage* arbeidsboka. Etter det er den en vanlig
+Excel-fil som klarer seg selv.
 
-## Hvordan det henger sammen
+## I IOPsky – arbeidsboka alene
 
-To halvdeler, og de kan brukes hver for seg:
+IOPsky er fylkets lukkede sky for taushetsbelagte dokumenter. Der kan det
+ikke kjøres programmer eller nettsider – bare dokumenter åpnes. Derfor gjør
+arbeidsboka hele jobben selv, med vanlige formler:
 
-**Innmeldingen** – der lærerne skriver. Enten en liste i **Microsoft Lists**
-som fane i Teams (anbefalt), eller Innmelding-arket i arbeidsboka.
+| Ark | Brukes til |
+| --- | --- |
+| **Innmelding** | Lærerne melder inn – én rad per ting |
+| **Oversikt** | Møtevisningen: velg møte og klasse, så står rutenettet ferdig |
+| **Elevkort** | Velg en elev: hva hver lærer skrev, og tiltakene som løper |
+| **Tiltak** | Det møtet ble enige om, med ansvarlig, frist og status |
 
-**Møtevisningen** – det dere ser på i elevstatusmøtet. Én HTML-fil som
-arbeidsboka lager, som du åpner i nettleseren og deler på skjermen.
+Ingen makroer, ingen tillegg, ingen lenker ut. Formlene er bevisst holdt til
+funksjoner som har fantes lenge (`SUMPRODUCT`, `INDEX`, `MATCH`, `LARGE`,
+`COUNTIFS`), så de regner likt i Excel, Excel for web og LibreOffice.
 
 Runden gjennom året:
 
 ```
-Lærerne melder inn fortløpende  →  Lists (eller Excel i Teams)
-Før møtet                       →  eksporter, lim inn, «trafikklys.py bygg»
-I møtet                         →  Elevstatus.html på skjermen
+Lærerne melder inn fortløpende  →  Innmelding-arket
+I møtet                         →  Oversikt på skjermen, Elevkort ved behov
 Etter møtet                     →  tiltak føres, med ansvarlig og frist
 Neste møte                      →  pilene viser hva som har flyttet seg
 ```
 
-### Hvorfor Lists til innmeldingen
+### Fire ting å sjekke i IOPsky før dere starter
 
-Lærerne skal skrive ofte og kort, gjerne fra mobilen mellom to timer. Der er
-en liste bedre enn et regneark: den låser ikke, den er laget for at mange
-skriver samtidig, den fyller inn «hvem» og «når» selv, og den har versjons-
-historikk hvis noe blir borte. Ingen nye lisenser – Lists følger med Microsoft
-365 og legges inn som en fane i teamet.
+Jeg har ikke tilgang til IOPsky og har ikke kunnet prøve fila der. Dette
+avgjør om det går slik som beskrevet:
 
-Oppskrift og ferdige filer ligger i [`lister/`](lister/LES-MEG.md). Kjør
-`python3 trafikklys.py lister`, så får du dem med skolens egne klasser og
-områder.
+1. **Godtar den Excel-filer**, eller bare Word? Word kan ikke regne, så med
+   bare Word faller oversikten bort.
+2. **Hva åpner den filene i?** Microsoft Excel (skrivebord eller nett) eller
+   noe annet, for eksempel Collabora/LibreOffice. Formlene er regnet gjennom i
+   LibreOffice; i Microsoft Excel bruker de bare eldre, vanlige funksjoner.
+3. **Kan flere skrive samtidig**, eller må fila sjekkes ut? Låser den, er det
+   lurt å ha én arbeidsbok per trinn eller per lærerteam, og en frist for
+   innmelding før hvert møte.
+4. **Hvem ser mappa?** Alle ansatte kan logge inn i IOPsky. Mappa med
+   arbeidsboka bør bare deles med lærerne som har klassene.
 
-**Vil dere heller ha alt i Excel?** Det virker også. Legg `Trafikklys.xlsx`
-i lærernes team, så skriver alle rett i Innmelding-arket. Ett forbehold:
-Elev-nedtrekket bruker `INDIRECT` for å vise bare klassens egne elever. Det
-virker i Excel på skrivebordet. I Excel for web kan det hende nedtrekket står
-tomt – da skriver du navnet for hånd, og arbeidsboka sier fra hvis det er
-stavet annerledes enn på Elever-arket.
+To nedtrekk – Elev i Innmelding og i Elevkort – bruker `INDIRECT` for å vise
+bare klassens egne elever. Virker ikke det i systemet dere har, står lista
+tom; da skriver du navnet for hånd, og Oversikt finner eleven likevel så lenge
+navnet er stavet som på Elever-arket.
+
+## Med Teams – bare om skolen tillater det
+
+Har skolen klarert at elevstatus kan ligge i Teams, finnes to tillegg:
+
+**Innmelding i Microsoft Lists.** Lærerne skriver ofte og kort, gjerne fra
+mobilen. Der er en liste bedre enn et regneark: den låser ikke, den fyller
+inn «hvem» og «når» selv, og den har versjonshistorikk. Oppskrift og ferdige
+filer ligger i [`lister/`](lister/LES-MEG.md); `python3 trafikklys.py
+lister` lager dem med skolens egne klasser og områder. Før møtet eksporterer
+du lista og limer radene inn i Innmelding-arket.
+
+**Møtevisning som nettside.** `python3 trafikklys.py bygg` lager
+`Elevstatus.html` – samme rutenett som Oversikt-arket, men med utfoldbare
+elevrader og lys/mørk modus. Den krever at Python kan kjøres på en maskin der
+fila får ligge, og passer derfor ikke i IOPsky.
 
 ## Arbeidsboka
 
-Fem ark, og bare to av dem er til daglig bruk.
+Sju ark. Lærerne bruker Innmelding; møtet bruker Oversikt og Elevkort.
 
 **Innmelding** – én rad per ting du melder inn:
 
@@ -92,7 +118,21 @@ Trivsel, Klassemiljø, Heim og føresette og Praktiske forhold. Bytt dem til det
 skolen faktisk bruker – rutenettet følger etter.
 
 **Elever** – én kolonne per klasse med navna. Det er denne som gjør at
-Elev-nedtrekket vet hvem som finnes.
+Elev-nedtrekket vet hvem som finnes, og den Oversikt henter klassen fra.
+
+**Oversikt** – møtevisningen i arket. Velg møte og klasse øverst. Rutenettet
+viser sterkeste lys per elev og område med formene ● ▲ ■, et tall når flere
+lærere har meldt inn det samme, og en pil mot forrige møte: ↑ verre,
+↓ bedre, ✱ ny. Elevene står med mest rødt øverst; de uten noe meldt inn står
+grått nederst. Øverst til høyre: antall røde, gule og grønne, hvor mange
+elever som er meldt inn, og åpne tiltak. Skrives ut på A4 liggende.
+
+**Elevkort** – velg en elev, så står alt som er meldt inn om eleven på det
+valgte møtet, og alle tiltakene eleven har, med frist og status.
+
+Oversikt og Elevkort er låst uten passord, så formlene ikke skrives over.
+Bare valgfeltene er åpne. Legger skolen til flere områder enn de åtte, viser
+du de skjulte kolonnene i Oversikt (høyreklikk → Vis). Det er plass til 12.
 
 **Start her** – oppskriften og hva lysene betyr, i arbeidsboka.
 
@@ -106,9 +146,9 @@ Innmelding rad 12: «Frammøtte» sto ikke i Oppsett. Den er tatt med som den er
 Innmelding rad 41: «Kari Nordmann» sto ikke på Elever-arket for 1ID. Eleven er lagt til.
 ```
 
-## Møtevisningen
+## Møtevisningen som nettside (valgfri)
 
-Én fil, uten noe utenfor seg selv – skriftene ligger inne i fila, så den ser
+Bare aktuelt der Python kan kjøres – ikke i IOPsky. Én fil, uten noe utenfor seg selv – skriftene ligger inne i fila, så den ser
 lik ut på skolens nett, på en projektor og uten nett i det hele tatt.
 
 - **Rutenettet** er hovedsaken. Én rad per elev, én kolonne per område.
@@ -138,10 +178,11 @@ Dette er det stedet løsningen skiller seg mest fra vekeplanen ved siden av.
 Vekeplanen legges ut på en åpen adresse. **Dette skal aldri legges ut.**
 
 - Arbeidsboka og `Elevstatus.html` inneholder personopplysninger om
-  identifiserbare elever. De hører hjemme i Teams, bak tilgangsstyringen
-  skolen allerede har.
-- Legg dem i **lærernes eget team eller en privat kanal** – ikke i
-  klasseteamet, der elevene er medlemmer.
+  identifiserbare elever. De hører hjemme der skolen oppbevarer
+  taushetsbelagte dokumenter – i Møre og Romsdal er det IOPsky.
+- Del mappa bare med lærerne som har klassene. Brukes Teams, er det
+  **lærernes eget team eller en privat kanal** – aldri klasseteamet, der
+  elevene er medlemmer.
 - Derfor finnes det med vilje **ingen `publiser`-kommando** her, og ingen
   `netlify.toml` i denne mappa. Koble aldri Netlify eller noe annet
   webhotell til `trafikklys/`.
@@ -164,7 +205,7 @@ Vekeplanen legges ut på en åpen adresse. **Dette skal aldri legges ut.**
 | `trafikklys.py ny` | ny, tom arbeidsbok |
 | `trafikklys.py ny --demo` | ferdig utfylt eksempel: tre klasser, to møter |
 | `trafikklys.py ny --sprak nynorsk` | arbeidsbok og møtevisning på nynorsk |
-| `trafikklys.py bygg` | lager `Elevstatus.html` |
+| `trafikklys.py bygg` | lager `Elevstatus.html` (valgfri, ikke for IOPsky) |
 | `trafikklys.py følg` | bygger på nytt hver gang arbeidsboka lagres |
 | `trafikklys.py sjekk` | leter etter skrivefeil og rader som ikke henger sammen |
 | `trafikklys.py lister` | lager oppsettet for Microsoft Lists |
@@ -174,7 +215,7 @@ Vekeplanen legges ut på en åpen adresse. **Dette skal aldri legges ut.**
 ```
 trafikklys.py             kommandolinja
 trafikklyslib/felles.py   lys, områder, målform, tolking av det som står i cellene
-trafikklyslib/regneark.py lager arbeidsboka
+trafikklyslib/regneark.py lager arbeidsboka, med Oversikt, Elevkort og formlene bak
 trafikklyslib/les.py      leser arbeidsboka – også et uttrekk limt inn fra Lists
 trafikklyslib/bygg.py     fyller malen og legger inn logoen
 trafikklyslib/lister.py   lager Excel-malene og fargeoppsettet til Microsoft Lists

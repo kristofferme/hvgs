@@ -21,7 +21,7 @@ ROT = Path(__file__).resolve().parent
 SRC = ROT / "src"
 UT = ROT / "publisert"
 
-CSS = ["fonter.css", "css/grunn.css", "css/skall.css", "css/blokker.css", "css/verktoy.css"]
+CSS = ["fonter.css", "css/grunn.css", "css/skall.css", "css/blokker.css", "css/verktoy.css", "css/hav.css"]
 
 
 def js_filer() -> list[Path]:
@@ -48,6 +48,20 @@ def bilder() -> dict[str, str]:
     return ut
 
 
+def foto() -> dict[str, dict]:
+    """Fotografiene i foto/ med kreditering fra foto/kreditter.json (CC BY 2.0)."""
+    mappe = ROT / "foto"
+    kred = json.loads((mappe / "kreditter.json").read_text(encoding="utf-8"))
+    ut: dict[str, dict] = {}
+    for navn, info in kred.items():
+        fil = mappe / f"{navn}.webp"
+        if not fil.exists():
+            print(f"  ! mangler {fil.name}")
+            continue
+        ut[navn] = dict(info, src="data:image/webp;base64," + base64.b64encode(fil.read_bytes()).decode("ascii"))
+    return ut
+
+
 def les(sti: Path) -> str:
     return sti.read_text(encoding="utf-8")
 
@@ -57,14 +71,15 @@ def main() -> None:
     css = "\n".join(les(SRC / f) for f in CSS)
     js = "\n;\n".join(les(f) for f in js_filer())
     bildedata = bilder()
-    forhånd = "window.FF_BILDER = " + json.dumps(bildedata) + ";\n"
+    fotodata = foto()
+    forhånd = "window.FF_BILDER = " + json.dumps(bildedata) + ";\nwindow.FF_FOTO = " + json.dumps(fotodata, ensure_ascii=False) + ";\n"
     mal = les(SRC / "index.html")
     side = (mal.replace("/*CSS*/", css)
                .replace("/*JS*/", (forhånd + js).replace("</script", "<\\/script")))
     UT.mkdir(exist_ok=True)
     (UT / "index.html").write_text(side, encoding="utf-8")
     kb = len(side.encode("utf-8")) // 1024
-    print(f"publisert/index.html · {kb} kB · {len(js_filer())} skript · {len(bildedata)} bilder")
+    print(f"publisert/index.html · {kb} kB · {len(js_filer())} skript · {len(fotodata)} foto · {len(bildedata)} egne bilder")
 
     if artefakt:
         # Artefaktvisningen legger selv på <html>, <head> og <body>.

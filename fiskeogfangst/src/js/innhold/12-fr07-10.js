@@ -37,6 +37,7 @@ FF.moduler.push({
       "<strong>Ising:</strong> Kulde, vind og sjøsprøyt sammen gir ising. Se modulen om stabilitet."
     ] },
 
+{ t: "foto", foto: "bolger-svaberg", cap: "Bølgene reiser seg og brekker når de kommer inn på grunt vann. Det skjer også over grunner langt ute – ikke bare mot land.", forhold: "16 / 9" },
     { t: "h2", tekst: "Tidevann og strøm" },
     { t: "p", html: "Månen og sola trekker i havet. Langs norskekysten får vi to flo og to fjære i døgnet, og høyvannet kommer rundt 50 minutter senere hver dag. Ved nymåne og fullmåne er forskjellen størst (<strong>springflo</strong>), ved halvmåne minst (<strong>nippflo</strong>)." },
     { t: "fig", fig: "tidevann", cap: "Tidevannet over et døgn. Tidevannstabeller for norske havner finner du hos Kartverket." },
@@ -120,6 +121,7 @@ FF.moduler.push({
 
     { t: "h2", tekst: "Garn" },
     { t: "fig", fig: "garn", cap: "Bunngarn i lenke. Flottørtelna holder garnet oppe, blytelna holder det nede." },
+{ t: "foto", foto: "fiskebat-garn", cap: "Fiskebåt med garn klart i bingen ved kaia.", forhold: "16 / 9" },
     { t: "p", html: "Fisken svømmer inn i garnet og setter seg fast med gjellelokkene i maskene. <strong>Maskevidden</strong> bestemmer hvor stor fisken blir – liten fisk går gjennom, stor fisk kommer ikke inn. Garn brukes særlig på torsk, sei og blåkveite, og settes ofte i lenker på mange garn." },
     { t: "steg", tittel: "Setting og haling av garn", items: [
       ["Klargjør", "Sjekk at garna er klare i kassene uten floker, og at bøyer, ankre og merking er i orden."],
@@ -140,6 +142,7 @@ FF.moduler.push({
 
     { t: "h2", tekst: "Teine" },
     { t: "fig", fig: "teine", cap: "Teine for krabbe. Fluktåpning slipper ut småkrabbe. Råtnetråden ruster eller råtner bort, så en tapt teine slutter å fiske." },
+{ t: "foto", foto: "teine-hal", cap: "Teina hales opp og tømmes. Fangsten kommer levende om bord, og småkrabbe kan slippes ut igjen.", forhold: "16 / 9" },
     { t: "p", html: "Teiner brukes på krabbe, kongekrabbe, snøkrabbe, hummer, sjøkreps og enkelte fiskearter. Fangsten kommer levende opp og kan sorteres og slippes ut igjen." },
 
     { t: "h2", tekst: "Snurrevad" },
@@ -152,6 +155,7 @@ FF.moduler.push({
 
     { t: "h2", tekst: "Not" },
     { t: "fig", fig: "ringnot", cap: "Ringnot. Når snurpelina trekkes inn, lukkes bunnen av nota, og hele stimen er fanget." },
+{ t: "foto", foto: "garn-kavler", cap: "Not og trål med flottører ligger klar på kaia. Flottørene holder overtelna oppe i sjøen.", forhold: "16 / 9" },
     { t: "p", html: "Ringnot brukes på sild, makrell, lodde og sei. Skipperen finner stimen med sonar og setter nota rundt den. Kystnot og landnot brukes nærmere land. Fisken kan holdes levende i nota og pumpes om bord." },
 
     { t: "h2", tekst: "Tauverk, knuter og vedlikehold" },
@@ -319,6 +323,7 @@ FF.moduler.push({
       "Oppdager du oljeflak fra eget fartøy: stopp kilden og varsle."
     ] },
 
+{ t: "foto", foto: "garn-kai", cap: "Garn er laget av plast. Et garn som blir liggende på havbunnen, kan fiske videre i lang tid.", forhold: "16 / 9" },
     { t: "h2", tekst: "Tapte redskaper og spøkelsesfiske" },
     { t: "p", html: "Et garn som er tapt, kan fortsette å fange fisk i lang tid – det kalles <strong>spøkelsesfiske</strong>. Derfor har du plikt til å lete etter redskap du har mistet, og melde fra om det du ikke finner. Meldingen går til Kystvakten, eller du registrerer den i den elektroniske fangstdagboka. Fiskeridirektoratet bruker meldingene når de rydder opp tapte redskaper hvert år." },
     { t: "notat", type: "praksis", tittel: "Ta med hjem", html: "<p>Får du avfall i redskapen, ta det med i land. Mange havner har ordninger der fiskere kan levere marin forsøpling gratis.</p>" },

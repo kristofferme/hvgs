@@ -26,6 +26,7 @@ FF.moduler.push({
       ["GM – metasenterhøyde", "Avstanden fra G opp til M. Positiv GM = fartøyet retter seg opp.", "metasenterhøgd"],
       ["GZ – rettende arm", "Den vannrette avstanden mellom vekta og oppdriften når fartøyet krenger.", "rettande arm"]
     ] },
+{ t: "foto", foto: "fiskebat-vind", cap: "I sterk vind og sjø får fartøyet hele tiden krefter som vil krenge det. Da er stabilitetsreserven – GM og GZ – det som får det til å rette seg opp igjen. Sjø på dekk og ising løfter G og spiser av den reserven.", forhold: "16 / 9" },
     { t: "notat", type: "fare", tittel: "Når G kommer over M", html: "<p>Hvis tyngdepunktet G kommer høyere enn metasenteret M, blir GM negativ. Da vrir kreftene fartøyet <em>videre over</em> i stedet for tilbake. Fartøyet får slagside eller kantrer.</p>" },
 
     { t: "h2", tekst: "Hva flytter tyngdepunktet?" },
@@ -194,6 +195,7 @@ FF.moduler.push({
       ["Gjennomfør", "Følg planen, og kontroller posisjonen jevnlig med minst to metoder – for eksempel GPS og radaravstand til en odde."],
       ["Overvåk og dokumenter", "Før logg: tid, posisjon, kurs, fart, vær og hendelser. Avvik fra planen skrives ned med årsak."]
     ] },
+{ t: "foto", foto: "lofoten-fjell", cap: "Trange sund og fjorder i Lofoten krever en god reiseplan: kurser, avstander til land og hvor du møter annen trafikk.", forhold: "16 / 9" },
     { t: "notat", type: "lokalt", tittel: "Over Hustadvika", html: "<p>Strekningen mellom Bud og Kristiansund ligger åpent mot havet. Grunnene langt ut gjør at sjøen kan bryte selv i moderat vind, særlig når vind og strøm står mot hverandre. Planlegg med god margin til grunnene, sjekk bølgevarselet, og vit hvor du kan gå inn hvis været slår om.</p>" },
 
     { t: "quiz", tittel: "Navigasjon", sp: [
@@ -287,6 +289,7 @@ FF.moduler.push({
 
     { t: "h2", tekst: "Brovakt" },
     { t: "p", html: "Sjøfartsdirektoratet har undersøkt mange grunnstøtinger med fiskefartøy. Et mønster går igjen: Den som hadde vakt, var alene, trøtt og sovnet. Andre ganger var oppmerksomheten på telefonen, fisket eller kartplotteren – ikke på sjøen." },
+{ t: "foto", foto: "bro-ms-lofoten", cap: "Broa på MS Lofoten. Instrumentene hjelper, men vakthavende skal også se ut av vinduet og lytte.", forhold: "16 / 9" },
     { t: "steg", tittel: "Overlevering av vakt", items: [
       ["Posisjon, kurs og fart", "Hvor er vi, hvor skal vi, og hvordan går det i forhold til planen?"],
       ["Trafikk og farer", "Fartøy i nærheten, merker, grunner og redskap i sjøen."],

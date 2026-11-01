@@ -42,5 +42,17 @@ FF.laererInnhold = function (alle) {
      ["Regelverk", "Tall som endres ofte – minstemål, kvoter og stengte felt – er med vilje ikke skrevet inn. Elevene øver på å finne gjeldende regler selv."]
     ].map(function (x) { return "<div><dt>" + x[0] + "</dt><dd>" + x[1] + "</dd></div>"; }).join("") + "</dl>" +
     '<p style="margin-top:24px"><a class="knapp" href="#figurer">Åpne illustrasjonsbanken</a></p></div></section>';
+  // Kreditering av fotografiene (CC BY 2.0 krever navn, kilde og lisens)
+  var navn = Object.keys(FF.foto);
+  if (navn.length) {
+    h += '<section class="seksjon" id="fotokreditt"><div class="ramme"><div class="seksjon-hode"><div><span class="etikett">Bilder</span><h2>Fotografiene</h2>' +
+      "<p>Fotografiene er hentet fra Open Images-samlingen og er publisert på Flickr med lisensen CC BY 2.0. Du kan bruke dem videre i undervisningen så lenge du oppgir fotografen og lisensen. Egne bilder fra skolebåten legger du i mappa «bilder».</p></div></div>" +
+      '<div class="tabell-rull"><table class="tabell"><thead><tr><th>Bilde</th><th>Motiv</th><th>Originaltittel</th><th>Fotograf</th><th>Lisens</th></tr></thead><tbody>' +
+      navn.map(function (k) {
+        var f = FF.foto[k];
+        return '<tr><td style="width:96px"><img src="' + f.src + '" alt="" loading="lazy" style="width:88px;height:58px;object-fit:cover;border-radius:2px;display:block"></td><td class="sterk">' + esc(f.tittel) + "</td><td>" + esc(f.originaltittel) +
+          '</td><td><a href="' + esc(f.kilde) + '" target="_blank" rel="noopener">' + esc(f.fotograf) + '</a></td><td><a href="' + esc(f.lisens_url) + '" target="_blank" rel="noopener">' + esc(f.lisens) + "</a></td></tr>";
+      }).join("") + "</tbody></table></div></div></section>";
+  }
   return h;
 };

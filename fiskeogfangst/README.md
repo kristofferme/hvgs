@@ -45,10 +45,25 @@ Kartrammens svart-hvite gradstige går igjen øverst på alle sider, og forsiden
 et Mercator-kart der hver modul er en havn på kursen fra Hustadvika til Vardø.
 Nattpaletten er laget som broa om natta – mørk og dempet.
 
+Fotografiene bærer designet: forsiden åpner på havna i Reine, hver etappe har
+sitt eget omslagsbilde fra kysten, og bølgekanter og dyphavsblått binder
+sidene sammen ned mot bunnen av sida. Tegningene (SVG) brukes der et foto ikke
+kan forklare – stabilitet, lanterner, redskap, kart.
+
 Skrifter: Barlow Condensed (overskrifter), Atkinson Hyperlegible Next
 (brødtekst – laget for lesbarhet), IBM Plex Mono (tall og data) og
 Big Shoulders Stencil (modulkodene, som malt på skroget). Alle ligger inne i
 fila.
+
+## Fotografier
+
+`foto/` har 29 fotografier fra norsk og nordatlantisk kyst (WebP, maks 1280 px).
+Alle er hentet fra Open Images-datasettet (Flickr) og har lisensen
+**CC BY 2.0**. Fotograf, originaltittel og lenker står i
+`foto/kreditter.json`, og bygget legger kreditten under hvert bilde og i en
+samlet tabell på lærersiden. Nytt foto: legg `navn.webp` i `foto/`, legg til
+en oppføring i `kreditter.json` og bruk det som `{ t: "foto", foto: "navn",
+cap: "…" }` i en modul, eller som omslag i `FF.omslag` i `kjerne.js`.
 
 ## Egne bilder
 
@@ -68,6 +83,7 @@ src/js/innhold/       læreplanen, modulene, ordlista og lærersiden
 src/js/verktoy/       simulatorer, kalkulatorer og om bord-kort
 src/js/app.js         visninger og ruter
 verktoy/              hent_fonter.py og lag_kart.mjs (kjøres bare ved endringer)
+foto/                 fotografier + kreditter.json (CC BY 2.0)
 bilder/               lærerens egne bilder
 ```
 

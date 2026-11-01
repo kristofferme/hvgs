@@ -23,6 +23,7 @@ FF.moduler.push({
       ["Fisker / dekksmann", "Arbeid med redskap og fangst", "Setting og haling, bløgging, sløying, ising, vedlikehold av redskap, vakt"],
       ["Lærling og elev", "Lære alle oppgavene under tilsyn", "Følger instruksen, spør når noe er uklart, sier fra om feil"]
     ] },
+{ t: "foto", foto: "rost-skrei", cap: "Skreisesong på Røst i februar. Fangsten tas imot, sorteres og ises. Lange dager i kulde er hverdagen – derfor betyr hviletid, riktig arbeidstøy og godt samarbeid mye.", forhold: "16 / 9" },
     { t: "notat", type: "regel", etikett: "Fartøyinstruks", tittel: "Alle skal vite hvor de skal være", html: "<p>Fiskefartøy skal ha en <strong>fartøyinstruks</strong> (på større fartøy kalt mønstringsliste). Den viser hvem som gjør hva ved <strong>brann</strong>, <strong>mann over bord</strong> og når dere må <strong>forlate fartøyet</strong>, og hvilke alarmsignaler som brukes. Den skal henge synlig og gjennomgås med alle nye før avgang.</p>" },
 
     { t: "h2", tekst: "Første tur: sikkerhetsgjennomgang" },
@@ -172,6 +173,7 @@ FF.moduler.push({
     { t: "verktoy", navn: "mayday" },
     { t: "p", html: "Fartøy skal også ha <strong>nødpeilesender (EPIRB)</strong> som sender posisjonen via satellitt når den kommer i sjøen, og ofte en <strong>radartransponder (SART)</strong> eller AIS-SART som viser dere på radaren og kartplotteren til redningsmannskapene." },
 
+{ t: "foto", foto: "redningsbat", cap: "Redningsskøyter og redningsbåter er på vei når du sender MAYDAY. Jo bedre posisjon du oppgir, jo raskere er de framme.", forhold: "16 / 9" },
     { t: "h2", tekst: "Forlate fartøyet" },
     { t: "steg", items: [
       ["Ta på overlevingsdrakt", "Øv på det. Du skal klare det på under to minutter."],
@@ -235,6 +237,7 @@ FF.moduler.push({
 
     { t: "h2", tekst: "Fartøytyper" },
     { t: "fig", fig: "fartoytyper", cap: "Fem vanlige fartøytyper, tegnet i samme målestokk. Kystflåten er fartøy under 28 meter, og de fleste er under 15 meter." },
+{ t: "foto", foto: "fiskebater-kai", cap: "Små kystfartøy ved kai. De fleste fartøyene i den norske fiskeflåten er under 15 meter.", forhold: "16 / 9" },
     { t: "p", html: "Fartøyene deles gjerne inn etter lengde og redskap. <strong>Kystflåten</strong> fisker med garn, line, juksa, snurrevad og not nær kysten. <strong>Havfiskeflåten</strong> – trålere, autolinere og ringnotfartøy – fisker lenger ute og er ute lenger om gangen. Lengden avgjør også hvilke regler som gjelder for utstyr, bemanning og sertifikater." },
 
     { t: "h2", tekst: "Delene på fartøyet" },

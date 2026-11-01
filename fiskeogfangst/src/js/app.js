@@ -26,6 +26,13 @@
 
   function kode(m) { return m.fag.toUpperCase() + "·" + m.nr; }
 
+  // Sidetopp med fotografi og bølgekant
+  function toppStart(nokkel, frø) {
+    var o = FF.omslag[nokkel];
+    if (!o || !FF.foto[o[0]]) return '<header class="sidetopp">' + FF.dybdekurver(frø || 7);
+    return '<header class="sidetopp med-foto">' + FF.fotoBak(o[0], "bakfoto", o[1]) + FF.bolgekant();
+  }
+
   function maalBrikker(liste, lenke) {
     return (liste || []).map(function (k) {
       var m = FF.maal[k];
@@ -64,7 +71,7 @@
       '<button class="ikon-knapp tema-knapp" type="button" aria-pressed="false">' + FF.ikon.maane + '<span class="tema-tekst">Dag</span></button>' +
       "</div></div></header>" +
       '<main id="innhold" tabindex="-1"></main>' +
-      '<footer class="bunn"><div class="ramme bunn-inner">' +
+      '<footer class="bunn">' + FF.bolgekant() + '<div class="ramme bunn-inner">' +
       "<div><h4>Fiske og fangst Vg2</h4><p>Læremiddel for programfagene i Vg2 fiske og fangst etter læreplan FFA02-03: fartøy og redskaper (337 timer), fangst og kvalitet (140 timer) og yrkesfaglig fordypning (253 timer).</p>" +
       "<p style=\"margin-top:10px\">Regelverk endres. Sjekk alltid gjeldende forskrifter og J-meldinger hos Fiskeridirektoratet, Sjøfartsdirektoratet og Lovdata før du bruker tall fra dette læremiddelet i praksis.</p>" +
       '<p class="koordinat">62°56\'N 007°05\'Ø · Hustadvika · versjon ' + FF.versjon + "</p></div>" +
@@ -93,6 +100,31 @@
 
   /* ---------- Forside ---------- */
 
+  // Fiskeriåret: [navn, område, typiske måneder (p = topp), redskap]
+  var SESONG = [
+    ["Skreifiske", "Lofoten, Vesterålen og kysten", [[1, "t"], [2, "p"], [3, "p"], [4, "t"]], "Garn, line, juksa, snurrevad"],
+    ["Vårtorsk", "Finnmark – torsken følger lodda", [[4, "t"], [5, "p"], [6, "t"]], "Snurrevad, juksa, garn"],
+    ["Hyse og lange", "Kysten og eggakanten", [[1, "t"], [2, "t"], [3, "t"], [4, "t"], [9, "t"], [10, "t"], [11, "t"], [12, "t"]], "Line"],
+    ["Makrell", "Nordsjøen og Norskehavet", [[8, "t"], [9, "p"], [10, "p"], [11, "t"]], "Ringnot, snøre"],
+    ["Norsk vårgytende sild", "Troms og Vesterålen – gyting på Møre", [[9, "t"], [10, "p"], [11, "p"], [12, "t"], [1, "t"], [2, "t"]], "Ringnot, trål"],
+    ["Sei", "Langs hele kysten", [[1, "t"], [2, "t"], [8, "t"], [9, "p"], [10, "p"], [11, "t"]], "Not, juksa, garn"],
+    ["Kongekrabbe", "Øst-Finnmark", [[9, "t"], [10, "p"], [11, "p"], [12, "t"]], "Teine"],
+    ["Dypvannsreke", "Barentshavet og kysten", [[1, "t"], [2, "t"], [3, "t"], [4, "t"], [5, "t"], [6, "t"], [7, "t"], [8, "t"], [9, "t"], [10, "t"], [11, "t"], [12, "t"]], "Reketrål"]
+  ];
+  var MND = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+
+  function sesongkalender() {
+    var h = '<div class="sesong" role="table" aria-label="Fiskeriåret: typiske måneder for de viktigste fiskeriene"><div class="sesong-rad sesong-hode" role="row"><span></span><div class="sesong-maaneder">' + MND.map(function (m) { return "<span>" + m + "</span>"; }).join("") + "</div></div>";
+    SESONG.forEach(function (r) {
+      var mnd = {};
+      r[2].forEach(function (x) { mnd[x[0]] = x[1]; });
+      var tekst = r[2].map(function (x) { return x[0]; });
+      h += '<div class="sesong-rad" role="row"><div class="navn"><strong>' + esc(r[0]) + "</strong><span>" + esc(r[1]) + " · " + esc(r[3]) + '</span></div><div class="sesong-maaneder" aria-label="Måneder: ' + tekst.join(", ") + '">' +
+        MND.map(function (_, i) { var v = mnd[i + 1]; return '<i class="' + (v || "") + '"></i>'; }).join("") + "</div></div>";
+    });
+    return h + '</div><p class="sesong-forkl"><span><i style="background:var(--sjo-dyp)"></i>Hovedsesong</span><span><i style="background:var(--skrog)"></i>Fiske foregår</span><span>Typisk mønster – varierer med år, kvoter og reguleringer.</span></p>';
+  }
+
   function forside() {
     var alle = sorterte();
     var ferdige = alle.filter(function (m) { return FF.status(m.id) === "ok"; }).length;
@@ -101,28 +133,46 @@
     var fortsett = paaVei || neste;
     var etappe = FF.kartdata.etapper[Math.min(ferdige, FF.kartdata.etapper.length - 1)];
 
-    var h = '<div class="ramme"><section class="hero">' +
-      '<div class="hero-tekst">' +
+    var h = '<section class="havhero">' + FF.fotoBak("lofoten-reine-havn", "bakfoto", "70% 45%") + FF.bolgekant() +
+      '<p class="posisjon" aria-hidden="true"><strong>67°56′N</strong>013°05′Ø · Reine</p>' +
+      '<div class="ramme"><div class="havhero-tekst">' +
       '<p class="etikett"><span>Naturbruk</span><span>Vg2</span><span>Læreplan FFA02-03</span></p>' +
       '<h1>Fiske og fangst <span class="vg">Vg2</span></h1>' +
-      '<p class="hero-ingress">Et læremiddel du kan bruke i klasserommet, i verkstedet og om bord. Tegninger, øvinger og sjekklister for alt fra stabilitet og sjøveisregler til bløgging, kvalitet og lott.</p>' +
+      '<p class="hero-ingress">Læremiddelet for deg som skal leve av havet. Bruk det i klasserommet, i verkstedet og om bord – med bilder, tegninger, simulatorer og sjekklister fra fartøy og redskap til bløgging, kvalitet og lott.</p>' +
       '<div class="kurs-status">' +
       '<div class="kurs-status-rad"><span class="stor">' + ferdige + "<small>/" + alle.length + "</small></span>" +
       '<span class="neste">etapper fullført' + (fortsett ? ". " + (paaVei ? "Du holder på med" : "Neste etappe") + ":<strong>" + esc(kode(fortsett)) + " " + esc(fortsett.tittel) + "</strong>" : "<strong>Hele kursen er fullført. God tur!</strong>") + "</span></div>" +
       '<div class="fremdrift-strek" aria-hidden="true">' + alle.map(function (m) { return '<i class="' + (FF.status(m.id) === "ok" ? "ok" : "") + '"></i>'; }).join("") + "</div>" +
       '<div class="knapperad">' +
       (fortsett ? '<a class="knapp" href="#' + fortsett.id + '">' + (paaVei ? "Fortsett" : ferdige ? "Neste etappe" : "Start kurset") + "</a>" : "") +
-      '<a class="knapp sekundar" href="#verktoy">Verktøy og øvinger</a></div>' +
-      "</div></div>" +
-      '<div class="kartfelt">' + FF.fig.kurskart({ ferdige: alle.map(function (m) { return FF.status(m.id) === "ok"; }), moduler: alle }) +
-      '<div class="kart-tittel"><span class="etikett">Kursen · ' + alle.length + ' etapper</span><strong>Fra Hustadvika til Vardø</strong>' +
-      '<span class="mono">Neste havn: ' + esc(etappe[0]) + "</span></div></div>" +
-      "</section></div>";
+      '<a class="knapp sekundar" href="#reiseplan" data-hopp="reiseplan">Se reiseplanen</a></div>' +
+      "</div></div></div></section>";
+
+    // Kursen langs kysten
+    h += '<section class="seksjon"><div class="ramme kurs-rad"><div class="tekst"><span class="etikett">Kursen</span><h2>Fra Hustadvika til Vardø</h2>' +
+      "<p>Vg2 er en tur langs kysten. Hver modul er en havn, og kursen tegnes inn i kartet etter hvert som du fullfører etappene. Fremdriften lagres bare på din egen enhet.</p>" +
+      "<p>Kartet er tegnet i Mercator, slik sjøkartet er. Den stiplede linja ved 62°N er grensa mange fiskerireguleringer bruker – Hustadvika ligger like nord for den.</p>" +
+      '<div class="kurs-fakta"><div><strong>' + alle.length + "</strong><span>etapper</span></div><div><strong>730</strong><span>timer programfag</span></div><div><strong>" + esc(etappe[0]) + '</strong><span>neste havn</span></div></div></div>' +
+      '<div class="kartfelt">' + FF.fig.kurskart({ ferdige: alle.map(function (m) { return FF.status(m.id) === "ok"; }), moduler: alle }) + "</div></div></section>";
+
+    // Livet langs kysten
+    var mos = [["torrfisk-hjell", "fk-05", "Tilvirking", "Tørrfisken henger på hjell"], ["rost-skrei", "fk-04", "Fangstbehandling", "Skreisesong på Røst"], ["bro-ms-lofoten", "fr-06", "Brovakt", "Utsikt fra broa"], ["teine-hal", "fr-08", "Redskaper", "Teina kommer opp"], ["fiskebat-storm", "fr-04", "Stabilitet", "Når sjøen står på"]];
+    h += '<section class="seksjon"><div class="ramme"><div class="seksjon-hode"><div><span class="etikett">Livet langs kysten</span><h2>Dette er yrket</h2>' +
+      "<p>Fra skreisesongen i Lofoten til tørrfisk på hjell og vakt på broa om natta. Trykk på et bilde for å gå til etappen.</p></div></div>" +
+      '<div class="mosaikk">' + mos.map(function (x) {
+        var f = FF.foto[x[0]];
+        if (!f) return "";
+        return '<a href="#' + x[1] + '"><img src="' + f.src + '" alt="' + esc(f.tittel) + '" loading="lazy"><span class="m-tekst"><span>' + esc(x[1].toUpperCase().replace("-", "·")) + " · " + esc(x[2]) + "</span><strong>" + esc(x[3]) + "</strong><small>Foto: " + esc(f.fotograf) + " · " + esc(f.lisens) + "</small></span></a>";
+      }).join("") + "</div></div></section>";
+
+    // Fiskeriåret
+    h += '<section class="seksjon"><div class="ramme"><div class="seksjon-hode"><div><span class="etikett">Fiskeriåret</span><h2>Når fisker vi hva?</h2>' +
+      "<p>Fisket følger fisken. Skreien kommer til kysten om vinteren, makrellen om høsten. Her er det typiske mønsteret for de viktigste fiskeriene.</p></div></div>" + sesongkalender() + "</div></section>";
 
     // Reiseplanen
     h += '<section class="seksjon" id="reiseplan"><div class="ramme">' +
       '<div class="seksjon-hode"><div><span class="etikett">Reiseplan</span><h2>Etappene i Vg2</h2>' +
-      "<p>Hver modul er en etappe langs kysten. Rekkefølgen er et forslag – læreren din bestemmer hvilken etappe dere tar når. Timene er veiledende og summerer til timetallet i læreplanen.</p></div></div>";
+      "<p>Rekkefølgen er et forslag – læreren din bestemmer hvilken etappe dere tar når. Timene er veiledende og summerer til timetallet i læreplanen.</p></div></div>";
     FAGREKKE.forEach(function (f) {
       var fag = FF.fag[f];
       var liste = alle.filter(function (m) { return m.fag === f; });
@@ -180,7 +230,7 @@
     var alle = sorterte();
     var liste = alle.filter(function (m) { return m.fag === f; });
     var maal = Object.keys(FF.maal).filter(function (k) { return FF.maal[k].fag === f; });
-    var h = '<header class="sidetopp">' + FF.dybdekurver(f.length * 7) + '<div class="ramme"><span class="etikett">Programfag · ' + fag.timer + " timer</span><h1>" + esc(fag.navn) + "</h1><p>" + esc(fag.ingress) + "</p></div></header>";
+    var h = toppStart(f, f.length * 7) + '<div class="ramme"><span class="etikett">Programfag · ' + fag.timer + " timer</span><h1>" + esc(fag.navn) + "</h1><p>" + esc(fag.ingress) + "</p></div></header>";
     h += '<section class="seksjon"><div class="ramme"><div class="seksjon-hode"><div><span class="etikett">Moduler</span><h2>Etappene</h2></div></div>' + reiseplanTabell(liste, alle) + "</div></section>";
     if (maal.length) {
       h += '<section class="seksjon"><div class="ramme"><div class="seksjon-hode"><div><span class="etikett">Kompetansemål</span><h2>Dette skal du kunne</h2><p>Målene er gjengitt i kortform. Full ordlyd står i læreplanen på udir.no.</p></div></div>' +
@@ -271,7 +321,9 @@
         "</div><p>" + Object.keys(FF.tilstand.kanjeg[m.id] || {}).filter(function (k) { return FF.tilstand.kanjeg[m.id][k] === 2; }).length + " av " + m.kanjeg.length + " sitter</p></div>";
     }
 
-    var h = '<header class="modul-topp">' + FF.dybdekurver(m.nr.charCodeAt(1) + m.fag.length * 11) + '<div class="ramme modul-topp-inner">' +
+    var oms = FF.omslag[m.id];
+    var harFoto = oms && FF.foto[oms[0]];
+    var h = '<header class="modul-topp' + (harFoto ? " med-foto" : "") + '">' + (harFoto ? FF.fotoBak(oms[0], "bakfoto", oms[1]) + FF.bolgekant() : FF.dybdekurver(m.nr.charCodeAt(1) + m.fag.length * 11)) + '<div class="ramme modul-topp-inner">' +
       '<div class="modul-kode" aria-hidden="true"><small>' + esc(fag.navn) + " · WP " + String(i + 1).padStart(2, "0") + "</small><span>" + m.fag.toUpperCase() + '<span class="kode-nr">' + m.nr + "</span></span></div>" +
       '<div class="modul-overskrift"><div class="smuler"><a href="#kurs">Kurs</a><span>/</span><a href="#' + m.fag + '">' + esc(fag.navn) + "</a></div>" +
       "<h1>" + esc(m.tittel) + '</h1><p class="undertittel">' + esc(m.under) + "</p></div>" +
@@ -329,6 +381,7 @@
           }).join("") + '</div><div class="hotspot-info" aria-live="polite"><span class="nr">?</span><strong>Trykk på punktene</strong><p>Utforsk figuren. <span class="hotspot-teller">0 av ' + b.punkter.length + " utforsket</span></p></div></div>");
       }
       case "foto": {
+        if (b.foto) return FF.fotoFig(b.foto, b.cap, b);
         var src = FF.bilder[b.fil];
         if (!src) return "";
         return '<figure class="foto"><img src="' + src + '" alt="' + esc(b.alt || b.cap || "") + '" loading="lazy">' + (b.cap ? "<figcaption>" + b.cap + "</figcaption>" : "") + "</figure>";
@@ -605,7 +658,7 @@
   /* ---------- Verktøy, ordliste, lærer ---------- */
 
   function verktoyOversikt() {
-    return '<header class="sidetopp">' + FF.dybdekurver(21) + '<div class="ramme"><span class="etikett">Øv med hendene</span><h1>Verktøy og øvinger</h1>' +
+    return toppStart("verktoy", 21) + '<div class="ramme"><span class="etikett">Øv med hendene</span><h1>Verktøy og øvinger</h1>' +
       "<p>Simulatorer, kalkulatorer og øvinger du kan bruke alene, i par eller på tavla. Alt virker uten nett.</p></div></header>" +
       '<section class="seksjon"><div class="ramme">' + verktoyRutenett() + "</div></section>" +
       '<section class="seksjon"><div class="ramme"><div class="seksjon-hode"><div><span class="etikett">Om bord-kort</span><h2>Sjekklister</h2></div></div><div class="lommekort-rad">' +
@@ -617,7 +670,7 @@
     var v = FF.verktoy[navn];
     if (!v) return ikkeFunnet();
     var mods = sorterte().filter(function (m) { return (m.verktoy || []).indexOf(navn) > -1; });
-    return '<header class="sidetopp">' + FF.dybdekurver(navn.length * 5) + '<div class="ramme"><span class="etikett">' + esc(v.etikett || "Verktøy") + "</span><h1>" + esc(v.tittel) + "</h1><p>" + esc(v.ingress || v.kort) + "</p></div></header>" +
+    return toppStart("verktoy", navn.length * 5) + '<div class="ramme"><span class="etikett">' + esc(v.etikett || "Verktøy") + "</span><h1>" + esc(v.tittel) + "</h1><p>" + esc(v.ingress || v.kort) + "</p></div></header>" +
       '<section class="seksjon"><div class="ramme"><div data-verktoy="' + navn + '"></div>' +
       (mods.length ? '<div style="margin-top:40px;display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span class="etikett" style="color:var(--blekk-3)">Brukes i</span>' + mods.map(function (m) { return '<a class="brikke" href="#' + m.id + '">' + esc(kode(m) + " " + m.tittel) + "</a>"; }).join("") + "</div>" : "") +
       "</div></section>";
@@ -625,7 +678,7 @@
 
   function ordliste() {
     var ord = FF.ord.slice().sort(function (a, b) { return a[0].localeCompare(b[0], "nb"); });
-    var h = '<header class="sidetopp">' + FF.dybdekurver(33) + '<div class="ramme"><span class="etikett">' + ord.length + ' fagord</span><h1>Ordliste</h1>' +
+    var h = toppStart("ordliste", 33) + '<div class="ramme"><span class="etikett">' + ord.length + ' fagord</span><h1>Ordliste</h1>' +
       "<p>Fagordene på bokmål, nynorsk og engelsk. Engelsk er språket på internasjonale fartøy og i sjøveisreglene.</p></div></header>" +
       '<section class="seksjon"><div class="ramme"><div class="ordsok"><label class="skjult-visuelt" for="ordsok">Søk i ordlista</label>' +
       '<input id="ordsok" type="search" placeholder="Søk: for eksempel «fribord» eller «bløgge»" autocomplete="off"><span class="mono ordteller" style="color:var(--blekk-3);font-size:.85rem"></span></div>' +
@@ -653,7 +706,7 @@
 
   function laerer() {
     var alle = sorterte();
-    var h = '<header class="sidetopp">' + FF.dybdekurver(41) + '<div class="ramme"><span class="etikett">For lærer</span><h1>Læreplan, progresjon og vurdering</h1>' +
+    var h = toppStart("laerer", 41) + '<div class="ramme"><span class="etikett">For lærer</span><h1>Læreplan, progresjon og vurdering</h1>' +
       "<p>Oversikt over hvordan modulene dekker kompetansemålene i FFA02-03, et forslag til årsplan og ideer til vurdering. Alt kan tilpasses egen skole og egne fartøy.</p></div></header>";
 
     h += '<section class="seksjon"><div class="ramme"><div class="seksjon-hode"><div><span class="etikett">Kjerneelementer</span><h2>Det viktigste i faget</h2></div></div>' +
@@ -693,7 +746,7 @@
   /* Illustrasjonsbank: alle tegningene samlet, til bruk i egne presentasjoner */
   function figurbank() {
     var navn = Object.keys(FF.fig).filter(function (k) { return !/^(kompassrose)$/.test(k) && !(FF.fig[k].skjult); });
-    var h = '<header class="sidetopp">' + FF.dybdekurver(51) + '<div class="ramme"><span class="etikett">For lærer · ' + navn.length + ' tegninger</span><h1>Illustrasjonsbank</h1>' +
+    var h = toppStart("figurer", 51) + '<div class="ramme"><span class="etikett">For lærer · ' + navn.length + ' tegninger</span><h1>Illustrasjonsbank</h1>' +
       "<p>Alle tegningene i læremiddelet. Kopier SVG-koden og lim den inn i PowerPoint, Word eller OneNote, eller ta et skjermbilde til tavla. Tegningene følger dag- og nattpaletten.</p></div></header>" +
       '<section class="seksjon"><div class="ramme" style="display:grid;gap:40px">';
     navn.forEach(function (k) {

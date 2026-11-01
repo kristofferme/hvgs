@@ -7,6 +7,7 @@ var FF = window.FF = {
   verktoy: {},
   ord: [],
   bilder: window.FF_BILDER || {},
+  foto: window.FF_FOTO || {},
   versjon: "2026.09"
 };
 
@@ -236,4 +237,48 @@ FF.ikon = {
   kopier: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="12" height="13" rx="1.5"/><path d="M16 8V4.5A1.5 1.5 0 0 0 14.5 3h-9A1.5 1.5 0 0 0 4 4.5v11A1.5 1.5 0 0 0 5.5 17H8"/></svg>',
   // Sjøkartets symbol for fiskeplass – brukt som merke
   fiskeplass: '<svg viewBox="0 0 34 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 11c5-7 13-8.5 20-4l7-5v18l-7-5c-7 4.5-15 3-20-4z"/><circle cx="8.5" cy="9.6" r="1.2" fill="currentColor" stroke="none"/></svg>'
+};
+
+/* ---------- Fotografier ---------- */
+
+FF.bolgekant = function () {
+  return '<svg class="bolgekant" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 36 C180 12 360 10 540 30 S900 56 1080 36 S1350 14 1440 28 L1440 60 L0 60 Z"/></svg>';
+};
+
+// Omslagsbilder for moduler og sider
+FF.omslag = {
+  "fr-01": ["mannskap-kai", "50% 40%"], "fr-02": ["bolger-molo", "50% 40%"], "fr-03": ["tralere-kai", "50% 60%"],
+  "fr-04": ["fiskebat-storm", "60% 60%"], "fr-05": ["lofoten-raftsund", "50% 60%"], "fr-06": ["tralere-natt", "50% 40%"],
+  "fr-07": ["fiskebat-vind", "50% 50%"], "fr-08": ["garn-kai", "50% 50%"], "fr-09": ["havn-fiskebater", "50% 60%"],
+  "fr-10": ["lofoten-fjell", "50% 55%"], "fk-01": ["fisk-pa-is", "50% 60%"], "fk-02": ["svolvaer", "50% 55%"],
+  "fk-03": ["garn-kavler", "50% 70%"], "fk-04": ["teine-hal", "50% 50%"], "fk-05": ["rost-skrei", "50% 45%"],
+  "fk-06": ["fiskemarked", "50% 50%"], "fk-07": ["lofoten-a", "50% 55%"], "yf-01": ["lofoten-rorbuer", "50% 55%"],
+  fr: ["tralere-natt", "50% 45%"], fk: ["torrfisk-hjell", "50% 35%"], yff: ["lofoten-rorbu-elv", "50% 50%"],
+  verktoy: ["bolger-svaberg", "50% 45%"], ordliste: ["lofoten-fjell", "50% 60%"], laerer: ["hav-reine", "50% 55%"],
+  figurer: ["vesteralen-kveld", "50% 55%"]
+};
+
+FF.kreditt = function (navn) {
+  var f = FF.foto[navn];
+  if (!f) return "";
+  return 'Foto: <a href="' + FF.esc(f.kilde) + '" target="_blank" rel="noopener">' + FF.esc(f.fotograf) + "</a> · " +
+    '<a href="' + FF.esc(f.lisens_url) + '" target="_blank" rel="noopener">' + FF.esc(f.lisens) + "</a>";
+};
+
+// Et foto som bakgrunn i et felt: <img> + kreditt i hjørnet
+FF.fotoBak = function (navn, klasse, posisjon) {
+  var f = FF.foto[navn];
+  if (!f) return "";
+  return '<img class="' + (klasse || "bakfoto") + '" src="' + f.src + '" alt="" style="object-position:' + (posisjon || "50% 50%") + '">' +
+    '<span class="fotokreditt">' + FF.esc(f.tittel) + " · " + FF.kreditt(navn) + "</span>";
+};
+
+FF.fotoFig = function (navn, tekst, opt) {
+  var f = FF.foto[navn];
+  if (!f) return "";
+  opt = opt || {};
+  return '<figure class="foto-fig' + (opt.bred ? " bred" : "") + '"><div class="foto-ramme"' + (opt.forhold ? ' style="aspect-ratio:' + opt.forhold + '"' : "") + '>' +
+    '<img src="' + f.src + '" alt="' + FF.esc(opt.alt || f.tittel) + '" loading="lazy" width="' + f.b + '" height="' + f.h + '"' + (opt.pos ? ' style="object-position:' + opt.pos + '"' : "") + "></div>" +
+    '<figcaption><span class="foto-tittel">' + FF.esc(f.tittel) + "</span>" + (tekst ? "<span>" + tekst + "</span>" : "") +
+    '<span class="foto-kred">' + FF.kreditt(navn) + "</span></figcaption></figure>";
 };

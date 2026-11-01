@@ -1,0 +1,257 @@
+/* ------------------------------------------------------------------
+   Havet: fotografier, bølgekanter og den dype sjøfargen
+   ------------------------------------------------------------------ */
+
+:root {
+  --dyp: #0a1f2e;          /* dypt hav – fotofelt, bunn og bånd */
+  --dyp-2: #12324a;
+  --skum: #e9f2f6;         /* tekst på mørkt hav */
+  --skum-2: #b8ccd8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --dyp: #050e15; --dyp-2: #0b2131; }
+}
+:root[data-theme="dark"] { --dyp: #050e15; --dyp-2: #0b2131; }
+
+/* Bølgekant i bunnen av fotofelt – tegnet i sidens bakgrunnsfarge */
+.bolgekant {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  width: 100%;
+  height: clamp(28px, 4vw, 56px);
+  color: var(--papir);
+  pointer-events: none;
+  z-index: 2;
+}
+.bolgekant path { fill: currentColor; }
+
+/* Fotokreditt i hjørnet av et fotofelt */
+.fotokreditt {
+  position: absolute;
+  right: 12px;
+  bottom: clamp(34px, 4.6vw, 62px);
+  z-index: 3;
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  color: rgba(233, 242, 246, 0.82);
+  background: rgba(5, 14, 21, 0.45);
+  padding: 3px 8px;
+  border-radius: 2px;
+  max-width: calc(100% - 24px);
+}
+.fotokreditt a { color: inherit; }
+
+.bakfoto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* ---------- Forsidens fotohero ---------- */
+
+.havhero {
+  position: relative;
+  overflow: hidden;
+  background: var(--dyp);
+  color: var(--skum);
+  min-height: clamp(520px, 70vh, 720px);
+  display: flex;
+  align-items: flex-end;
+}
+.havhero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(6, 20, 32, 0.92) 0%, rgba(6, 20, 32, 0.72) 38%, rgba(6, 20, 32, 0.1) 72%),
+    linear-gradient(0deg, rgba(6, 20, 32, 0.75) 0%, rgba(6, 20, 32, 0) 45%);
+}
+.havhero .ramme {
+  position: relative;
+  z-index: 2;
+  padding-block: var(--m8) calc(var(--m8) + 40px);
+}
+.havhero-tekst { max-width: 620px; }
+.havhero .etikett { color: var(--skum-2); display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.havhero .etikett span + span::before { content: "·"; margin-right: 14px; opacity: .6; }
+.havhero h1 {
+  font-size: clamp(3rem, 8.5vw, 6.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.88;
+  margin-top: var(--m4);
+  color: #fff;
+}
+.havhero h1 .vg { font-family: var(--f-sjablong); color: #ff8fcf; letter-spacing: 0; }
+.havhero .hero-ingress { color: var(--skum); font-size: var(--t-m); line-height: 1.5; margin-top: var(--m5); max-width: 32em; }
+.havhero .kurs-status { border-top-color: rgba(233, 242, 246, 0.6); }
+.havhero .kurs-status .stor small { color: var(--skum-2); }
+.havhero .kurs-status .neste { color: var(--skum-2); }
+.havhero .kurs-status .neste strong { color: #fff; }
+.havhero .fremdrift-strek i { background: rgba(233, 242, 246, 0.22); }
+.havhero .fremdrift-strek i.ok { background: #ff8fcf; }
+.havhero .knapp { background: #fff; border-color: #fff; color: var(--dyp); }
+.havhero .knapp:hover { background: var(--magenta); border-color: var(--magenta); color: #fff; }
+.havhero .knapp.sekundar { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.8); }
+.havhero .knapp.sekundar:hover { background: #fff; color: var(--dyp); }
+.havhero .posisjon {
+  position: absolute;
+  z-index: 2;
+  right: clamp(16px, 4vw, 40px);
+  top: var(--m6);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  color: var(--skum-2);
+  text-align: right;
+  line-height: 1.6;
+}
+.havhero .posisjon strong { display: block; font-family: var(--f-sjablong); font-size: 1.5rem; color: #fff; font-weight: 800; letter-spacing: 0.02em; }
+@media (max-width: 720px) {
+  .havhero { min-height: 0; }
+  .havhero::after { background: linear-gradient(0deg, rgba(6, 20, 32, 0.94) 0%, rgba(6, 20, 32, 0.78) 55%, rgba(6, 20, 32, 0.35) 100%); }
+  .havhero .ramme { padding-block: 160px calc(var(--m7) + 30px); }
+  .havhero .posisjon { display: none; }
+}
+
+/* Kursen: kart + tekst */
+.kurs-rad {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: var(--m7);
+  align-items: center;
+}
+.kurs-rad .tekst p { color: var(--blekk-2); margin-top: var(--m4); max-width: 46ch; }
+.kurs-rad .tekst h2 { font-size: var(--t-xl); }
+.kurs-rad .tekst .etikett { color: var(--magenta); display: block; margin-bottom: var(--m3); }
+.kurs-fakta { margin-top: var(--m5); display: grid; grid-template-columns: repeat(3, 1fr); border-top: 2px solid var(--blekk); }
+.kurs-fakta div { padding: 12px 10px 0 0; }
+.kurs-fakta strong { display: block; font-family: var(--f-sjablong); font-size: 2.2rem; line-height: 1; }
+.kurs-fakta span { font-size: 0.82rem; color: var(--blekk-3); }
+@media (max-width: 920px) { .kurs-rad { grid-template-columns: 1fr; } }
+
+/* Fiskeriåret – sesongkalender */
+.sesong { border-top: 2px solid var(--blekk); }
+.sesong-rad {
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--linje);
+}
+.sesong-rad .navn strong { font-family: var(--f-display); font-size: 1.15rem; display: block; line-height: 1.1; }
+.sesong-rad .navn span { font-size: 0.8rem; color: var(--blekk-3); }
+.sesong-maaneder { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+.sesong-maaneder i { height: 22px; background: var(--flate-2); border-radius: 2px; }
+.sesong-maaneder i.p { background: var(--sjo-dyp); }
+.sesong-maaneder i.t { background: var(--skrog); }
+.sesong-hode { border-bottom: 0; padding-bottom: 4px; }
+.sesong-hode .sesong-maaneder span { font-family: var(--f-mono); font-size: 0.72rem; color: var(--blekk-3); text-align: center; }
+.sesong-forkl { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 0.82rem; color: var(--blekk-2); align-items: center; }
+.sesong-forkl i { display: inline-block; width: 22px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+@media (max-width: 640px) {
+  .sesong-rad { grid-template-columns: 1fr; gap: 6px; }
+  .sesong-maaneder i { height: 16px; }
+}
+
+/* Livet langs kysten – fotomosaikk */
+.mosaikk {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  grid-template-rows: 240px 240px;
+  gap: 10px;
+}
+.mosaikk a {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r);
+  text-decoration: none;
+  color: #fff;
+  background: var(--dyp);
+}
+.mosaikk a:first-child { grid-row: span 2; }
+.mosaikk img { width: 100%; height: 100%; object-fit: cover; transition: transform 600ms cubic-bezier(.2,.7,.2,1); }
+.mosaikk a:hover img { transform: scale(1.04); }
+.mosaikk a::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(6, 20, 32, 0.88) 0%, rgba(6, 20, 32, 0) 60%); }
+.mosaikk .m-tekst { position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 1; }
+.mosaikk .m-tekst span { font-family: var(--f-mono); font-size: 0.72rem; color: var(--skum-2); }
+.mosaikk .m-tekst strong { display: block; font-family: var(--f-display); font-size: 1.45rem; line-height: 1.05; margin-top: 2px; }
+.mosaikk .m-tekst small { display: block; font-size: 0.66rem; color: var(--skum-2); margin-top: 6px; font-family: var(--f-mono); }
+@media (max-width: 760px) {
+  .mosaikk { grid-template-columns: 1fr 1fr; grid-template-rows: 220px 160px 160px; }
+  .mosaikk a:first-child { grid-column: span 2; grid-row: auto; }
+}
+
+/* ---------- Modultopp og sidetopp med foto ---------- */
+
+.modul-topp.med-foto, .sidetopp.med-foto {
+  background: var(--dyp);
+  color: var(--skum);
+  border-bottom: 0;
+}
+.modul-topp.med-foto::after, .sidetopp.med-foto::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(6, 20, 32, 0.9) 0%, rgba(6, 20, 32, 0.7) 45%, rgba(6, 20, 32, 0.25) 100%),
+    linear-gradient(0deg, rgba(6, 20, 32, 0.8) 0%, rgba(6, 20, 32, 0) 50%);
+}
+.modul-topp.med-foto .modul-topp-inner, .sidetopp.med-foto .ramme { position: relative; z-index: 2; }
+.modul-topp.med-foto .modul-topp-inner { padding-block: var(--m8) calc(var(--m6) + 48px); }
+.sidetopp.med-foto { padding-block: var(--m8) calc(var(--m7) + 40px); }
+.med-foto .modul-kode, .med-foto h1 { color: #fff; }
+.med-foto .modul-kode .kode-nr { color: #ff8fcf; }
+.med-foto .modul-kode small, .med-foto .smuler, .med-foto .smuler a { color: var(--skum-2); }
+.med-foto .undertittel, .sidetopp.med-foto p { color: var(--skum); }
+.sidetopp.med-foto .etikett { color: #ff8fcf; }
+.med-foto .modul-meta { border-top-color: rgba(233, 242, 246, 0.28); }
+.med-foto .modul-meta .meta-felt > .etikett { color: var(--skum-2); }
+.med-foto .brikke { background: rgba(10, 31, 46, 0.55); color: var(--skum); border-color: rgba(233, 242, 246, 0.35); }
+.med-foto .brikke.fylt { background: #fff; color: var(--dyp); border-color: #fff; }
+.med-foto .ikon-knapp { background: rgba(10, 31, 46, 0.55); color: #fff; border-color: rgba(233, 242, 246, 0.5); }
+.med-foto .ikon-knapp:hover { border-color: #fff; }
+.med-foto .les-knapp[aria-pressed="true"] { background: var(--magenta); border-color: var(--magenta); }
+.med-foto .fotokreditt { bottom: clamp(30px, 4vw, 58px); }
+
+/* ---------- Foto som figur i teksten ---------- */
+
+.foto-fig { margin: 0; }
+.foto-ramme { border-radius: var(--r); overflow: hidden; background: var(--dyp); }
+.foto-ramme img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.foto-fig figcaption {
+  display: grid;
+  gap: 2px 12px;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin-top: 10px;
+  font-size: var(--t-s);
+  color: var(--blekk-2);
+  line-height: 1.45;
+  max-width: var(--maal);
+}
+@media (max-width: 640px) { .foto-fig figcaption { grid-template-columns: minmax(0, 1fr); } }
+.foto-fig .foto-tittel { overflow-wrap: anywhere; font-family: var(--f-display); font-weight: 700; font-size: 1rem; color: var(--blekk); letter-spacing: 0.02em; text-transform: uppercase; }
+.foto-fig .foto-kred { grid-column: 1 / -1; font-family: var(--f-mono); font-size: 0.7rem; color: var(--blekk-3); }
+.foto-fig .foto-kred a { color: inherit; }
+.foto-fig.bred .foto-ramme { aspect-ratio: 21 / 9; }
+
+/* ---------- Bunnen: dypt hav ---------- */
+
+.bunn {
+  position: relative;
+  background: var(--dyp);
+  color: var(--skum-2);
+  border-top: 0;
+  margin-top: calc(var(--m8) + 30px);
+}
+.bunn .bolgekant { top: -1px; bottom: auto; transform: scaleY(-1); }
+.bunn h4 { color: #fff; }
+.bunn a { color: var(--skum); }
+.bunn a:hover { color: #ff8fcf; }
+.bunn .koordinat { color: var(--skum-2); }
+.bunn-inner { padding-block: calc(var(--m7) + 30px) var(--m7); }

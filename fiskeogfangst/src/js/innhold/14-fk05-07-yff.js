@@ -24,6 +24,7 @@ FF.moduler.push({
       ["Kokt reke og krabbe", "Kokt og fryst om bord", "Reketrålere og snøkrabbefartøy"]
     ] },
 
+{ t: "html", html: '<div class="fig-par">' + FF.fotoFig("torrfisk-hjell", "Skreien henges på hjell fra februar til mai og tørker i vind og kulde. Ferdig tørrfisk eksporteres særlig til Italia.") + FF.fotoFig("klippfisk", "Klippfisk er saltet og tørket torsk. Portugal, Brasil og Spania er de store markedene.") + "</div>" },
     { t: "h2", tekst: "Råstoffutnyttelse" },
     { t: "fig", fig: "utnyttelse", cap: "Omtrentlig fordeling av en torsk. Filetutbyttet avhenger av størrelse, sesong og hvordan fisken skjæres." },
     { t: "ul", items: [
@@ -173,6 +174,7 @@ FF.moduler.push({
 
     { t: "h2", tekst: "Salgslag og marked" },
     { t: "p", html: "All villfanget fisk i Norge omsettes første gang gjennom et <strong>salgslag</strong>. Salgslagene fastsetter minstepriser, sørger for at fiskeren får betalt, og kontrollerer at det som landes stemmer med kvotene. Norges Sildesalgslag omsetter pelagisk fisk for hele landet. Bunnfisk omsettes av regionale salgslag – langs Mørekysten blant annet Sunnmøre og Romsdal Fiskesalslag og Norges Råfisklag. Sjekk hvilket lag som gjelder der dere lander." },
+{ t: "foto", foto: "fiskemarked", cap: "Fisk og skalldyr i kasser på et fiskemarked i Tokyo. Norsk sjømat selges i rundt 150 land.", forhold: "16 / 9" },
     { t: "tabell", hode: ["Produkt", "Viktige markeder"], rader: [
       ["Fersk torsk og hyse", "EU og Storbritannia"],
       ["Fryst hodekappet torsk", "Kina, som bearbeider og selger videre"],
@@ -228,6 +230,7 @@ FF.moduler.push({
     { t: "verktoy", navn: "praksislogg" },
 
     { t: "h2", tekst: "Veien videre" },
+{ t: "foto", foto: "vesteralen-kveld", cap: "Kveld i Vesterålen. Mange velger yrket fordi de vil jobbe på havet – og bo ved det.", forhold: "21 / 9" },
     { t: "fig", fig: "veivalg", cap: "Det vanlige løpet er to år på skole og to år som lærling om bord. Fagbrev som fisker gir mange veier videre." },
     { t: "tabell", tittel: "Fiskeskippersertifikat klasse C", hode: ["Krav", "Hva det betyr"], rader: [
       ["Alder", "Minst 18 år"],

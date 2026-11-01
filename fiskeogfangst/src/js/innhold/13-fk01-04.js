@@ -45,6 +45,7 @@ FF.moduler.push({
       ["Norsk vårgytende sild", "Februar–mars, langs kysten, blant annet utenfor Møre", "Ringnot og trål høst og vinter"],
       ["Makrell", "Vår og sommer, vest for Storbritannia og i Nordsjøen", "Ringnot og trål august–oktober"]
     ] },
+{ t: "foto", foto: "lofoten-a", cap: "Å på Moskenesøya. Fiskeværene i Lofoten ble bygd for skreifisket, og mange rorbuer står fortsatt ved sjøen.", forhold: "16 / 9" },
     { t: "notat", type: "lokalt", tittel: "Havet utenfor oss", html: "<p>Mørekysten ligger midt i vandringsveiene. Silda kommer inn for å gyte, skreien kommer langs kysten, og feltene utenfor Hustadvika og Nordmøre er viktige for både kystflåten og havfiskeflåten. Snakk med fiskere i distriktet om hvilke arter som fiskes når.</p>" },
 
     { t: "h2", tekst: "Økosystemet" },
@@ -238,6 +239,7 @@ FF.moduler.push({
 
     { t: "h2", tekst: "Kjøling og lagring" },
     { t: "fig", fig: "temperatur", cap: "Jo varmere fisken er, jo raskere forsvinner kvaliteten. Prinsippskisse." },
+{ t: "foto", foto: "fisk-pa-is", cap: "Fisken skal ligge på og under is – kald hele veien fra båten til kunden.", forhold: "16 / 9" },
     { t: "tabell", hode: ["Metode", "Slik virker det", "Brukes"], rader: [
       ["Is i kasser", "Fisken legges lagvis med is under, mellom og over", "Kystflåten, fersk fisk"],
       ["RSW (kjølt sjøvann)", "Sjøvann kjølt med kjøleanlegg, nær 0 °C", "Pelagisk fisk og mye bunnfisk på større fartøy"],

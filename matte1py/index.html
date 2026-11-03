@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nn">
+<html lang="nb">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -23,9 +23,11 @@
     <nav class="hovudnav" aria-label="Hovudmeny">
       <a class="nav-lenke" data-nav="kap" href="#start">Kapittel</a>
       <a class="nav-lenke" href="#trening">Matteløypa</a>
+      <a class="nav-lenke" data-nav="papir" href="#papir">Oppgåvehefte</a>
       <a class="nav-lenke" href="#laereplan">Læreplan</a>
     </nav>
     <div class="topp-verktoy">
+      <button id="spraakknapp" class="spraak mono" type="button" title="Bokmål eller nynorsk" data-nt><b>BM</b> · NN</button>
       <button id="formelknapp" class="ikon" type="button" title="Formelark (F)" aria-label="Opne formelarket"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5H7l6 7-6 7h11"/></svg></button>
       <button id="kalkknapp" class="ikon" type="button" title="Kalkulator (K)" aria-label="Opne kalkulatoren"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg></button>
       <button id="peikarknapp" class="ikon berre-mus" type="button" title="Koordinatpeikar" aria-label="Slå koordinatpeikaren av eller på" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg></button>
@@ -55,7 +57,10 @@
 </div>
 
 <script src="js/kjerne.js"></script>
+<script src="js/spraak.js"></script>
 <script src="js/python.js"></script>
+<script src="js/papir.js"></script>
+<script src="js/ressursar.js"></script>
 <script src="js/kap/01-tal.js"></script>
 <script src="js/kap/02-einingar.js"></script>
 <script src="js/kap/03-forhold.js"></script>
@@ -66,6 +71,8 @@
 <script src="js/kap/08-statistikk.js"></script>
 <script src="js/kap/09-okonomi.js"></script>
 <script src="js/kap/10-programmering.js"></script>
+<script src="js/ovingsboks.js"></script>
+<script src="js/sider.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

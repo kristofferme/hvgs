@@ -61,14 +61,14 @@ else:
   /* --- Python-laben --- */
   function lab(vert, opts = {}) {
     const velg = el('select', { id: 'py-val' + (opts.id || ''), 'aria-label': 'Vel eit eksempelprogram' });
-    Object.keys(PROGRAM).forEach((k) => velg.append(el('option', { value: k }, k)));
+    Object.keys(PROGRAM).forEach((k) => velg.append(el('option', { value: k }, MT.t(k))));
     const kode = el('textarea', { class: 'kode mono', id: 'py-kode' + (opts.id || ''), spellcheck: 'false', autocapitalize: 'off', 'aria-label': 'Python-kode' });
     const linjenr = el('div', { class: 'linjenr mono', 'aria-hidden': 'true' });
     const inndata = el('textarea', { class: 'inndata mono', id: 'py-inn' + (opts.id || ''), rows: 2, placeholder: 'Inndata, éin verdi per linje (til input())', 'aria-label': 'Inndata' });
     const ut = el('pre', { class: 'utdata mono', 'aria-live': 'polite' });
     const vars = el('div', { class: 'variablar' });
     const kjorBtn = el('button', { class: 'knapp' }, '▶ Køyr');
-    const sett = (k) => { kode.value = PROGRAM[k]; inndata.value = k.includes('input') ? '120\n2.5' : ''; tal(); kjor(); };
+    const sett = (k) => { kode.value = MT.t(PROGRAM[k]); inndata.value = k.includes('input') ? '120\n2.5' : ''; tal(); kjor(); };
     const tal = () => { linjenr.textContent = kode.value.split('\n').map((_, i) => i + 1).join('\n'); };
     function kjor() {
       const r = MiniPython.kjor(kode.value, { inndata: inndata.value.split('\n').filter((x) => x.trim() !== '') });

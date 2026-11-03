@@ -16,17 +16,23 @@
   MT.skriv = (k, v) => { try { localStorage.setItem('mt.' + k, JSON.stringify(v)); } catch (e) {} };
 
   MT.MAAL = 8; // rette svar for å meistre eit kapittel
+  MT.RANGAR = [[0, 'Lærling'], [150, 'Gardshjelp'], [400, 'Fagarbeidar'], [800, 'Driftsleiar'], [1400, 'Agronom'], [2200, 'Meister'], [3500, 'Matte-legende']];
+  MT.rang = (xp = MT.lager.xp) => { let i = 0; MT.RANGAR.forEach((r, j) => { if (xp >= r[0]) i = j; }); const neste = MT.RANGAR[i + 1]; return { namn: MT.RANGAR[i][1], nr: i, fra: MT.RANGAR[i][0], til: neste ? neste[0] : null, neste: neste ? neste[1] : null }; };
+  MT.kombo = () => (MT.lager.rekke >= 10 ? 3 : MT.lager.rekke >= 5 ? 2 : 1);
   MT.registrer = function (kapId, rett) {
-    const L = MT.lager;
+    const L = MT.lager, forRang = MT.rang().nr;
     L.forsok[kapId] = (L.forsok[kapId] || 0) + 1;
+    let xp = 0;
     if (rett) {
       L.rett[kapId] = (L.rett[kapId] || 0) + 1;
       L.rekke += 1; L.besteRekke = Math.max(L.besteRekke, L.rekke);
-      L.xp += 10 + Math.min(L.rekke, 10);
+      xp = 10 * MT.kombo() + Math.min(L.rekke, 10);
+      L.xp += xp;
       L.dagar[new Date().toISOString().slice(0, 10)] = 1;
     } else L.rekke = 0;
     MT.lagre();
-    document.dispatchEvent(new CustomEvent('mt:framdrift'));
+    document.dispatchEvent(new CustomEvent('mt:framdrift', { detail: { xp, rett, nyRang: MT.rang().nr > forRang } }));
+    return xp;
   };
   MT.framdrift = (kapId) => Math.min(1, (MT.lager.rett[kapId] || 0) / MT.MAAL);
 
@@ -62,7 +68,7 @@
   };
 
   /* ---------- Formelsetjing: $…$ og $$…$$ ---------- */
-  const SYM = { cdot: '·', times: '×', div: ':', pi: 'π', approx: '≈', le: '≤', ge: '≥', ne: '≠', Rightarrow: '⇒', to: '→', pm: '±', deg: '°', infty: '∞', Delta: 'Δ', quad: '<span class="q"></span>', qquad: '<span class="q"></span><span class="q"></span>', ',': ' ', '%': '%' };
+  const SYM = { cdot: '·', times: '×', div: ':', pi: 'π', approx: '<span class="o">≈</span>', le: '<span class="o">≤</span>', ge: '<span class="o">≥</span>', ne: '<span class="o">≠</span>', Rightarrow: '<span class="o">⇒</span>', to: '→', pm: '±', deg: '°', infty: '∞', Delta: 'Δ', quad: '<span class="q"></span>', qquad: '<span class="q"></span><span class="q"></span>', ',': ' ', '%': '%' };
   const esc = (c) => (c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '&' ? '&amp;' : c);
   MT.tex = function (s) {
     let i = 0;
@@ -232,8 +238,8 @@
       ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
       for (let y = Math.ceil(o.ymin / ys) * ys; y <= o.ymax + 1e-9; y += ys) if (Math.abs(y) > 1e-9) ctx.fillText(MT.n(y, 3), x0 - 6, this.Y(y));
       ctx.font = 'italic 13px "STIX Two Text", Cambria, Georgia, serif'; ctx.fillStyle = F.blekk;
-      ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(o.xnamn, this.X(o.xmax) - 2, y0 - 4);
-      ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText(o.ynamn, x0 + 6, this.Y(o.ymax) + 2);
+      ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(MT.t ? MT.t(o.xnamn) : o.xnamn, this.X(o.xmax) - 2, y0 - 4);
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText(MT.t ? MT.t(o.ynamn) : o.ynamn, x0 + 6, this.Y(o.ymax) + 2);
       ctx.save(); ctx.beginPath(); ctx.rect(this.X(o.xmin), this.Y(o.ymax), this.X(o.xmax) - this.X(o.xmin), this.Y(o.ymin) - this.Y(o.ymax)); ctx.clip();
       this.lag && this.lag(this);
       ctx.restore();
@@ -255,7 +261,7 @@
       if (ring) { ctx.lineWidth = 2.5; ctx.strokeStyle = this.F.papir; ctx.stroke(); }
     }
     linje(x1, y1, x2, y2, farge, b = 1.5, strek) { const ctx = this.ctx; ctx.strokeStyle = farge || this.F.blekk; ctx.lineWidth = b; ctx.setLineDash(strek || []); ctx.beginPath(); ctx.moveTo(this.X(x1), this.Y(y1)); ctx.lineTo(this.X(x2), this.Y(y2)); ctx.stroke(); ctx.setLineDash([]); }
-    tekst(t, x, y, farge, just = 'left', font) { const ctx = this.ctx; ctx.font = font || '600 12px "Instrument Sans", system-ui, sans-serif'; ctx.fillStyle = farge || this.F.blekk; ctx.textAlign = just; ctx.textBaseline = 'middle'; ctx.fillText(t, this.X(x), this.Y(y)); }
+    tekst(t, x, y, farge, just = 'left', font) { const ctx = this.ctx; ctx.font = font || '600 12px "Instrument Sans", system-ui, sans-serif'; ctx.fillStyle = farge || this.F.blekk; ctx.textAlign = just; ctx.textBaseline = 'middle'; ctx.fillText(MT.t ? MT.t(t) : t, this.X(x), this.Y(y)); }
     mangekant(p, fyll, strek) { const ctx = this.ctx; ctx.beginPath(); p.forEach(([x, y], i) => (i ? ctx.lineTo(this.X(x), this.Y(y)) : ctx.moveTo(this.X(x), this.Y(y)))); ctx.closePath(); if (fyll) { ctx.fillStyle = fyll; ctx.fill(); } if (strek) { ctx.strokeStyle = strek; ctx.lineWidth = 2; ctx.stroke(); } }
     soyle(x, b, y, fyll) { const ctx = this.ctx; ctx.fillStyle = fyll; const x1 = this.X(x - b / 2), x2 = this.X(x + b / 2), y1 = this.Y(Math.max(0, y)), y2 = this.Y(Math.min(0, y)); ctx.fillRect(x1, y1, x2 - x1, y2 - y1); }
   }
@@ -288,66 +294,7 @@
     return Math.abs(x - o.svar) <= tol;
   };
 
-  MT.ovingsboks = function (vert, { kapId, generatorar, tittel = 'Øving' }) {
-    const boks = MT.el('div', { class: 'oving' });
-    const topp = MT.el('div', { class: 'oving-topp' });
-    const tel = MT.el('span', { class: 'oving-tel mono' });
-    const kropp = MT.el('div', { class: 'oving-kropp', 'aria-live': 'polite' });
-    topp.append(MT.el('span', { class: 'merkelapp' }, tittel), tel);
-    boks.append(topp, kropp);
-    vert.append(boks);
-    let nr = 0, o, gen;
-    const visTel = () => { if (kapId === 'blanda') { tel.textContent = `${MT.lager.xp} XP · rekkje ${MT.lager.rekke}`; return; } const r = MT.lager.rett[kapId] || 0; tel.textContent = `${Math.min(r, MT.MAAL)}/${MT.MAAL} mot meistring · rekkje ${MT.lager.rekke}`; };
-    document.addEventListener('mt:framdrift', visTel);
-    function ny() {
-      nr++; gen = generatorar[(nr - 1) % generatorar.length];
-      if (nr > generatorar.length) gen = MT.vel(generatorar);
-      o = gen(); visTel();
-      kropp.innerHTML = '';
-      const sp = MT.el('div', { class: 'oppg-tekst', html: o.tekst });
-      kropp.append(MT.el('div', { class: 'oppg-nr mono' }, 'Oppgåve ' + nr), sp);
-      const tilbake = MT.el('div', { class: 'tilbake' });
-      let forsok = 0, ferdig = false;
-      const svarFerdig = (rett, inn) => {
-        forsok++;
-        if (rett === null) { tilbake.className = 'tilbake info'; tilbake.textContent = 'Skriv svaret som eit tal, til dømes 12,5'; return; }
-        if (rett) {
-          tilbake.className = 'tilbake rett'; tilbake.innerHTML = MT.mat(MT.vel(['Rett!', 'Heilt rett.', 'Det stemmer.', 'Rett – godt jobba.']) + (o.losning ? ' <button class="lenkeknapp vis-los">Sjå utrekninga</button>' : ''));
-          if (!ferdig) MT.registrer(o.kap || kapId, forsok === 1);
-          ferdig = true; boks.classList.remove('feil-rist'); boks.classList.add('rett-puls');
-          setTimeout(() => boks.classList.remove('rett-puls'), 700);
-          nesteBtn.focus();
-        } else {
-          tilbake.className = 'tilbake feil';
-          tilbake.innerHTML = MT.mat(forsok === 1 ? 'Ikkje heilt. Sjå over utrekninga og prøv igjen.' + (o.tips ? ' <button class="lenkeknapp vis-tips">Vis eit tips</button>' : '') : 'Framleis feil. ' + (o.losning ? '<button class="lenkeknapp vis-los">Vis løysinga</button>' : ''));
-          if (forsok === 1) MT.registrer(o.kap || kapId, false);
-          boks.classList.remove('feil-rist'); void boks.offsetWidth; boks.classList.add('feil-rist');
-        }
-      };
-      if (o.val) {
-        const vg = MT.el('div', { class: 'val-grid' });
-        o.val.forEach((t, i) => vg.append(MT.el('button', { class: 'val', html: t, onclick: (e) => { if (ferdig) return; const r = MT.sjekk(o, i); e.currentTarget.classList.add(r ? 'rett' : 'feil'); svarFerdig(r); } })));
-        kropp.append(vg);
-      } else {
-        const id = 'svar-' + kapId;
-        const f = MT.el('form', { class: 'svar-rad', onsubmit: (e) => { e.preventDefault(); if (ferdig) { ny(); return; } svarFerdig(MT.sjekk(o, inn.value), inn.value); } });
-        const inn = MT.el('input', { id, class: 'svar-inn mono', inputmode: 'decimal', autocomplete: 'off', placeholder: 'Svar', 'aria-label': 'Svaret ditt' });
-        f.append(...[inn, o.eining ? MT.el('span', { class: 'eining', html: o.eining }) : null, MT.el('button', { class: 'knapp', type: 'submit' }, 'Sjekk')].filter(Boolean));
-        kropp.append(f);
-        setTimeout(() => { if (boks.getBoundingClientRect().top < innerHeight && document.activeElement && document.activeElement.closest && document.activeElement.closest('.oving') === boks) inn.focus(); }, 30);
-      }
-      const ekstra = MT.el('div', { class: 'oppg-ekstra' });
-      kropp.append(tilbake, ekstra);
-      tilbake.addEventListener('click', (e) => {
-        if (e.target.classList.contains('vis-tips')) { ekstra.innerHTML = MT.mat('<div class="tips"><b>Tips:</b> ' + o.tips + '</div>'); e.target.remove(); }
-        if (e.target.classList.contains('vis-los')) { ekstra.innerHTML = MT.mat('<div class="losning"><b>Løysing</b>' + o.losning + '</div>'); e.target.remove(); ferdig = true; }
-      });
-      const nesteBtn = MT.el('button', { class: 'knapp sekundar', onclick: ny }, 'Ny oppgåve →');
-      kropp.append(MT.el('div', { class: 'oppg-knappar' }, nesteBtn));
-    }
-    ny();
-    return { ny };
-  };
+  /* Øvingsboksen ligg i ovingsboks.js */
 
   /* ---------- Steg-for-steg-eksempel ---------- */
   MT.eksempel = function (vert, { nr, tittel, oppgave, steg, svar }) {

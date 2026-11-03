@@ -18,8 +18,17 @@
 
   /* ---------- XP-merke ---------- */
   const xp = MT.$('#xp');
-  const visXp = () => { xp.textContent = MT.lager.xp + ' XP'; xp.classList.remove('hopp'); void xp.offsetWidth; xp.classList.add('hopp'); };
+  const visXp = (e) => { xp.title = MT.t('Rang: ' + MT.rang().namn); if (e && e.detail && e.detail.nyRang) toast('Ny rang: ' + MT.rang().namn + '!'); xp.textContent = MT.lager.xp + ' XP'; xp.classList.remove('hopp'); void xp.offsetWidth; xp.classList.add('hopp'); };
   document.addEventListener('mt:framdrift', visXp); xp.textContent = MT.lager.xp + ' XP';
+
+  function toast(t) { const d = el('div', { class: 'toast', role: 'status' }, el('span', { class: 'merkelapp' }, 'Opprykk'), el('b', {}, t)); document.body.append(d); setTimeout(() => d.classList.add('vis'), 20); setTimeout(() => { d.classList.remove('vis'); setTimeout(() => d.remove(), 400); }, 3200); }
+  xp.title = MT.t('Rang: ' + MT.rang().namn);
+
+  /* ---------- Språk ---------- */
+  const spraakKnapp = MT.$('#spraakknapp');
+  const visSpraak = () => { spraakKnapp.innerHTML = MT.spraak === 'nb' ? '<b>BM</b> · NN' : 'BM · <b>NN</b>'; spraakKnapp.setAttribute('aria-label', MT.spraak === 'nb' ? 'Byt til nynorsk' : 'Bytt til bokmål'); };
+  spraakKnapp.addEventListener('click', () => { MT.settSpraak(MT.spraak === 'nb' ? 'nn' : 'nb'); visSpraak(); rute(); });
+  visSpraak();
 
   /* ---------- Koordinatpeikar ---------- */
   const peikar = MT.$('#peikar');
@@ -106,10 +115,12 @@
     const h = (location.hash || '#start').slice(1);
     hovud.innerHTML = '';
     hovud.classList.remove('inn'); void hovud.offsetWidth; hovud.classList.add('inn');
-    MT.$$('.nav-lenke').forEach((a) => a.classList.toggle('pa', a.getAttribute('href') === '#' + h || (h.startsWith('k-') && a.dataset.nav === 'kap')));
-    if (h.startsWith('k-')) { const [id, sek] = h.slice(2).split('--'); const k = K.find((x) => x.id === id); if (k) { kapittelSide(k); document.title = k.tittel + ' · Matematikk 1P-Y NA'; if (sek) setTimeout(() => { const s = document.getElementById('s-' + sek); s && s.scrollIntoView(); }, 30); else scrollTo(0, 0); return; } }
-    if (h === 'trening') { treningSide(); document.title = 'Matteløypa · Matematikk 1P-Y NA'; scrollTo(0, 0); return; }
-    if (h === 'laereplan') { laereplanSide(); document.title = 'Læreplan · Matematikk 1P-Y NA'; scrollTo(0, 0); return; }
+    MT.$$('.nav-lenke').forEach((a) => a.classList.toggle('pa', a.getAttribute('href') === '#' + h || ((h.startsWith('k-') || h === 'start') && a.dataset.nav === 'kap') || (/^(papir|fasit)/.test(h) && a.dataset.nav === 'papir')));
+    if (h.startsWith('k-')) { const [id, sek] = h.slice(2).split('--'); const k = K.find((x) => x.id === id); if (k) { kapittelSide(k); document.title = MT.t(k.tittel + ' · Matematikk 1P-Y NA'); if (sek) setTimeout(() => { const s = document.getElementById('s-' + sek); s && s.scrollIntoView(); }, 30); else scrollTo(0, 0); return; } }
+    if (h === 'trening') { MT.sider.trening(hovud, K); document.title = MT.t('Matteløypa · Matematikk 1P-Y NA'); scrollTo(0, 0); return; }
+    if (h === 'papir') { MT.sider.papirOversikt(hovud, K); document.title = MT.t('Oppgåvehefte · Matematikk 1P-Y NA'); scrollTo(0, 0); return; }
+    if (/^(papir|fasit)-/.test(h)) { const [t, id] = h.split('-'); const k = K.find((x) => x.id === id); if (k) { MT.sider.papir(hovud, k, t === 'fasit'); document.title = MT.t((t === 'fasit' ? 'Løysingsforslag ' : 'Oppgåveark ') + k.nr + ' · Matematikk 1P-Y NA'); scrollTo(0, 0); return; } }
+    if (h === 'laereplan') { laereplanSide(); document.title = MT.t('Læreplan · Matematikk 1P-Y NA'); scrollTo(0, 0); return; }
     framside(); document.title = 'Matematikk 1P-Y NA'; scrollTo(0, 0);
   }
   addEventListener('hashchange', rute);
@@ -136,7 +147,7 @@
     laeringskurve(kurve);
 
     hovud.append(el('section', { class: 'status-rad', 'aria-label': 'Framdrifta di' },
-      ...[['XP', L.xp], ['Rette svar', totaltRett], ['Kapittel meistra', meistra + ' av ' + K.length], ['Beste rekkje', L.besteRekke]].map(([a, b]) => el('div', {}, el('span', { class: 'merkelapp' }, a), el('b', { class: 'mono' }, String(b))))));
+      ...[['Rang', MT.rang().namn], ['XP', L.xp], ['Rette svar', totaltRett], ['Kapittel meistra', meistra + ' av ' + K.length], ['Beste rekkje', L.besteRekke]].map(([a, b]) => el('div', {}, el('span', { class: 'merkelapp' }, a), el('b', { class: 'mono' }, String(b))))));
 
     // Dagens oppgåve
     const d = new Date(); const frø = +(d.getFullYear() + '' + (d.getMonth() + 1) + d.getDate());
@@ -163,6 +174,7 @@
     rutenett.append(liste); hovud.append(rutenett);
 
     hovud.append(el('section', { class: 'verktoyrad' },
+      el('a', { class: 'verktoy', href: '#papir' }, el('b', {}, 'Oppgåvehefte'), el('span', {}, 'Penn og papir, med løysingsforslag')),
       el('a', { class: 'verktoy', href: '#k-programmering--python' }, el('b', {}, 'Python-laben'), el('span', {}, 'Køyr Python rett i nettlesaren')),
       el('button', { class: 'verktoy', onclick: () => opneSkuff('formlar') }, el('b', {}, 'Formelark'), el('span', {}, 'Alle formlane samla. Snarveg: F')),
       el('button', { class: 'verktoy', onclick: () => opneSkuff('kalk') }, el('b', {}, 'Kalkulator'), el('span', {}, 'Med historikk og π. Snarveg: K')),
@@ -200,10 +212,13 @@
     topp.append(el('a', { class: 'tilbake-lenke', href: '#start' }, '← Alle kapittel'),
       el('div', { class: 'kap-tittelrad' }, el('span', { class: 'kap-stort-nr mono', 'aria-hidden': 'true' }, String(k.nr).padStart(2, '0')), el('div', {}, el('p', { class: 'merkelapp' }, 'Kapittel ' + k.nr), el('h1', {}, k.tittel), el('p', { class: 'ingress' }, k.kort))),
       el('div', { class: 'maal-boks' }, el('h2', { class: 'merkelapp' }, 'Dette skal du lære'), el('ul', {}, ...k.maal.map((m) => el('li', {}, m)))));
+    const kb = MT.sider.bilete((MT.ressursar[k.id] || {}).bilete);
+    const toppVert = el('div', { class: 'kap-topp-vert' + (kb ? ' med-bilete' : '') }, topp, kb);
     const innhald = el('nav', { class: 'innhald', 'aria-label': 'Innhald i kapittelet' });
     const il = el('ol', {});
     const tekst = el('div', { class: 'kap-tekst' });
-    k.seksjonar.forEach((s, si) => {
+    const seks = [...k.seksjonar, { id: 'papir', tittel: 'Penn og papir', blokker: [{ type: 'papir' }] }, { id: 'meir', tittel: 'Video og lenker', blokker: [{ type: 'ressurs' }] }];
+    seks.forEach((s, si) => {
       const nr = k.nr + '.' + (si + 1);
       il.append(el('li', {}, el('a', { href: '#k-' + k.id + '--' + s.id, 'data-s': s.id, onclick: (e) => { e.preventDefault(); history.replaceState(null, '', '#k-' + k.id + '--' + s.id); document.getElementById('s-' + s.id).scrollIntoView({ behavior: MT.roleg ? 'auto' : 'smooth' }); } }, el('span', { class: 'mono svak' }, nr), ' ' + s.tittel)));
       const sek = el('section', { class: 'seksjon', id: 's-' + s.id });
@@ -212,6 +227,8 @@
         if (b.type === 'teori') sek.append(el('div', { class: 'teori', html: b.html }));
         else if (b.type === 'eksempel') MT.eksempel(sek, b);
         else if (b.type === 'utforsk') { const w = el('figure', { class: 'utforsk' }); w.append(el('figcaption', {}, el('span', { class: 'merkelapp' }, 'Utforsk'), el('h3', {}, b.tittel), b.intro ? el('p', { html: b.intro }) : null)); const kropp = el('div', { class: 'utforsk-kropp' }); w.append(kropp); sek.append(w); try { b.lag(kropp); } catch (e) { kropp.append(el('p', { class: 'tilbake feil' }, 'Denne figuren kunne ikkje lastast: ' + e.message)); console.error(e); } }
+        else if (b.type === 'papir') MT.sider.papirBlokk(sek, k);
+        else if (b.type === 'ressurs') MT.sider.ressursar(sek, k);
         else if (b.type === 'oving') { sek.append(el('p', { class: 'svak' }, `Oppgåvene blir laga på nytt kvar gong. Få ${MT.MAAL} rette på første forsøk for å meistre kapittelet.`)); MT.ovingsboks(sek, { kapId: k.id, generatorar: b.generatorar }); }
       });
       tekst.append(sek);
@@ -221,28 +238,11 @@
       i > 0 ? el('a', { href: '#k-' + K[i - 1].id }, el('span', { class: 'merkelapp' }, '← Førre'), K[i - 1].tittel) : el('span'),
       i < K.length - 1 ? el('a', { href: '#k-' + K[i + 1].id, class: 'neste' }, el('span', { class: 'merkelapp' }, 'Neste →'), K[i + 1].tittel) : el('a', { href: '#trening', class: 'neste' }, el('span', { class: 'merkelapp' }, 'Ferdig? →'), 'Matteløypa'));
     tekst.append(nav);
-    hovud.append(topp, el('div', { class: 'kap-oppsett' }, innhald, tekst));
+    hovud.append(toppVert, el('div', { class: 'kap-oppsett' }, innhald, tekst));
     document.addEventListener('mt:framdrift', () => { const b = MT.$('.innhald-framdrift .kap-bar'); b && b.style.setProperty('--p', MT.framdrift(k.id)); });
     // marker aktiv seksjon i innhaldslista
     const obs = new IntersectionObserver((e) => e.forEach((x) => { if (x.isIntersecting) MT.$$('a', il).forEach((a) => a.classList.toggle('pa', a.dataset.s === x.target.id.slice(2))); }), { rootMargin: '-30% 0px -60% 0px' });
     MT.$$('.seksjon', tekst).forEach((s) => obs.observe(s));
-  }
-
-  /* ---------- Matteløypa (blanda trening) ---------- */
-  function treningSide() {
-    let valde = new Set(MT.les('treningval', K.map((k) => k.id)));
-    const topp = el('header', { class: 'kap-topp' });
-    topp.append(el('a', { class: 'tilbake-lenke', href: '#start' }, '← Framsida'), el('p', { class: 'merkelapp' }, 'Blanda trening'), el('h1', {}, 'Matteløypa'), el('p', { class: 'ingress' }, 'Oppgåver frå kapitla du vel, i tilfeldig rekkjefølgje. Kvar rett på første forsøk gir XP og byggjer rekkja di. Eitt feil svar, og rekkja startar på nytt.'));
-    const brikker = el('div', { class: 'brikker' });
-    K.forEach((k) => brikker.append(el('button', { class: 'brikke' + (valde.has(k.id) ? ' pa' : ''), 'aria-pressed': valde.has(k.id), onclick: (e) => { valde.has(k.id) ? valde.delete(k.id) : valde.add(k.id); if (!valde.size) valde.add(k.id); MT.skriv('treningval', [...valde]); e.currentTarget.classList.toggle('pa', valde.has(k.id)); e.currentTarget.setAttribute('aria-pressed', valde.has(k.id)); start(); } }, k.nr + '. ' + k.tittel)));
-    const vert = el('div', { class: 'trening-vert' });
-    hovud.append(topp, el('div', { class: 'smal' }, el('p', { class: 'merkelapp' }, 'Kapittel med i løypa'), brikker, vert));
-    function start() {
-      vert.innerHTML = '';
-      const blanda = MT.stokk(K.filter((k) => valde.has(k.id)).flatMap((k) => k.seksjonar.find((s) => s.id === 'oving').blokker[0].generatorar.map((g) => () => { const o = g(); o.kap = k.id; o.tekst = `<span class="kap-merke mono">Kap. ${k.nr}</span> ` + o.tekst; return o; })));
-      MT.ovingsboks(vert, { kapId: 'blanda', generatorar: blanda, tittel: 'Matteløypa' });
-    }
-    start();
   }
 
   /* ---------- Læreplan ---------- */

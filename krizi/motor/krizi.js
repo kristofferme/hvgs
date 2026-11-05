@@ -1,0 +1,1645 @@
+/* ==========================================================================
+   Krizi – motor
+   Leser presentasjonen fra <script id="krizi-data">, bygger lerretet,
+   flyr kameraet langs stien, og lar deg redigere alt direkte i nettleseren.
+   Ingen avhengigheter. Filen må ikke inneholde teksten "</" + "script".
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var VERSJON = '1.0';
+  var FONT_URL = 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Caveat:wght@500..700&family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Manrope:wght@400..800&display=swap';
+  var STORRELSER = { kort: [1600, 900], sirkel: [1000, 1000], fri: [1600, 900] };
+  var TEMAER = [
+    { id: 'aurora', navn: 'Aurora', bg: 'radial-gradient(circle at 30% 20%, #1c3a5c, #060b18 70%)', ink: '#5ef2c5' },
+    { id: 'fjord', navn: 'Fjord', bg: 'linear-gradient(160deg, #ffffff, #e3e9ee)', ink: '#f0531c' },
+    { id: 'kritt', navn: 'Kritt', bg: 'radial-gradient(circle at 40% 30%, #2f443a, #1a261f 75%)', ink: '#ffd94a' },
+    { id: 'glod', navn: 'Glød', bg: 'radial-gradient(circle at 70% 30%, #5a1f3f, #150b19 75%)', ink: '#ff8a5b' }
+  ];
+  var FARGER = ['#5ef2c5', '#9a86ff', '#ff8a5b', '#ffd94a', '#ff5d8f', '#4cc3ff', '#f0531c', '#1662d6'];
+  var reduser = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var LUKK = '<' + '/';
+
+  /* ---------- Småhjelpere ---------- */
+
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function h(tag, props) {
+    var el = document.createElement(tag);
+    if (props) {
+      for (var k in props) {
+        var v = props[k];
+        if (v == null || v === false) continue;
+        if (k === 'class') el.className = v;
+        else if (k === 'html') el.innerHTML = v;
+        else if (k === 'text') el.textContent = v;
+        else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), v);
+        else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+        else el.setAttribute(k, v === true ? '' : v);
+      }
+    }
+    for (var i = 2; i < arguments.length; i++) leggTil(el, arguments[i]);
+    return el;
+  }
+  function leggTil(el, kid) {
+    if (kid == null || kid === false) return;
+    if (Array.isArray(kid)) { kid.forEach(function (k) { leggTil(el, k); }); return; }
+    el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function uid() { return 'r' + Math.random().toString(36).slice(2, 8); }
+  function rad(d) { return d * Math.PI / 180; }
+  function rot(x, y, deg) { var a = rad(deg), c = Math.cos(a), s = Math.sin(a); return { x: x * c - y * s, y: x * s + y * c }; }
+  function frac(v) { return v - Math.floor(v); }
+  function mod(v, m) { return ((v % m) + m) % m; }
+  function vinkelDiff(a, b) { var d = mod(b - a + 180, 360) - 180; return d; }
+  var lager = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+    del: function (k) { try { localStorage.removeItem(k); } catch (e) { /* ingen lagring */ } }
+  };
+
+  var IKON = {
+    play: '<path d="M7 4.5v15l12-7.5z" fill="currentColor"/>',
+    edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+    kort: '<rect x="3" y="6" width="18" height="12" rx="2.5"/>',
+    sirkel: '<circle cx="12" cy="12" r="8"/>',
+    tekst: '<path d="M5 6h14M12 6v13M9 19h6"/>',
+    bilde: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-9 8"/>',
+    angre: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>',
+    gjor: '<path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 000 12h3"/>',
+    oversikt: '<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
+    lagre: '<path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/>',
+    venstre: '<path d="M15 5l-7 7 7 7"/>',
+    hoyre: '<path d="M9 5l7 7-7 7"/>',
+    opp: '<path d="M6 15l6-6 6 6"/>',
+    ned: '<path d="M6 9l6 6 6-6"/>',
+    x: '<path d="M6 6l12 12M18 6L6 18"/>',
+    fullskjerm: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+    skjerm: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+    hjelp: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-1 .7-1.5 1.2-1.5 2.5M12 17h.01"/>',
+    kopi: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>',
+    slett: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+    sikt: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>',
+    sti: '<circle cx="5" cy="18" r="2"/><circle cx="19" cy="6" r="2"/><path d="M7 17c6-1 4-9 10-10"/>',
+    pluss: '<path d="M12 5v14M5 12h14"/>',
+    hjem: '<path d="M4 11l8-7 8 7M6 9.5V20h12V9.5"/>'
+  };
+  function ikon(navn) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + IKON[navn] + '</svg>';
+  }
+  function knapp(navn, tekst, onclick, ekstra) {
+    var b = h('button', Object.assign({ class: 'k-btn', type: 'button', title: tekst, 'aria-label': tekst, onclick: onclick }, ekstra || {}));
+    b.innerHTML = ikon(navn) + '<span class="k-tekst">' + esc(tekst) + '</span>';
+    return b;
+  }
+  function ikonKnapp(navn, tekst, onclick, ekstra) {
+    var b = knapp(navn, tekst, onclick, ekstra);
+    b.classList.add('k-ikon-knapp');
+    b.querySelector('.k-tekst').remove();
+    return b;
+  }
+
+  /* ---------- Data ---------- */
+
+  function normaliser(d) {
+    d = d && typeof d === 'object' ? d : {};
+    d.tittel = d.tittel || 'Uten tittel';
+    if (!TEMAER.some(function (t) { return t.id === d.tema; })) d.tema = 'aurora';
+    d.id = d.id || uid() + uid();
+    d.visSti = d.visSti !== false;
+    d.fart = typeof d.fart === 'number' ? clamp(d.fart, 0.4, 2) : 1;
+    d.rammer = Array.isArray(d.rammer) ? d.rammer : [];
+    var ids = {};
+    d.rammer.forEach(function (f) {
+      if (!f.id || ids[f.id]) f.id = uid();
+      ids[f.id] = true;
+      f.x = +f.x || 0; f.y = +f.y || 0;
+      f.s = +f.s > 0 ? +f.s : 1;
+      f.r = +f.r || 0;
+      if (!STORRELSER[f.form]) f.form = 'kort';
+      f.tekst = f.tekst == null ? '' : String(f.tekst);
+    });
+    if (!Array.isArray(d.sti)) d.sti = d.rammer.map(function (f) { return f.id; });
+    d.sti = d.sti.filter(function (e) { return typeof e === 'string' ? ids[e] : e && typeof e === 'object' && isFinite(e.x) && isFinite(e.y); });
+    d.pynt = Array.isArray(d.pynt) ? d.pynt : [];
+    return d;
+  }
+  function str(f) { var b = STORRELSER[f.form] || STORRELSER.kort; return [f.w || b[0], f.h || b[1]]; }
+  function areal(f) { var s = str(f); return s[0] * s[1] * f.s * f.s; }
+  function ramme(id) { for (var i = 0; i < doc.rammer.length; i++) if (doc.rammer[i].id === id) return doc.rammer[i]; return null; }
+  function tittelPa(f) {
+    if (!f) return 'Utsnitt';
+    var linjer = f.tekst.split('\n').map(function (s) { return s.trim(); }).filter(function (s) { return s && !/^!\[/.test(s) && s !== '||' && !/^-{3,}$/.test(s); });
+    var linje = linjer.filter(function (s) { return /^#\s/.test(s); })[0] || linjer.filter(function (s) { return /^##\s/.test(s); })[0] || linjer[0];
+    if (!linje) return /!\[/.test(f.tekst) ? 'Bilde' : 'Tom ramme';
+    return linje.replace(/^(#{1,3}|!!|>|[-*•]|\d+[.)])\s*/, '').replace(/[*=`]/g, '').replace(/\s\|\s.*$/, '').slice(0, 48);
+  }
+
+  /* ---------- Markdown → innhold ---------- */
+
+  var EMOJI = /^(?:[☀-➿]|\p{Extended_Pictographic}|\p{Emoji_Modifier}|‍|️|\s)+$/u;
+  var DASH = /^(—|–|--)\s*/;
+
+  function inline(s) {
+    s = esc(s);
+    return s
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\*)/g, '$1<em>$2</em>')
+      .replace(/==([^=]+)==/g, '<mark>$1</mark>')
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, t, u) {
+        return /^(https?:|mailto:|#)/i.test(u) ? '<a href="' + u + '" target="_blank" rel="noopener">' + t + '</a>' : t;
+      });
+  }
+
+  // Alt før første «||» er felles topp; hver «||» åpner en ny kolonne.
+  function md(src) {
+    var topp = [], kolonner = [], cur = topp;
+    var para = null, liste = null, sitat = null;
+    function tom() {
+      if (para) { cur.push('<p class="k-b">' + para.map(inline).join('<br>') + '</p>'); para = null; }
+      if (liste) { cur.push('<' + liste.t + ' class="k-b">' + liste.items.map(function (i) { return '<li>' + inline(i) + '</li>'; }).join('') + LUKK + liste.t + '>'); liste = null; }
+      if (sitat) {
+        var cite = '';
+        if (sitat.length > 1 && DASH.test(sitat[sitat.length - 1])) cite = '<cite>' + inline(sitat.pop().replace(DASH, '')) + '</cite>';
+        cur.push('<blockquote class="k-b"><p>' + sitat.map(inline).join('<br>') + '</p>' + cite + '</blockquote>');
+        sitat = null;
+      }
+    }
+    String(src).replace(/\r/g, '').split('\n').forEach(function (raw) {
+      var t = raw.trim(), m;
+      if (!t) { tom(); return; }
+      if (t === '||') { tom(); cur = []; kolonner.push(cur); return; }
+      if (sitat && DASH.test(t)) { sitat.push(t); return; }
+      if ((m = t.match(/^>\s?(.*)$/))) { if (!sitat) { tom(); sitat = []; } sitat.push(m[1]); return; }
+      if (sitat) tom();
+      if ((m = t.match(/^(#{1,3})\s+(.*)$/))) {
+        tom();
+        var n = m[1].length;
+        if (n === 1) cur.push('<h1 class="k-b">' + inline(m[2]) + '</h1>');
+        else if (n === 2) cur.push('<h2 class="k-b">' + inline(m[2]) + '</h2>');
+        else cur.push('<div class="k-b k-eyebrow">' + inline(m[2]) + '</div>');
+        return;
+      }
+      if ((m = t.match(/^!!\s*(.+)$/))) {
+        tom();
+        var deler = m[1].split(/\s+\|\s+/);
+        cur.push('<div class="k-b k-stat"><span class="k-num">' + inline(deler[0].trim()) + '</span>' + (deler[1] ? '<span class="k-cap">' + inline(deler.slice(1).join(' | ').trim()) + '</span>' : '') + '</div>');
+        return;
+      }
+      if ((m = t.match(/^!\[([^\]]*)\]\(([^)\s]+)\)$/))) {
+        tom();
+        cur.push('<figure class="k-b k-img"><img src="' + esc(m[2]) + '" alt="' + esc(m[1]) + '" draggable="false">' + (m[1] ? '<figcaption>' + inline(m[1]) + '</figcaption>' : '') + '</figure>');
+        return;
+      }
+      if (/^(-{3,}|\*{3,})$/.test(t)) { tom(); cur.push('<hr class="k-b">'); return; }
+      if ((m = t.match(/^[-*•]\s+(.*)$/))) { if (!liste || liste.t !== 'ul') { tom(); liste = { t: 'ul', items: [] }; } liste.items.push(m[1]); return; }
+      if ((m = t.match(/^\d+[.)]\s+(.*)$/))) { if (!liste || liste.t !== 'ol') { tom(); liste = { t: 'ol', items: [] }; } liste.items.push(m[1]); return; }
+      if (EMOJI.test(t) && !/^[\d\s#*]+$/.test(t)) { tom(); cur.push('<div class="k-b k-ikon">' + esc(t) + '</div>'); return; }
+      if (liste) tom();
+      (para = para || []).push(t);
+    });
+    tom();
+    kolonner = kolonner.filter(function (c) { return c.length; });
+    if (kolonner.length) {
+      return topp.join('') + '<div class="k-cols k-b" style="--n:' + kolonner.length + '">' + kolonner.map(function (c) { return '<div class="k-col">' + c.join('') + '</div>'; }).join('') + '</div>';
+    }
+    return topp.join('');
+  }
+
+  function delOrd(el) {
+    var w = 0;
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    var noder = [];
+    while (walker.nextNode()) noder.push(walker.currentNode);
+    noder.forEach(function (node) {
+      var frag = document.createDocumentFragment();
+      node.textContent.split(/(\s+)/).forEach(function (bit) {
+        if (!bit) return;
+        if (/^\s+$/.test(bit)) { frag.append(document.createTextNode(bit)); return; }
+        var sp = document.createElement('span');
+        sp.className = 'k-w';
+        sp.style.setProperty('--w', w++);
+        sp.textContent = bit;
+        frag.append(sp);
+      });
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+  /* ---------- Tilstand ---------- */
+
+  var dataEl = document.getElementById('krizi-data');
+  var doc;
+  try { doc = normaliser(JSON.parse(dataEl ? dataEl.textContent : '{}')); }
+  catch (e) { console.error('Krizi: kunne ikke lese presentasjonen', e); doc = normaliser({}); }
+
+  var W = innerWidth, H = innerHeight;
+  var cam = { x: 0, y: 0, z: 0.5, r: 0 };
+  var zRef = 0.5;
+  var pos = 0, viste = 0, aktivId = null, maalId = null;
+  var redigerer = false, oversikt = false, friVisning = false;
+  var valgt = null;
+  var flight = null;
+  var els = {};
+  var lag = [];
+  var historikk = [], fremtid = [], sisteBilde = null, ulagret = false;
+  var filHandle = null;
+  var presVindu = null, presTimer = null, presStart = Date.now();
+  var UTKAST = 'krizi-utkast:' + doc.id;
+
+  /* ---------- DOM ---------- */
+
+  document.documentElement.setAttribute('data-theme', doc.tema);
+  document.documentElement.lang = document.documentElement.lang || 'no';
+  if (!document.title) document.title = doc.tittel;
+  if (!$('link[href*="fonts.googleapis.com"]')) {
+    document.head.append(h('link', { rel: 'stylesheet', href: FONT_URL }));
+  }
+
+  var root = h('div', { class: 'k-root' });
+  var sky = h('div', { class: 'k-sky', html: '<i></i><i></i><i></i>' });
+  var dustCv = h('canvas', { class: 'k-dust' });
+  var stage = h('div', { class: 'k-stage' });
+  var bak = h('div', { class: 'k-layer k-back' });
+  var world = h('div', { class: 'k-world' });
+  var fram = h('div', { class: 'k-layer k-front' });
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  var trail = document.createElementNS(SVGNS, 'svg');
+  trail.setAttribute('class', 'k-trail');
+  var trailAlle = document.createElementNS(SVGNS, 'path'); trailAlle.setAttribute('class', 'k-t-all');
+  var trailGjort = document.createElementNS(SVGNS, 'path'); trailGjort.setAttribute('class', 'k-t-done');
+  trail.append(trailAlle, trailGjort);
+  var sel = h('div', { class: 'k-sel', html: '<div class="k-sel-boks"></div><span class="k-sel-merke"></span><i class="k-h" data-h="scale" style="left:0;top:0"></i><i class="k-h k-ne" data-h="scale" style="left:100%;top:0"></i><i class="k-h" data-h="scale" style="left:100%;top:100%"></i><i class="k-h k-sw" data-h="scale" style="left:0;top:100%"></i><i class="k-h" data-h="rot"></i>' });
+  stage.append(bak, world, fram, sel);
+
+  var ui = h('div', { class: 'k-ui' });
+  var progress = h('div', { class: 'k-progress', html: '<i></i>' });
+  var dock = h('div', { class: 'k-dock', role: 'toolbar', 'aria-label': 'Krizi' });
+  var panel = h('aside', { class: 'k-panel', 'aria-label': 'Rediger' });
+  var toaster = h('div', { class: 'k-toaster', role: 'status', 'aria-live': 'polite' });
+  var tilbake = h('button', { class: 'k-btn k-tilbake', type: 'button', onclick: function () { gaTil(pos, { behold: true }); } });
+  tilbake.innerHTML = ikon('hjem') + '<span>Tilbake til stien</span>';
+  var notater = h('div', { class: 'k-notater' });
+  var laser = h('div', { class: 'k-laser' });
+  var blank = h('div', { class: 'k-blank', onclick: function () { root.classList.remove('k-blank-pa'); } });
+  var hjelp = h('div', { class: 'k-hjelp', onclick: function (e) { if (e.target === hjelp) visHjelp(false); } });
+  var dropp = h('div', { class: 'k-dropp', text: 'Slipp bildet for å legge det på lerretet' });
+  ui.append(progress, tilbake, notater, dock, panel, toaster, hjelp, dropp);
+  root.append(sky, dustCv, stage, h('div', { class: 'k-grain' }), ui, laser, blank);
+
+  if (dataEl) dataEl.insertAdjacentElement('afterend', root); else document.body.append(root);
+
+  /* ---------- Bygging av lerretet ---------- */
+
+  function plasser(el, f) {
+    el.style.transform = 'translate(' + f.x + 'px,' + f.y + 'px) rotate(' + f.r + 'deg) scale(' + f.s + ') translate(-50%,-50%)';
+  }
+  function fyll(el, f) {
+    var s = str(f);
+    el.className = 'k-frame k-' + f.form + (el.classList.contains('k-aktiv') ? ' k-aktiv' : '') + (f.id === maalId ? ' k-maal' : '');
+    el.style.width = s[0] + 'px';
+    el.style.height = s[1] + 'px';
+    if (f.farge) el.style.setProperty('--a', f.farge); else el.style.removeProperty('--a');
+    el.innerHTML = '<div class="k-inner">' + md(f.tekst) + '</div>';
+    el.classList.toggle('k-tom', !f.tekst.trim());
+    $$('.k-b', el).forEach(function (b, i) { b.style.setProperty('--i', i); });
+    $$('h1', el).forEach(delOrd);
+    if (f.steg) $$('li', el).forEach(function (li) { li.classList.add('k-steg'); });
+    $$('img', el).forEach(function (img) { if (!img.complete) img.addEventListener('load', function () { tilpass(el); }, { once: true }); });
+    if (el.isConnected) tilpass(el);
+  }
+  function tilpass(el) {
+    var inner = el.firstElementChild;
+    if (!inner) return;
+    el.style.fontSize = '';
+    var cs = getComputedStyle(el);
+    var plass = el.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var bredde = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    function passer() { return inner.scrollHeight <= plass + 1 && inner.scrollWidth <= bredde + 1; }
+    if (passer()) return;
+    var base = parseFloat(cs.fontSize), lo = base * 0.3, hi = base;
+    for (var i = 0; i < 8; i++) {
+      var mid = (lo + hi) / 2;
+      el.style.fontSize = mid + 'px';
+      if (passer()) lo = mid; else hi = mid;
+    }
+    el.style.fontSize = lo + 'px';
+  }
+  function lagRamme(f) {
+    var el = h('div', { 'data-id': f.id });
+    fyll(el, f);
+    plasser(el, f);
+    return el;
+  }
+
+  function byggVerden() {
+    world.textContent = '';
+    world.append(trail);
+    els = {};
+    doc.rammer.slice().sort(function (a, b) { return areal(b) - areal(a); }).forEach(function (f) {
+      var el = lagRamme(f);
+      els[f.id] = el;
+      world.append(el);
+      tilpass(el);
+    });
+    byggPynt();
+    tegnSti();
+    zRef = oversiktsVisning(true).z;
+    if (aktivId && els[aktivId]) els[aktivId].classList.add('k-aktiv');
+    root.classList.toggle('k-fokus', !!aktivId);
+    visSteg();
+  }
+
+  function byggPynt() {
+    bak.textContent = ''; fram.textContent = '';
+    lag = [];
+    var grupper = {};
+    doc.pynt.forEach(function (p) {
+      var d = typeof p.dybde === 'number' ? clamp(p.dybde, 0.05, 3) : 0.6;
+      var nokkel = d.toFixed(2);
+      if (!grupper[nokkel]) {
+        var div = h('div');
+        (d > 1 ? fram : bak).append(div);
+        grupper[nokkel] = { el: div, p: d };
+        lag.push(grupper[nokkel]);
+      }
+      var type = p.type || (p.tekst ? 'tekst' : 'ring');
+      var el = h('div', { class: 'k-pynt k-pynt-' + type });
+      if (type === 'tekst') el.textContent = p.tekst || '';
+      if (type === 'bilde' && p.src) el.append(h('img', { src: p.src, alt: '' }));
+      if (p.farge) { el.style.color = p.farge; el.style.borderColor = p.farge; if (type === 'glod') el.style.background = 'radial-gradient(circle, ' + p.farge + ', transparent 62%)'; if (type === 'prikk') el.style.background = p.farge; }
+      el.style.opacity = p.opasitet != null ? p.opasitet : (type === 'tekst' ? 0.06 : type === 'glod' ? 0.22 : 0.18);
+      el.style.transform = 'translate(' + (+p.x || 0) + 'px,' + (+p.y || 0) + 'px) rotate(' + (+p.r || 0) + 'deg) scale(' + (+p.s || 1) + ') translate(-50%,-50%)';
+      grupper[nokkel].el.append(el);
+    });
+  }
+
+  function inneholder(a, b) {
+    // Ligger b sitt sentrum inne i a, og er b mindre?
+    if (areal(b) >= areal(a)) return false;
+    var s = str(a), l = rot(b.x - a.x, b.y - a.y, -a.r);
+    return Math.abs(l.x) <= s[0] * a.s / 2 && Math.abs(l.y) <= s[1] * a.s / 2;
+  }
+
+  // Den største rammen som (direkte eller indirekte) inneholder f – stien går mellom disse.
+  function ytterste(f) {
+    var best = f;
+    doc.rammer.forEach(function (a) { if (a !== f && areal(a) > areal(best) && inneholder(a, f)) best = a; });
+    return best;
+  }
+  // Avstand fra sentrum til kanten av rammen i retning (ux, uy)
+  function tilKant(f, ux, uy) {
+    var s = str(f), a = s[0] * f.s / 2, b = s[1] * f.s / 2;
+    if (f.form === 'sirkel') return Math.min(a, b);
+    var l = rot(ux, uy, -f.r);
+    return Math.min(Math.abs(l.x) > 1e-9 ? a / Math.abs(l.x) : Infinity, Math.abs(l.y) > 1e-9 ? b / Math.abs(l.y) : Infinity);
+  }
+  function tegnSti() {
+    trail.style.display = doc.visSti ? '' : 'none';
+    if (!doc.visSti) return;
+    var alle = '', gjort = '', forrige = null, side = 1;
+    doc.sti.forEach(function (e, i) {
+      var f0 = typeof e === 'string' ? ramme(e) : null;
+      if (!f0) return;
+      var f = ytterste(f0);
+      if (forrige && forrige !== f) {
+        var dx = f.x - forrige.x, dy = f.y - forrige.y, d = Math.hypot(dx, dy);
+        var ux = dx / d, uy = dy / d;
+        var t0 = tilKant(forrige, ux, uy) + 40 * forrige.s, t1 = tilKant(f, -ux, -uy) + 40 * f.s;
+        if (t0 + t1 < d * 0.95) {
+          var ax = forrige.x + ux * t0, ay = forrige.y + uy * t0, bx = f.x - ux * t1, by = f.y - uy * t1;
+          var k = 0.18 * side; side = -side;
+          var mx = (ax + bx) / 2, my = (ay + by) / 2;
+          var seg = 'M' + ax.toFixed(1) + ' ' + ay.toFixed(1) + 'Q' + (mx - (by - ay) * k).toFixed(1) + ' ' + (my + (bx - ax) * k).toFixed(1) + ' ' + bx.toFixed(1) + ' ' + by.toFixed(1);
+          alle += seg;
+          if (i <= pos && !redigerer) gjort += seg;
+        }
+      }
+      forrige = f;
+    });
+    trailAlle.setAttribute('d', alle);
+    trailGjort.setAttribute('d', gjort);
+  }
+
+  /* ---------- Kamera ---------- */
+
+  // I redigering ligger panelet til høyre – da sentreres alt i den ledige delen av skjermen.
+  var PANEL = 372;
+  function panelPa() { return redigerer && W > 720; }
+  function iFelt(v) {
+    if (!panelPa()) return v;
+    var z = v.z * (W - PANEL) / W, d = rot(PANEL / 2 / z, 0, v.r);
+    return { x: v.x + d.x, y: v.y + d.y, z: z, r: v.r };
+  }
+  function midtpunkt() { return tilVerden(panelPa() ? (W - PANEL) / 2 : W / 2, H / 2); }
+  function rammeVisning(f) {
+    var s = str(f), m = W < 700 ? 0.94 : 0.86;
+    return iFelt({ x: f.x, y: f.y, z: Math.min(W * m / (s[0] * f.s), H * m / (s[1] * f.s)), r: f.r });
+  }
+  function boks(liste) {
+    if (!liste.length) return null;
+    var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    liste.forEach(function (f) {
+      var s = str(f), hw = s[0] * f.s / 2, hh = s[1] * f.s / 2;
+      [[-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]].forEach(function (c) {
+        var p = rot(c[0], c[1], f.r);
+        x0 = Math.min(x0, f.x + p.x); x1 = Math.max(x1, f.x + p.x);
+        y0 = Math.min(y0, f.y + p.y); y1 = Math.max(y1, f.y + p.y);
+      });
+    });
+    return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: x1 - x0, h: y1 - y0 };
+  }
+  function oversiktsVisning(raa) {
+    var b = boks(doc.rammer);
+    if (!b) return { x: 0, y: 0, z: 0.5, r: 0 };
+    var m = W < 700 ? 0.92 : 0.82;
+    var v = { x: b.cx, y: b.cy, z: Math.min(W * m / Math.max(b.w, 1), H * m / Math.max(b.h, 1)), r: 0 };
+    return raa ? v : iFelt(v);
+  }
+  function visningFor(e) {
+    if (typeof e === 'string') { var f = ramme(e); return f ? rammeVisning(f) : oversiktsVisning(); }
+    if (!e) return oversiktsVisning();
+    var b = e.b || 1600, hh = e.h || b * 9 / 16;
+    return iFelt({ x: e.x, y: e.y, z: Math.min(W / b, H / hh), r: e.r || 0 });
+  }
+
+  var sisteTransform = '';
+  function brukKamera() {
+    var t = 'translate(' + (W / 2) + 'px,' + (H / 2) + 'px) rotate(' + (-cam.r) + 'deg) scale(' + cam.z + ') translate(' + (-cam.x) + 'px,' + (-cam.y) + 'px)';
+    if (t === sisteTransform) return;
+    sisteTransform = t;
+    world.style.transform = t;
+    trail.style.setProperty('--iz', 1 / cam.z);
+    for (var i = 0; i < lag.length; i++) {
+      var L = lag[i];
+      var zp = Math.pow(cam.z, L.p) * Math.pow(zRef, 1 - L.p);
+      L.el.style.transform = 'translate(' + (W / 2) + 'px,' + (H / 2) + 'px) rotate(' + (-cam.r) + 'deg) scale(' + zp + ') translate(' + (-cam.x) + 'px,' + (-cam.y) + 'px)';
+    }
+    oppdaterMarkering();
+  }
+  function tilSkjerm(x, y, c) {
+    c = c || cam;
+    var p = rot(x - c.x, y - c.y, -c.r);
+    return { x: W / 2 + p.x * c.z, y: H / 2 + p.y * c.z };
+  }
+  function tilVerden(sx, sy, c) {
+    c = c || cam;
+    var p = rot((sx - W / 2) / c.z, (sy - H / 2) / c.z, c.r);
+    return { x: c.x + p.x, y: c.y + p.y };
+  }
+  function skjermDelta(dx, dy, c) {
+    c = c || cam;
+    var p = rot(dx / c.z, dy / c.z, c.r);
+    return p;
+  }
+  function zoomVed(sx, sy, faktor) {
+    var wp = tilVerden(sx, sy);
+    cam.z = clamp(cam.z * faktor, 1e-4, 1e4);
+    var p = rot((sx - W / 2) / cam.z, (sy - H / 2) / cam.z, cam.r);
+    cam.x = wp.x - p.x; cam.y = wp.y - p.y;
+  }
+
+  /* Glatt flytur: van Wijk & Nuij – kameraet zoomer naturlig ut og inn igjen */
+  function flyTil(mal, valg) {
+    valg = valg || {};
+    var fra = { x: cam.x, y: cam.y, z: cam.z, r: cam.r };
+    var w0 = W / fra.z, w1 = W / mal.z;
+    var dx = mal.x - fra.x, dy = mal.y - fra.y, d = Math.hypot(dx, dy);
+    var rho = 1.32, rho2 = rho * rho, rho4 = rho2 * rho2;
+    var S, interp;
+    if (d < 1e-6 * Math.max(w0, w1)) {
+      var k = w1 < w0 ? -1 : 1;
+      S = Math.abs(Math.log(w1 / w0)) / rho;
+      interp = function (s) { return { u: 0, w: w0 * Math.exp(k * rho * s) }; };
+    } else {
+      var b0 = (w1 * w1 - w0 * w0 + rho4 * d * d) / (2 * w0 * rho2 * d);
+      var b1 = (w1 * w1 - w0 * w0 - rho4 * d * d) / (2 * w1 * rho2 * d);
+      var r0 = Math.log(Math.sqrt(b0 * b0 + 1) - b0);
+      var r1 = Math.log(Math.sqrt(b1 * b1 + 1) - b1);
+      S = (r1 - r0) / rho;
+      var coshr0 = Math.cosh(r0), sinhr0 = Math.sinh(r0);
+      interp = function (s) {
+        return { u: w0 / (rho2 * d) * (coshr0 * Math.tanh(rho * s + r0) - sinhr0), w: w0 * coshr0 / Math.cosh(rho * s + r0) };
+      };
+    }
+    if (!isFinite(S)) { S = 1; interp = function (s) { return { u: s, w: w0 + (w1 - w0) * s }; }; }
+    var varighet = valg.varighet || clamp(380 + S * 480, 520, 2900) / doc.fart;
+    if (reduser) varighet = Math.min(varighet, 260);
+    flight = {
+      start: performance.now(), varighet: varighet, S: S, interp: interp, fra: fra, mal: mal, dx: dx, dy: dy,
+      dr: vinkelDiff(fra.r, mal.r), naer: valg.naer, ferdig: valg.ferdig, naerKjort: false, ease: valg.ease || ease
+    };
+    if (S < 1e-4) { flight.varighet = Math.min(varighet, 520); }
+  }
+  function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function easeUt(t) { return 1 - Math.pow(1 - t, 3); }
+  function stegFly(na) {
+    var F = flight;
+    var t = clamp((na - F.start) / F.varighet, 0, 1);
+    var e = F.ease(t);
+    if (t >= 1) {
+      cam.x = F.mal.x; cam.y = F.mal.y; cam.z = F.mal.z; cam.r = F.mal.r;
+    } else {
+      var p = F.interp(e * F.S);
+      cam.x = F.fra.x + p.u * F.dx; cam.y = F.fra.y + p.u * F.dy;
+      cam.z = W / p.w; cam.r = F.fra.r + F.dr * e;
+    }
+    if (!F.naerKjort && t > 0.7) { F.naerKjort = true; if (F.naer) F.naer(); }
+    if (t >= 1) { flight = null; if (F.ferdig) F.ferdig(); }
+  }
+  function stoppFly() {
+    if (!flight) return;
+    var F = flight; flight = null;
+    if (!F.naerKjort && F.naer) F.naer();
+  }
+
+  /* ---------- Støv: partikler i dybden som reagerer på kameraet ---------- */
+
+  var stov = (function () {
+    var ctx = dustCv.getContext('2d'), ps = [], prev = null, offX = 0, offY = 0, logZ = 0, farge = '255,255,255', styrke = 1, dpr = 1;
+    for (var i = 0; i < 150; i++) ps.push({ x: Math.random(), y: Math.random(), d: 0.25 + Math.random() * 0.75, o: Math.random(), a: 0.25 + Math.random() * 0.65, sz: 0.5 + Math.random() * 1.5 });
+    function storrelse() { dpr = Math.min(2, window.devicePixelRatio || 1); dustCv.width = W * dpr; dustCv.height = H * dpr; }
+    function tema() {
+      var t = doc.tema;
+      farge = t === 'fjord' ? '13,33,54' : t === 'glod' ? '255,214,180' : t === 'kritt' ? '240,238,228' : '210,240,255';
+      styrke = t === 'fjord' ? 0.45 : t === 'kritt' ? 0.7 : 1;
+    }
+    function tikk() {
+      if (reduser) { if (!prev) { prev = 1; ctx.clearRect(0, 0, dustCv.width, dustCv.height); } return; }
+      if (!prev || typeof prev !== 'object') prev = { x: cam.x, y: cam.y, z: cam.z, r: cam.r };
+      var sd = rot((cam.x - prev.x) * cam.z, (cam.y - prev.y) * cam.z, -cam.r);
+      offX += sd.x; offY += sd.y;
+      if (prev.z > 0 && cam.z > 0) logZ += Math.log(cam.z / prev.z);
+      prev.x = cam.x; prev.y = cam.y; prev.z = cam.z; prev.r = cam.r;
+      offX += 0.12; offY += 0.04;
+      ctx.clearRect(0, 0, dustCv.width, dustCv.height);
+      var S = Math.max(W, H) * 1.25;
+      for (var i = 0; i < ps.length; i++) {
+        var p = ps[i];
+        var fase = frac(p.o + logZ * 0.2 * p.d);
+        var k = 0.4 * Math.exp(fase * 1.9);
+        var bx = mod(p.x * S - offX * p.d * 0.55, S) - S / 2;
+        var by = mod(p.y * S - offY * p.d * 0.55, S) - S / 2;
+        var sx = W / 2 + bx * k, sy = H / 2 + by * k;
+        if (sx < -10 || sy < -10 || sx > W + 10 || sy > H + 10) continue;
+        var a = p.a * Math.sin(fase * Math.PI) * styrke;
+        if (a < 0.02) continue;
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(' + farge + ',' + a.toFixed(3) + ')';
+        ctx.arc(sx * dpr, sy * dpr, p.sz * (0.5 + k * 0.55) * dpr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    return { storrelse: storrelse, tema: tema, tikk: tikk };
+  })();
+
+  /* ---------- Navigasjon ---------- */
+
+  function antallSteg(id) { var el = els[id]; return el ? el.querySelectorAll('.k-steg').length : 0; }
+  function visSteg() {
+    var id = maalId || aktivId;
+    $$('.k-steg.k-vis', world).forEach(function (li) { if (!id || !els[id] || !els[id].contains(li)) li.classList.remove('k-vis'); });
+    if (!id || !els[id]) return;
+    $$('.k-steg', els[id]).forEach(function (li, i) { li.classList.toggle('k-vis', i < viste); });
+  }
+  function settAktiv(id) {
+    Object.keys(els).forEach(function (k) { if (k !== id) els[k].classList.remove('k-aktiv'); });
+    aktivId = id;
+    if (id && els[id]) {
+      var el = els[id];
+      el.classList.remove('k-aktiv');
+      void el.offsetWidth;
+      el.classList.add('k-aktiv');
+    }
+    root.classList.toggle('k-fokus', !!id && !redigerer);
+  }
+  function settMaal(id) {
+    if (maalId && els[maalId]) els[maalId].classList.remove('k-maal');
+    maalId = id;
+    if (id && els[id]) els[id].classList.add('k-maal');
+  }
+
+  function gaTil(i, valg) {
+    valg = valg || {};
+    if (!doc.sti.length) { flyTil(oversiktsVisning()); return; }
+    i = clamp(i, 0, doc.sti.length - 1);
+    var endret = i !== pos;
+    pos = i;
+    oversikt = false; friVisning = false;
+    root.classList.remove('k-oversikt', 'k-fri-visning');
+    var e = doc.sti[i];
+    var id = typeof e === 'string' ? e : null;
+    if (!valg.behold || endret) viste = valg.alleSteg && id ? antallSteg(id) : 0;
+    settAktiv(null);
+    settMaal(id);
+    visSteg();
+    var mal = visningFor(e);
+    function ankomst() { settAktiv(id); settMaal(null); visSteg(); }
+    if (valg.straks) { stoppFly(); cam.x = mal.x; cam.y = mal.y; cam.z = mal.z; cam.r = mal.r; ankomst(); }
+    else flyTil(mal, Object.assign({ naer: ankomst }, valg.fly || {}));
+    tegnSti();
+    oppdaterStatus();
+    if (!redigerer) skrivHash();
+  }
+  function neste() {
+    if (oversikt) { gaTil(pos, { behold: true }); return; }
+    var id = typeof doc.sti[pos] === 'string' ? doc.sti[pos] : null;
+    if (!friVisning && id && viste < antallSteg(id)) { viste++; stoppFly(); settAktiv(id); settMaal(null); visSteg(); oppdaterStatus(); return; }
+    if (friVisning) {
+      if ((id && viste < antallSteg(id)) || pos >= doc.sti.length - 1) gaTil(pos, { behold: true });
+      else gaTil(pos + 1);
+      return;
+    }
+    if (pos < doc.sti.length - 1) gaTil(pos + 1);
+    else blink();
+  }
+  function forrige() {
+    if (oversikt || friVisning) { gaTil(pos, { behold: true }); return; }
+    var id = typeof doc.sti[pos] === 'string' ? doc.sti[pos] : null;
+    if (id && viste > 0) { viste--; visSteg(); oppdaterStatus(); return; }
+    if (pos > 0) gaTil(pos - 1, { alleSteg: true });
+    else blink();
+  }
+  function blink() {
+    // Liten «fjær» når du er ved enden av stien
+    if (reduser) return;
+    var z = cam.z;
+    flyTil({ x: cam.x, y: cam.y, z: z * 0.985, r: cam.r }, { varighet: 140, ferdig: function () { flyTil({ x: cam.x, y: cam.y, z: z, r: cam.r }, { varighet: 260, ease: easeUt }); } });
+  }
+  function visOversikt(pa) {
+    if (pa === undefined) pa = !oversikt;
+    if (!pa) { gaTil(pos, { behold: true }); return; }
+    oversikt = true;
+    root.classList.add('k-oversikt');
+    settAktiv(null); settMaal(null);
+    flyTil(oversiktsVisning());
+    oppdaterStatus();
+  }
+  function gaTilRamme(id) {
+    var i = doc.sti.indexOf(id);
+    if (i >= 0 && !redigerer) { gaTil(i); return; }
+    var f = ramme(id);
+    if (!f) return;
+    oversikt = false; root.classList.remove('k-oversikt');
+    friVisning = !redigerer; root.classList.toggle('k-fri-visning', friVisning);
+    settAktiv(null);
+    flyTil(rammeVisning(f), { naer: function () { if (!redigerer) settAktiv(id); } });
+  }
+  function skrivHash() {
+    var ny = '#' + (pos + 1);
+    if (location.hash !== ny) { try { history.replaceState(null, '', ny); } catch (e) { /* ignorer */ } }
+  }
+
+  /* ---------- Grensesnitt: dokk, status, toast ---------- */
+
+  var teller, knappAngre, knappGjor, knappLagre;
+  function byggDokk() {
+    dock.textContent = '';
+    if (redigerer) {
+      dock.append(
+        knapp('kort', 'Kort', function () { nyRamme('kort'); }),
+        knapp('sirkel', 'Sirkel', function () { nyRamme('sirkel'); }),
+        knapp('tekst', 'Tekst', function () { nyRamme('fri'); }),
+        knapp('bilde', 'Bilde', velgBilde),
+        h('span', { class: 'k-sep' }),
+        (knappAngre = ikonKnapp('angre', 'Angre (Ctrl+Z)', angre)),
+        (knappGjor = ikonKnapp('gjor', 'Gjør om (Ctrl+Shift+Z)', gjorOm)),
+        h('span', { class: 'k-sep' }),
+        ikonKnapp('oversikt', 'Oversikt (O)', function () { flyTil(oversiktsVisning()); }),
+        (knappLagre = knapp('lagre', 'Lagre', lagre)),
+        knapp('play', 'Presenter', function () { veksleRedigering(false); }, { class: 'k-btn k-primar' })
+      );
+    } else {
+      teller = h('span', { class: 'k-teller' });
+      dock.append(
+        ikonKnapp('venstre', 'Forrige (←)', forrige),
+        teller,
+        ikonKnapp('hoyre', 'Neste (→)', neste),
+        h('span', { class: 'k-sep' }),
+        ikonKnapp('oversikt', 'Oversikt (O)', function () { visOversikt(); }),
+        ikonKnapp('fullskjerm', 'Fullskjerm (F)', fullskjerm),
+        ikonKnapp('skjerm', 'Presentatørvisning (P)', apnePresentator),
+        ikonKnapp('hjelp', 'Hjelp (?)', function () { visHjelp(true); }),
+        h('span', { class: 'k-sep' }),
+        knapp('edit', 'Rediger', function () { veksleRedigering(true); })
+      );
+    }
+    oppdaterStatus();
+  }
+  function oppdaterStatus() {
+    var n = doc.sti.length;
+    var e = doc.sti[pos], id = typeof e === 'string' ? e : null;
+    var totalt = antallSteg(id);
+    if (teller) teller.textContent = n ? (pos + 1) + ' / ' + n : '0 / 0';
+    var frac = n > 1 ? pos / (n - 1) : 1;
+    if (totalt) frac = n > 1 ? (pos + viste / (totalt + 1)) / (n - 1) : viste / totalt;
+    progress.firstChild.style.width = (oversikt ? 0 : clamp(frac, 0, 1) * 100) + '%';
+    progress.style.display = redigerer ? 'none' : '';
+    if (knappAngre) knappAngre.disabled = !historikk.length;
+    if (knappGjor) knappGjor.disabled = !fremtid.length;
+    if (knappLagre) knappLagre.classList.toggle('k-ulagret', ulagret);
+    var f = id ? ramme(id) : null;
+    notater.innerHTML = '<b>Notater · ' + esc(tittelPa(f)) + '</b>' + (f && f.notat ? esc(f.notat) : '<span style="opacity:.6">Ingen notater for denne rammen.</span>');
+    oppdaterPresentator();
+    if (redigerer && !valgt) markerStiRad();
+  }
+  function toast(tekst, handlinger, ms) {
+    var t = h('div', { class: 'k-toast' }, h('span', { text: tekst }));
+    (handlinger || []).forEach(function (a) {
+      t.append(h('button', { class: 'k-btn' + (a.primar ? ' k-primar' : ''), type: 'button', text: a.tekst, onclick: function () { a.fn(); fjern(); } }));
+    });
+    function fjern() { t.classList.add('k-ut'); setTimeout(function () { t.remove(); }, 360); }
+    toaster.append(t);
+    if (ms !== 0) setTimeout(fjern, ms || 3200);
+    return fjern;
+  }
+
+  /* Skjul dokk og peker når du ikke beveger musa */
+  var idleTimer = null;
+  function aktivitet() {
+    root.classList.remove('k-skjul-ui', 'k-idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () {
+      if (redigerer || dock.matches(':hover')) return;
+      root.classList.add('k-skjul-ui', 'k-idle');
+    }, 2600);
+  }
+
+  function visHjelp(pa) {
+    if (pa && !hjelp.firstChild) {
+      hjelp.innerHTML = '<div role="dialog" aria-label="Hjelp"><h2>Krizi</h2><p>Et uendelig lerret. Kameraet flyr mellom rammene langs stien din.</p><dl>' +
+        '<h4>Presentere</h4>' +
+        '<dt><kbd>→</kbd> <kbd>mellomrom</kbd></dt><dd>Neste steg</dd>' +
+        '<dt><kbd>←</kbd></dt><dd>Forrige steg</dd>' +
+        '<dt><kbd>O</kbd></dt><dd>Oversikt over hele lerretet</dd>' +
+        '<dt>klikk på en ramme</dt><dd>Fly dit</dd>' +
+        '<dt>hjul / klyp · dra</dt><dd>Zoom og flytt fritt</dd>' +
+        '<dt><kbd>F</kbd></dt><dd>Fullskjerm</dd>' +
+        '<dt><kbd>P</kbd></dt><dd>Presentatørvisning i eget vindu (notater, neste, tid)</dd>' +
+        '<dt><kbd>N</kbd></dt><dd>Vis notater</dd>' +
+        '<dt><kbd>L</kbd></dt><dd>Laserpeker</dd>' +
+        '<dt><kbd>B</kbd></dt><dd>Svart skjerm</dd>' +
+        '<h4>Redigere</h4>' +
+        '<dt><kbd>E</kbd></dt><dd>Slå redigering av og på</dd>' +
+        '<dt>dra ramme</dt><dd>Flytt (innholdet i rammen følger med)</dd>' +
+        '<dt>hjørne · prikk over</dt><dd>Skaler · roter (hold <kbd>Shift</kbd> for 15°-trinn)</dd>' +
+        '<dt>dobbeltklikk</dt><dd>Skriv i rammen</dd>' +
+        '<dt><kbd>Ctrl</kbd> <kbd>D</kbd></dt><dd>Dupliser</dd>' +
+        '<dt><kbd>Delete</kbd></dt><dd>Slett valgt ramme</dd>' +
+        '<dt><kbd>Ctrl</kbd> <kbd>Z</kbd></dt><dd>Angre</dd>' +
+        '<dt><kbd>Ctrl</kbd> <kbd>S</kbd></dt><dd>Lagre filen</dd>' +
+        '<dt>slipp / lim inn bilde</dt><dd>Legg bildet på lerretet</dd>' +
+        '</dl></div>';
+    }
+    hjelp.classList.toggle('k-pa', !!pa);
+  }
+
+  function fullskjerm() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () { toast('Fullskjerm er ikke tilgjengelig her.'); });
+    } catch (e) { toast('Fullskjerm er ikke tilgjengelig her.'); }
+  }
+
+  /* ---------- Presentatørvisning ---------- */
+
+  function apnePresentator() {
+    var w = null;
+    try { w = window.open('', 'krizi-presentator', 'popup,width=1100,height=700'); } catch (e) { w = null; }
+    if (!w) { toast('Nettleseren stoppet vinduet. Tillat popup-vinduer for denne siden, eller trykk N for notater her.'); return; }
+    presVindu = w;
+    presStart = Date.now();
+    var d = w.document;
+    d.title = 'Presentatør · ' + doc.tittel;
+    d.head.innerHTML = '<meta charset="utf-8"><style>' +
+      'body{margin:0;font:16px/1.5 Manrope,system-ui,sans-serif;background:#0b111d;color:#e9eef9;height:100vh;display:grid;grid-template-columns:1.3fr 1fr;grid-template-rows:auto 1fr auto;gap:18px;padding:22px;box-sizing:border-box}' +
+      'header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:20px}' +
+      'h1{margin:0;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:#98a6c2}' +
+      '.tid{font-size:42px;font-weight:800;font-variant-numeric:tabular-nums;cursor:pointer}.klokke{color:#98a6c2;font-variant-numeric:tabular-nums}' +
+      'section{background:#121a2b;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:20px 24px;overflow:auto}' +
+      'small{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#5ef2c5;font-weight:800;margin-bottom:6px}' +
+      '.na{font-size:30px;font-weight:800;line-height:1.15}.neste{font-size:20px;font-weight:700;color:#b9c6e0}.notat{white-space:pre-wrap;font-size:22px;line-height:1.5}' +
+      'footer{grid-column:1/-1;display:flex;gap:10px;align-items:center}button{font:inherit;font-weight:700;background:#1b2640;color:inherit;border:0;border-radius:12px;padding:12px 20px;cursor:pointer}button:hover{background:#25335a}' +
+      '.steg{margin-left:auto;color:#98a6c2;font-variant-numeric:tabular-nums}' +
+      '</style>';
+    d.body.innerHTML = '<header><h1></h1><div><span class="tid" title="Klikk for å nullstille">00:00</span> <span class="klokke"></span></div></header>' +
+      '<section><small>Nå</small><div class="na"></div><div style="height:18px"></div><small>Notater</small><div class="notat"></div></section>' +
+      '<section><small>Neste</small><div class="neste"></div></section>' +
+      '<footer><button data-a="forrige">← Forrige</button><button data-a="neste">Neste →</button><button data-a="oversikt">Oversikt</button><span class="steg"></span></footer>';
+    $('h1', d).textContent = doc.tittel;
+    $('.tid', d).addEventListener('click', function () { presStart = Date.now(); klokke(); });
+    d.body.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('button');
+      if (!a) return;
+      if (a.dataset.a === 'neste') neste(); else if (a.dataset.a === 'forrige') forrige(); else visOversikt();
+    });
+    d.addEventListener('keydown', tast);
+    clearInterval(presTimer);
+    presTimer = setInterval(klokke, 1000);
+    klokke();
+    oppdaterPresentator();
+  }
+  function klokke() {
+    if (!presVindu || presVindu.closed) { clearInterval(presTimer); presVindu = null; return; }
+    var s = Math.floor((Date.now() - presStart) / 1000);
+    var d = presVindu.document;
+    var t = $('.tid', d); if (t) t.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+    var k = $('.klokke', d); if (k) k.textContent = new Date().toLocaleTimeString('no', { hour: '2-digit', minute: '2-digit' });
+  }
+  function oppdaterPresentator() {
+    if (!presVindu || presVindu.closed) return;
+    var d = presVindu.document;
+    var e = doc.sti[pos], f = typeof e === 'string' ? ramme(e) : null;
+    var n = doc.sti[pos + 1], nf = typeof n === 'string' ? ramme(n) : null;
+    var na = $('.na', d); if (!na) return;
+    na.textContent = tittelPa(f);
+    $('.notat', d).textContent = f && f.notat ? f.notat : '–';
+    $('.neste', d).textContent = n ? tittelPa(nf) : 'Slutt';
+    var tot = antallSteg(f && f.id);
+    $('.steg', d).textContent = 'Ramme ' + (pos + 1) + ' av ' + doc.sti.length + (tot ? ' · punkt ' + viste + ' av ' + tot : '');
+  }
+
+  /* ---------- Redigering ---------- */
+
+  function veksleRedigering(pa) {
+    if (pa === undefined) pa = !redigerer;
+    redigerer = pa;
+    root.classList.toggle('k-editing', pa);
+    if (pa) {
+      oversikt = false; root.classList.remove('k-oversikt', 'k-fri-visning', 'k-skjul-ui', 'k-idle', 'k-vis-notater', 'k-laser-pa');
+      settAktiv(null); settMaal(null);
+      if (!sisteBilde) sisteBilde = JSON.stringify(doc);
+    } else {
+      velg(null);
+      if (!doc.sti.length) { toast('Legg minst én ramme i stien for å presentere.'); }
+    }
+    byggDokk();
+    byggPanel();
+    tegnSti();
+    if (!pa) gaTil(pos, { behold: true });
+    else if (!friVisning && doc.sti.length) flyTil(visningFor(doc.sti[pos]), { varighet: 700 });
+  }
+
+  function velg(id) {
+    valgt = id && ramme(id) ? id : null;
+    byggPanel();
+    oppdaterMarkering();
+  }
+  function oppdaterMarkering() {
+    var f = valgt && ramme(valgt);
+    if (!f || !redigerer) { sel.classList.remove('k-pa'); return; }
+    var s = str(f), c = tilSkjerm(f.x, f.y);
+    var sw = s[0] * f.s * cam.z, sh = s[1] * f.s * cam.z;
+    sel.classList.add('k-pa');
+    sel.style.width = sw + 'px';
+    sel.style.height = sh + 'px';
+    sel.style.transform = 'translate(' + c.x + 'px,' + c.y + 'px) rotate(' + (f.r - cam.r) + 'deg) translate(-50%,-50%)';
+    var i = doc.sti.indexOf(f.id);
+    sel.querySelector('.k-sel-merke').textContent = i >= 0 ? 'Steg ' + (i + 1) : 'Ikke i stien';
+  }
+
+  /* Historikk */
+  function lagreHistorikk() {
+    var na = JSON.stringify(doc);
+    if (sisteBilde === null) { sisteBilde = na; return; }
+    if (na === sisteBilde) return;
+    historikk.push(sisteBilde);
+    if (historikk.length > 120) historikk.shift();
+    sisteBilde = na;
+    fremtid = [];
+    ulagret = true;
+    lagreUtkast();
+    oppdaterStatus();
+  }
+  function settDoc(json) {
+    doc = normaliser(JSON.parse(json));
+    sisteBilde = json;
+    document.documentElement.setAttribute('data-theme', doc.tema);
+    stov.tema();
+    if (valgt && !ramme(valgt)) valgt = null;
+    pos = clamp(pos, 0, Math.max(0, doc.sti.length - 1));
+    byggVerden();
+    byggPanel();
+    oppdaterStatus();
+    ulagret = true;
+    lagreUtkast();
+  }
+  function angre() { if (!historikk.length) return; fremtid.push(sisteBilde); settDoc(historikk.pop()); }
+  function gjorOm() { if (!fremtid.length) return; historikk.push(sisteBilde); settDoc(fremtid.pop()); }
+  var utkastTimer = null;
+  function lagreUtkast() {
+    clearTimeout(utkastTimer);
+    utkastTimer = setTimeout(function () { lager.set(UTKAST, JSON.stringify({ tid: Date.now(), doc: doc })); }, 400);
+  }
+  var tekstTimer = null;
+  function senereHistorikk() { clearTimeout(tekstTimer); tekstTimer = setTimeout(lagreHistorikk, 700); }
+
+  function oppdaterRamme(f, innhold) {
+    var el = els[f.id];
+    if (!el) return;
+    if (innhold) fyll(el, f);
+    plasser(el, f);
+  }
+
+  function nyRamme(form, tekst) {
+    var s = STORRELSER[form], m = midtpunkt();
+    var f = {
+      id: uid(), form: form, x: Math.round(m.x), y: Math.round(m.y), r: Math.round(cam.r),
+      s: +(((panelPa() ? W - PANEL : W) / cam.z) * 0.5 / s[0]).toPrecision(3),
+      tekst: tekst != null ? tekst : (form === 'sirkel' ? '### Etikett\n## Ny idé\nKort forklaring' : form === 'fri' ? '## Overskrift\nSkriv tekst rett på lerretet.' : '### Etikett\n# Ny tittel\nSkriv innholdet her. Dobbeltklikk for å endre.')
+    };
+    doc.rammer.push(f);
+    var inn = Math.min(pos + 1, doc.sti.length);
+    doc.sti.splice(inn, 0, f.id);
+    byggVerden();
+    lagreHistorikk();
+    velg(f.id);
+    fokuserTekst(true);
+    return f;
+  }
+  function fokuserTekst(merkAlt) {
+    var ta = $('#k-innhold', panel);
+    if (!ta) return;
+    ta.focus();
+    if (merkAlt) ta.select();
+  }
+  function slettValgt() {
+    if (!valgt) return;
+    var id = valgt;
+    doc.rammer = doc.rammer.filter(function (f) { return f.id !== id; });
+    doc.sti = doc.sti.filter(function (e) { return e !== id; });
+    valgt = null;
+    pos = clamp(pos, 0, Math.max(0, doc.sti.length - 1));
+    byggVerden(); lagreHistorikk(); byggPanel(); oppdaterMarkering();
+    toast('Rammen er slettet.', [{ tekst: 'Angre', fn: angre }]);
+  }
+  function dupliser() {
+    var f = valgt && ramme(valgt);
+    if (!f) return;
+    var s = str(f);
+    var ny = JSON.parse(JSON.stringify(f));
+    ny.id = uid();
+    var p = rot(s[0] * f.s * 1.1, 0, f.r);
+    ny.x = f.x + p.x; ny.y = f.y + p.y;
+    doc.rammer.push(ny);
+    var i = doc.sti.indexOf(f.id);
+    if (i >= 0) doc.sti.splice(i + 1, 0, ny.id);
+    byggVerden(); lagreHistorikk(); velg(ny.id);
+  }
+  function iSti(id) { return doc.sti.indexOf(id) >= 0; }
+  function veksleSti(id) {
+    if (iSti(id)) doc.sti = doc.sti.filter(function (e) { return e !== id; });
+    else doc.sti.splice(Math.min(pos + 1, doc.sti.length), 0, id);
+    pos = clamp(pos, 0, Math.max(0, doc.sti.length - 1));
+    tegnSti(); lagreHistorikk(); byggPanel(); oppdaterMarkering();
+  }
+
+  /* Automatisk oppsett av rammene i stien */
+  function ordne(type) {
+    var sett = {}, liste = [];
+    doc.sti.forEach(function (e) { if (typeof e === 'string' && !sett[e]) { sett[e] = 1; liste.push(ramme(e)); } });
+    doc.rammer.forEach(function (f) { if (!sett[f.id]) liste.push(f); });
+    if (!liste.length) return;
+    if (type === 'reise') {
+      var x = 0;
+      liste.forEach(function (f, i) {
+        f.s = i === 0 ? 1 : 0.62;
+        f.r = i === 0 ? 0 : (i % 2 ? -1 : 1) * (2 + (i % 3) * 2);
+        var w = str(f)[0] * f.s;
+        if (i > 0) x += w / 2 + (i === 1 ? 800 : 420);
+        f.x = Math.round(x); f.y = Math.round(i === 0 ? 0 : Math.sin(i * 1.25) * 520);
+        x += w / 2;
+      });
+    } else if (type === 'spiral') {
+      var cx = 0, cy = 0, s = 1.2, retning = 0, forrigeS = null;
+      liste.forEach(function (f, i) {
+        f.s = +s.toPrecision(3);
+        f.r = 0;
+        if (i > 0) {
+          var a = str(liste[i - 1]), b = str(f);
+          var dx = [1, 0, -1, 0][retning], dy = [0, 1, 0, -1][retning];
+          var avstand = dx ? (a[0] * forrigeS + b[0] * f.s) / 2 * 1.06 : (a[1] * forrigeS + b[1] * f.s) / 2 * 1.08;
+          cx += dx * avstand; cy += dy * avstand;
+          retning = (retning + 1) % 4;
+        }
+        f.x = Math.round(cx); f.y = Math.round(cy);
+        forrigeS = f.s;
+        s *= 0.58;
+      });
+    } else if (type === 'dykk') {
+      liste.forEach(function (f, i) {
+        if (i === 0) { f.x = 0; f.y = 0; f.s = 1; f.r = 0; return; }
+        var p = liste[i - 1], ps = str(p);
+        f.s = +(p.s * 0.17).toPrecision(3);
+        var o = rot(ps[0] * p.s * 0.37, ps[1] * p.s * 0.31, p.r);
+        f.x = p.x + o.x; f.y = p.y + o.y;
+        f.r = p.r + (i % 2 ? 8 : -6);
+      });
+    } else {
+      var kol = Math.ceil(Math.sqrt(liste.length));
+      liste.forEach(function (f, i) {
+        f.s = 1; f.r = 0;
+        f.x = (i % kol) * 1800; f.y = Math.floor(i / kol) * 1150;
+      });
+    }
+    byggVerden(); lagreHistorikk(); flyTil(oversiktsVisning());
+    toast('Rammene er ordnet. Angre med Ctrl+Z hvis du vil tilbake.');
+  }
+
+  /* Bilder */
+  function velgBilde() {
+    var inp = h('input', { type: 'file', accept: 'image/*' });
+    inp.addEventListener('change', function () { if (inp.files[0]) leggTilBildeFil(inp.files[0]); });
+    inp.click();
+  }
+  function lesFil(fil) {
+    return new Promise(function (ok, feil) { var r = new FileReader(); r.onload = function () { ok(r.result); }; r.onerror = feil; r.readAsDataURL(fil); });
+  }
+  function lastBilde(src) {
+    return new Promise(function (ok, feil) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = feil; i.src = src; });
+  }
+  function leggTilBildeFil(fil, punkt) {
+    if (!/^image\//.test(fil.type)) { toast('Bare bildefiler kan legges på lerretet.'); return; }
+    lesFil(fil).then(function (url) {
+      return lastBilde(url).then(function (img) {
+        var maks = 1800, k = Math.min(1, maks / Math.max(img.width, img.height));
+        if (k === 1 && fil.size < 700000) return { url: url, w: img.width, h: img.height };
+        var cv = document.createElement('canvas');
+        cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        var ut = fil.type === 'image/png' ? cv.toDataURL('image/png') : '';
+        if (!ut || ut.length > 1500000) ut = cv.toDataURL('image/jpeg', 0.86);
+        return { url: ut, w: cv.width, h: cv.height };
+      });
+    }).then(function (b) {
+      if (!redigerer) veksleRedigering(true);
+      var bredde = 1600, hoyde = Math.round(clamp(bredde * b.h / b.w, 300, 2400)) + 80;
+      var f = {
+        id: uid(), form: 'fri', w: bredde + 80, h: hoyde, x: midtpunkt().x, y: midtpunkt().y, r: Math.round(cam.r),
+        tekst: '![](' + b.url + ')'
+      };
+      if (punkt) { var wp = tilVerden(punkt.x, punkt.y); f.x = wp.x; f.y = wp.y; }
+      f.s = +((Math.min(W / cam.z * 0.45 / f.w, H / cam.z * 0.6 / f.h))).toPrecision(3);
+      doc.rammer.push(f);
+      doc.sti.splice(Math.min(pos + 1, doc.sti.length), 0, f.id);
+      byggVerden(); lagreHistorikk(); velg(f.id);
+    }).catch(function () { toast('Klarte ikke å lese bildet.'); });
+  }
+
+  /* ---------- Panel ---------- */
+
+  function felt(etikett, innhold, ekstra) {
+    return h('div', { class: 'k-felt' }, typeof etikett === 'string' ? h('label', { text: etikett, for: ekstra }) : etikett, innhold);
+  }
+
+  function byggPanel() {
+    panel.textContent = '';
+    if (!redigerer) return;
+    var f = valgt && ramme(valgt);
+    if (f) byggRammePanel(f); else byggDokPanel();
+  }
+
+  function byggRammePanel(f) {
+    var i = doc.sti.indexOf(f.id);
+    panel.append(h('div', { class: 'k-panel-hode' },
+      h('div', null, h('h3', { text: tittelPa(f) }), h('small', { text: i >= 0 ? 'Steg ' + (i + 1) + ' i stien' : 'Ikke i stien' })),
+      ikonKnapp('x', 'Lukk', function () { velg(null); })
+    ));
+    var kropp = h('div', { class: 'k-panel-kropp' });
+    var ta = h('textarea', { id: 'k-innhold', rows: 9, spellcheck: 'true' });
+    ta.value = f.tekst;
+    ta.addEventListener('input', function () {
+      f.tekst = ta.value;
+      oppdaterRamme(f, true);
+      panel.querySelector('.k-panel-hode h3').textContent = tittelPa(f);
+      senereHistorikk();
+    });
+    kropp.append(felt('Innhold', ta, 'k-innhold'));
+    kropp.append(h('details', { class: 'k-detaljer' }, h('summary', { text: 'Slik skriver du' }),
+      h('div', { class: 'k-hint', html:
+        '<code># Tittel</code> stor overskrift<br><code>## Undertittel</code><br><code>### Etikett</code> liten tekst over tittelen<br>' +
+        '<code>- punkt</code> liste · <code>1. punkt</code> nummerert<br><code>!! 42 % | forklaring</code> stort tall<br>' +
+        '<code>&gt; sitat</code> og <code>— Navn</code> på linja under<br><code>**fet**</code> <code>*kursiv*</code> <code>==utheving==</code><br>' +
+        '<code>||</code> på egen linje deler i kolonner<br><code>![tekst](lenke)</code> bilde · en linje med bare emoji blir et stort ikon' })));
+
+    var formSeg = h('div', { class: 'k-seg', role: 'group', 'aria-label': 'Form' });
+    [['kort', 'Kort'], ['sirkel', 'Sirkel'], ['fri', 'Fri']].forEach(function (o) {
+      formSeg.append(h('button', { type: 'button', 'aria-pressed': String(f.form === o[0]), text: o[1], onclick: function () {
+        f.form = o[0]; if (o[0] !== 'fri' || !/^!\[/.test(f.tekst.trim())) { delete f.w; delete f.h; }
+        oppdaterRamme(f, true); lagreHistorikk(); byggPanel(); oppdaterMarkering(); tegnSti();
+      } }));
+    });
+    kropp.append(felt(h('span', { class: 'k-etikett', text: 'Form' }), formSeg));
+
+    var farger = h('div', { class: 'k-farger' });
+    farger.append(h('button', { type: 'button', class: 'k-auto', title: 'Temafarge', 'aria-label': 'Temafarge', 'aria-pressed': String(!f.farge), onclick: function () { delete f.farge; oppdaterRamme(f, true); lagreHistorikk(); byggPanel(); } }));
+    FARGER.forEach(function (c) {
+      farger.append(h('button', { type: 'button', title: c, 'aria-label': 'Farge ' + c, style: { background: c }, 'aria-pressed': String(f.farge === c), onclick: function () { f.farge = c; oppdaterRamme(f, true); lagreHistorikk(); byggPanel(); } }));
+    });
+    var egen = h('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(f.farge || '') ? f.farge : '#5ef2c5', title: 'Velg egen farge', 'aria-label': 'Velg egen farge' });
+    egen.addEventListener('input', function () { f.farge = egen.value; oppdaterRamme(f, true); senereHistorikk(); });
+    farger.append(egen);
+    kropp.append(felt(h('span', { class: 'k-etikett', text: 'Uthevingsfarge' }), farger));
+
+    var steg = h('input', { type: 'checkbox', id: 'k-steg' });
+    steg.checked = !!f.steg;
+    steg.addEventListener('change', function () { f.steg = steg.checked; if (!f.steg) delete f.steg; oppdaterRamme(f, true); lagreHistorikk(); });
+    kropp.append(h('label', { class: 'k-bryter', for: 'k-steg' }, steg, 'Vis punktene ett og ett'));
+
+    var notat = h('textarea', { id: 'k-notat', rows: 3, placeholder: 'Det du vil huske å si. Bare du ser dette.' });
+    notat.value = f.notat || '';
+    notat.style.fontFamily = 'var(--f-ui)';
+    notat.addEventListener('input', function () { f.notat = notat.value; if (!f.notat) delete f.notat; senereHistorikk(); });
+    kropp.append(felt('Notater', notat, 'k-notat'));
+
+    kropp.append(h('div', { class: 'k-knapperad' },
+      knapp('sikt', 'Zoom hit', function () { flyTil(rammeVisning(f)); }),
+      knapp('sti', iSti(f.id) ? 'Ta ut av stien' : 'Legg i stien', function () { veksleSti(f.id); }),
+      knapp('kopi', 'Dupliser', dupliser),
+      knapp('slett', 'Slett', slettValgt, { class: 'k-btn k-fare' })
+    ));
+    panel.append(kropp);
+  }
+
+  var draIdx = -1;
+  function byggDokPanel() {
+    panel.append(h('div', { class: 'k-panel-hode' },
+      h('div', null, h('h3', { text: 'Presentasjonen' }), h('small', { text: 'Klikk på en ramme for å endre den' })),
+      ikonKnapp('play', 'Presenter (E)', function () { veksleRedigering(false); })
+    ));
+    var kropp = h('div', { class: 'k-panel-kropp' });
+
+    var tittel = h('input', { type: 'text', id: 'k-tittel', value: doc.tittel });
+    tittel.addEventListener('input', function () { doc.tittel = tittel.value || 'Uten tittel'; document.title = doc.tittel; senereHistorikk(); });
+    kropp.append(felt('Tittel', tittel, 'k-tittel'));
+
+    var temaer = h('div', { class: 'k-temaer' });
+    TEMAER.forEach(function (t) {
+      var b = h('button', { type: 'button', class: 'k-tema', 'aria-pressed': String(doc.tema === t.id), onclick: function () {
+        doc.tema = t.id; document.documentElement.setAttribute('data-theme', t.id); stov.tema();
+        byggVerden(); lagreHistorikk(); byggPanel();
+      } });
+      var prov = h('span', { style: { background: t.bg, color: t.ink } });
+      b.append(prov, h('b', { text: t.navn }));
+      temaer.append(b);
+    });
+    kropp.append(felt(h('span', { class: 'k-etikett', text: 'Tema' }), temaer));
+
+    var liste = h('ol', { class: 'k-sti-liste' });
+    doc.sti.forEach(function (e, i) {
+      var f = typeof e === 'string' ? ramme(e) : null;
+      var li = h('li', { draggable: 'true', 'data-i': i, class: i === pos ? 'k-her' : '' },
+        h('span', { class: 'k-nr', text: String(i + 1) }),
+        h('span', { class: 'k-navn', text: f ? tittelPa(f) : 'Utsnitt' }));
+      function mini(navn, tekst, fn, av) {
+        var b = h('button', { type: 'button', class: 'k-mini', title: tekst, 'aria-label': tekst, html: ikon(navn), onclick: function (ev) { ev.stopPropagation(); fn(); } });
+        if (av) b.disabled = true;
+        return b;
+      }
+      li.append(
+        mini('opp', 'Flytt opp', function () { flyttSti(i, i - 1); }, i === 0),
+        mini('ned', 'Flytt ned', function () { flyttSti(i, i + 1); }, i === doc.sti.length - 1),
+        mini('x', 'Fjern fra stien', function () { doc.sti.splice(i, 1); pos = clamp(pos, 0, Math.max(0, doc.sti.length - 1)); tegnSti(); lagreHistorikk(); byggPanel(); })
+      );
+      li.addEventListener('click', function () { pos = i; viste = 0; flyTil(visningFor(e)); markerStiRad(); });
+      li.addEventListener('dblclick', function () { if (f) velg(f.id); });
+      li.addEventListener('dragstart', function (ev) { draIdx = i; ev.dataTransfer.effectAllowed = 'move'; try { ev.dataTransfer.setData('text/plain', String(i)); } catch (er) { /* ok */ } });
+      li.addEventListener('dragover', function (ev) { ev.preventDefault(); li.classList.add('k-dra-over'); });
+      li.addEventListener('dragleave', function () { li.classList.remove('k-dra-over'); });
+      li.addEventListener('drop', function (ev) { ev.preventDefault(); ev.stopPropagation(); li.classList.remove('k-dra-over'); if (draIdx >= 0 && draIdx !== i) flyttSti(draIdx, draIdx < i ? i - 1 : i); draIdx = -1; });
+      liste.append(li);
+    });
+    if (!doc.sti.length) liste.append(h('li', { style: { cursor: 'default' }, text: 'Stien er tom. Legg til rammer med knappene nede.' }));
+    kropp.append(felt(h('span', { class: 'k-etikett', text: 'Sti · rekkefølgen du presenterer i' }), h('div', { style: { display: 'flex', flexDirection: 'column', gap: '8px' } }, liste,
+      h('div', { class: 'k-knapperad' }, knapp('pluss', 'Legg til dette utsnittet', function () {
+        doc.sti.splice(Math.min(pos + 1, doc.sti.length), 0, { x: Math.round(cam.x), y: Math.round(cam.y), b: Math.round(W / cam.z), h: Math.round(H / cam.z), r: Math.round(cam.r) });
+        pos = Math.min(pos + 1, doc.sti.length - 1);
+        tegnSti(); lagreHistorikk(); byggPanel();
+        toast('Utsnittet er lagt i stien. Kameraet stopper akkurat her.');
+      })))));
+
+    var visSti = h('input', { type: 'checkbox', id: 'k-vissti' });
+    visSti.checked = doc.visSti;
+    visSti.addEventListener('change', function () { doc.visSti = visSti.checked; tegnSti(); lagreHistorikk(); });
+    kropp.append(h('label', { class: 'k-bryter', for: 'k-vissti' }, visSti, 'Vis stien som en linje på lerretet'));
+
+    var fart = h('input', { type: 'range', id: 'k-fart', class: 'k-glider', min: '0.5', max: '1.8', step: '0.1', value: String(doc.fart) });
+    fart.addEventListener('input', function () { doc.fart = +fart.value; senereHistorikk(); });
+    kropp.append(felt('Fart på kameraet', fart, 'k-fart'));
+
+    kropp.append(felt(h('span', { class: 'k-etikett', text: 'Ordne rammene automatisk' }), h('div', { class: 'k-knapperad' },
+      h('button', { class: 'k-btn', type: 'button', text: 'Reise', title: 'En bølgende vei fra venstre mot høyre', onclick: function () { ordne('reise'); } }),
+      h('button', { class: 'k-btn', type: 'button', text: 'Spiral', title: 'Hver ramme mindre enn den forrige, i en spiral innover', onclick: function () { ordne('spiral'); } }),
+      h('button', { class: 'k-btn', type: 'button', text: 'Dykk', title: 'Hver ramme gjemt inne i den forrige', onclick: function () { ordne('dykk'); } }),
+      h('button', { class: 'k-btn', type: 'button', text: 'Rutenett', title: 'Pent på rad og rekke', onclick: function () { ordne('rutenett'); } })
+    )));
+
+    kropp.append(felt(h('span', { class: 'k-etikett', text: 'Lagre' }), h('div', { style: { display: 'flex', flexDirection: 'column', gap: '8px' } },
+      h('div', { class: 'k-knapperad' },
+        knapp('lagre', 'Lagre fil', lagre, { class: 'k-btn k-primar' }),
+        knapp('kopi', 'Kopier som tekst', kopierTekst)),
+      h('div', { class: 'k-hint', text: 'Hele presentasjonen ligger i én HTML-fil. «Kopier som tekst» gir deg innholdet du kan lime inn til Claude for å få endringer.' }))));
+
+    panel.append(kropp);
+  }
+  function markerStiRad() {
+    $$('.k-sti-liste li', panel).forEach(function (li) { li.classList.toggle('k-her', +li.dataset.i === pos); });
+  }
+  function flyttSti(fra, til) {
+    if (til < 0 || til >= doc.sti.length) return;
+    var e = doc.sti.splice(fra, 1)[0];
+    doc.sti.splice(til, 0, e);
+    if (pos === fra) pos = til;
+    tegnSti(); lagreHistorikk(); byggPanel();
+  }
+
+  /* ---------- Lagring ---------- */
+
+  function somHTML() {
+    var css = ($('#krizi-style') || {}).textContent || '';
+    var js = ($('#krizi-engine') || {}).textContent || '';
+    var json = JSON.stringify(doc, null, 1).replace(/</g, '\\u003c');
+    return '<!doctype html>\n<html lang="no">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' +
+      '<title>' + esc(doc.tittel) + LUKK + 'title>\n<meta name="generator" content="Krizi ' + VERSJON + '">\n' +
+      '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
+      '<link rel="stylesheet" href="' + FONT_URL.replace(/&/g, '&amp;') + '">\n' +
+      '<style id="krizi-style">' + css + LUKK + 'style>\n' + LUKK + 'head>\n<body>\n' +
+      '<script type="application/json" id="krizi-data">\n' + json + '\n' + LUKK + 'script>\n' +
+      '<script id="krizi-engine">' + js + LUKK + 'script>\n' + LUKK + 'body>\n' + LUKK + 'html>\n';
+  }
+  function filnavn() {
+    var s = doc.tittel.toLowerCase().replace(/[æ]/g, 'ae').replace(/[ø]/g, 'o').replace(/[å]/g, 'a').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return (s || 'presentasjon') + '.html';
+  }
+  function lagret() {
+    ulagret = false;
+    lager.del(UTKAST);
+    oppdaterStatus();
+  }
+  var iRamme = (function () { try { return window.top !== window; } catch (e) { return true; } })();
+  function lagre() {
+    lagreHistorikk();
+    var html = somHTML();
+    if (iRamme) {
+      // Inne i en innebygd visning (f.eks. claude.ai) kan siden ikke skrive filer.
+      kopierTekst('Her kan ikke siden lagre filer, så presentasjonen er kopiert som tekst. Lim den inn hos Claude, eller åpne HTML-filen lokalt for å lagre.');
+      lagreUtkast();
+      return;
+    }
+    if (window.showSaveFilePicker) {
+      var p = filHandle ? Promise.resolve(filHandle) : window.showSaveFilePicker({ suggestedName: filnavn(), types: [{ description: 'Krizi-presentasjon', accept: { 'text/html': ['.html'] } }] });
+      p.then(function (handle) {
+        filHandle = handle;
+        return handle.createWritable().then(function (w) { return w.write(html).then(function () { return w.close(); }); });
+      }).then(function () { lagret(); toast('Lagret i «' + (filHandle.name || filnavn()) + '».'); })
+        .catch(function (e) {
+          if (e && e.name === 'AbortError') return;
+          lastNed(html);
+        });
+      return;
+    }
+    lastNed(html);
+  }
+  function lastNed(html) {
+    try {
+      var blob = new Blob([html], { type: 'text/html' });
+      var a = h('a', { href: URL.createObjectURL(blob), download: filnavn() });
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+      lagret();
+      toast('Lastet ned «' + filnavn() + '». Åpne den filen neste gang.', [{ tekst: 'Kopier som tekst', fn: kopierTekst }], 6000);
+    } catch (e) {
+      kopierTekst();
+    }
+  }
+  function kopierTekst(melding) {
+    var tekst = JSON.stringify(doc, null, 1);
+    var ok = function () { toast(typeof melding === 'string' ? melding : 'Presentasjonen er kopiert. Lim den inn hos Claude for å få endringer.', null, 6000); };
+    try {
+      navigator.clipboard.writeText(tekst).then(ok, function () { visTekst(tekst); });
+    } catch (e) { visTekst(tekst); }
+  }
+  function visTekst(tekst) {
+    var ta = h('textarea', { rows: 12, style: { width: '100%', fontSize: '12px' } });
+    ta.value = tekst;
+    hjelp.innerHTML = '';
+    hjelp.append(h('div', null, h('h2', { text: 'Presentasjonen som tekst' }), h('p', { text: 'Merk alt og kopier.' }), ta));
+    hjelp.classList.add('k-pa');
+    ta.focus(); ta.select();
+    hjelp.addEventListener('click', function nullstill(e) { if (e.target === hjelp) { hjelp.innerHTML = ''; hjelp.removeEventListener('click', nullstill); } });
+  }
+
+  /* ---------- Peker, touch og hjul ---------- */
+
+  var pekere = {}, gest = null;
+  function antallPekere() { return Object.keys(pekere).length; }
+  function pekerListe() { return Object.keys(pekere).map(function (k) { return pekere[k]; }); }
+
+  stage.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse' && e.button !== 0 && e.button !== 1) return;
+    if (!redigerer && e.target.closest('a')) return;
+    aktivitet();
+    pekere[e.pointerId] = { x: e.clientX, y: e.clientY };
+    try { stage.setPointerCapture(e.pointerId); } catch (er) { /* ok */ }
+    if (antallPekere() === 2) {
+      var ps = pekerListe();
+      gest = { type: 'klyp', d0: Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y) || 1, m0: { x: (ps[0].x + ps[1].x) / 2, y: (ps[0].y + ps[1].y) / 2 }, cam0: Object.assign({}, cam), flyttet: true };
+      return;
+    }
+    if (antallPekere() > 2) return;
+    stoppFly();
+    var handtak = e.target.closest('[data-h]');
+    var rammeEl = e.target.closest('.k-frame');
+    var g = { sx: e.clientX, sy: e.clientY, t: performance.now(), flyttet: false, cam0: Object.assign({}, cam), mal: rammeEl ? rammeEl.dataset.id : null, touch: e.pointerType === 'touch' };
+    if (redigerer && handtak && valgt) {
+      g.type = handtak.dataset.h;
+      startGruppe(g, ramme(valgt));
+    } else if (redigerer && rammeEl && e.button === 0) {
+      if (valgt !== rammeEl.dataset.id) velg(rammeEl.dataset.id);
+      g.type = 'flytt';
+      startGruppe(g, ramme(valgt));
+    } else {
+      g.type = 'panorer';
+    }
+    gest = g;
+  });
+
+  function startGruppe(g, f) {
+    g.f = f;
+    g.f0 = { x: f.x, y: f.y, s: f.s, r: f.r };
+    g.barn = doc.rammer.filter(function (b) { return b !== f && inneholder(f, b); }).map(function (b) { return { f: b, x: b.x, y: b.y, s: b.s, r: b.r }; });
+    var c = tilSkjerm(f.x, f.y);
+    g.c = c;
+    g.d0 = Math.hypot(g.sx - c.x, g.sy - c.y) || 1;
+    g.a0 = Math.atan2(g.sy - c.y, g.sx - c.x);
+  }
+  function brukGruppe(g, ny) {
+    var f = g.f, f0 = g.f0;
+    f.x = ny.x; f.y = ny.y; f.s = ny.s; f.r = ny.r;
+    oppdaterRamme(f);
+    var k = ny.s / f0.s, dr = ny.r - f0.r;
+    g.barn.forEach(function (b) {
+      var l = rot(b.x - f0.x, b.y - f0.y, -f0.r);
+      var p = rot(l.x * k, l.y * k, ny.r);
+      b.f.x = ny.x + p.x; b.f.y = ny.y + p.y; b.f.s = b.s * k; b.f.r = b.r + dr;
+      oppdaterRamme(b.f);
+    });
+    oppdaterMarkering();
+  }
+
+  stage.addEventListener('pointermove', function (e) {
+    if (root.classList.contains('k-laser-pa')) { laser.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)'; }
+    if (e.pointerType === 'mouse' && !pekere[e.pointerId]) { aktivitet(); return; }
+    var p = pekere[e.pointerId];
+    if (!p || !gest) return;
+    p.x = e.clientX; p.y = e.clientY;
+    var g = gest;
+    if (g.type === 'klyp') {
+      var ps = pekerListe();
+      if (ps.length < 2) return;
+      var d1 = Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y) || 1;
+      var m1 = { x: (ps[0].x + ps[1].x) / 2, y: (ps[0].y + ps[1].y) / 2 };
+      var wp = tilVerden(g.m0.x, g.m0.y, g.cam0);
+      cam.z = clamp(g.cam0.z * d1 / g.d0, 1e-4, 1e4);
+      var q = rot((m1.x - W / 2) / cam.z, (m1.y - H / 2) / cam.z, cam.r);
+      cam.x = wp.x - q.x; cam.y = wp.y - q.y;
+      merkFri();
+      return;
+    }
+    var dx = e.clientX - g.sx, dy = e.clientY - g.sy;
+    if (!g.flyttet && Math.hypot(dx, dy) > (g.touch ? 8 : 4)) { g.flyttet = true; root.classList.add('k-drar'); }
+    if (!g.flyttet) return;
+    if (g.type === 'panorer') {
+      var d = skjermDelta(dx, dy, g.cam0);
+      cam.x = g.cam0.x - d.x; cam.y = g.cam0.y - d.y;
+      merkFri();
+    } else if (g.type === 'flytt') {
+      var dw = skjermDelta(dx, dy);
+      brukGruppe(g, { x: g.f0.x + dw.x, y: g.f0.y + dw.y, s: g.f0.s, r: g.f0.r });
+    } else if (g.type === 'scale') {
+      var dd = Math.hypot(e.clientX - g.c.x, e.clientY - g.c.y);
+      brukGruppe(g, { x: g.f0.x, y: g.f0.y, s: Math.max(1e-4, g.f0.s * dd / g.d0), r: g.f0.r });
+    } else if (g.type === 'rot') {
+      var a = Math.atan2(e.clientY - g.c.y, e.clientX - g.c.x);
+      var r = g.f0.r + (a - g.a0) * 180 / Math.PI;
+      if (e.shiftKey) r = Math.round(r / 15) * 15;
+      else if (Math.abs(vinkelDiff(0, r) - Math.round(vinkelDiff(0, r) / 90) * 90) < 3) r = Math.round(r / 90) * 90;
+      brukGruppe(g, { x: g.f0.x, y: g.f0.y, s: g.f0.s, r: Math.round(r * 10) / 10 });
+    }
+  });
+
+  function merkFri() {
+    if (!redigerer && !oversikt) { friVisning = true; root.classList.add('k-fri-visning'); }
+  }
+
+  function pekerOpp(e) {
+    if (!pekere[e.pointerId]) return;
+    delete pekere[e.pointerId];
+    var g = gest;
+    if (!g) return;
+    if (g.type === 'klyp') { if (antallPekere() === 0) gest = null; return; }
+    if (antallPekere() > 0) return;
+    gest = null;
+    root.classList.remove('k-drar');
+    var dt = performance.now() - g.t, dx = e.clientX - g.sx, dy = e.clientY - g.sy;
+    if (g.flyttet) {
+      if (g.type !== 'panorer') { lagreHistorikk(); tegnSti(); zRef = oversiktsVisning(true).z; }
+      else if (!redigerer && g.touch && dt < 400 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+        cam.x = g.cam0.x; cam.y = g.cam0.y; friVisning = false; root.classList.remove('k-fri-visning');
+        if (dx < 0) neste(); else forrige();
+      }
+      return;
+    }
+    if (e.type === 'pointercancel') return;
+    if (redigerer) { if (!g.mal) velg(null); return; }
+    if (oversikt) { if (g.mal) gaTilRamme(g.mal); else visOversikt(false); return; }
+    var aktiv = ramme(aktivId);
+    // Klikk på en annen ramme flyr dit. Klikk på rammen du står i (eller rammen rundt) går videre.
+    if (g.mal && g.mal !== aktivId && !(aktiv && inneholder(ramme(g.mal), aktiv))) gaTilRamme(g.mal);
+    else neste();
+  }
+  stage.addEventListener('pointerup', pekerOpp);
+  stage.addEventListener('pointercancel', pekerOpp);
+
+  stage.addEventListener('dblclick', function (e) {
+    if (!redigerer) return;
+    var el = e.target.closest('.k-frame');
+    if (el) { velg(el.dataset.id); fokuserTekst(false); }
+  });
+
+  stage.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    stoppFly();
+    aktivitet();
+    var faktorX = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 400 : 1;
+    if (e.shiftKey && !e.ctrlKey) {
+      var d = skjermDelta((e.deltaY || e.deltaX) * faktorX, 0);
+      cam.x += d.x; cam.y += d.y;
+    } else {
+      var k = e.ctrlKey ? 0.011 : 0.0017;
+      zoomVed(e.clientX, e.clientY, Math.exp(-e.deltaY * faktorX * k));
+    }
+    merkFri();
+  }, { passive: false });
+
+  /* Dra og slipp / lim inn bilder */
+  root.addEventListener('dragover', function (e) {
+    if (!e.dataTransfer || Array.prototype.indexOf.call(e.dataTransfer.types || [], 'Files') < 0) return;
+    e.preventDefault(); root.classList.add('k-dropp-pa');
+  });
+  root.addEventListener('dragleave', function (e) { if (e.target === root || !root.contains(e.relatedTarget)) root.classList.remove('k-dropp-pa'); });
+  root.addEventListener('drop', function (e) {
+    root.classList.remove('k-dropp-pa');
+    var fil = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!fil) return;
+    e.preventDefault();
+    leggTilBildeFil(fil, { x: e.clientX, y: e.clientY });
+  });
+  document.addEventListener('paste', function (e) {
+    if (skriver(e.target)) return;
+    var items = (e.clipboardData && e.clipboardData.items) || [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].kind === 'file' && /^image\//.test(items[i].type)) { e.preventDefault(); leggTilBildeFil(items[i].getAsFile()); return; }
+    }
+  });
+
+  /* ---------- Tastatur ---------- */
+
+  function skriver(t) {
+    return t && (t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && !/^(checkbox|range|color|button)$/.test(t.type)) || t.isContentEditable);
+  }
+  function tast(e) {
+    var t = e.target;
+    var mod = e.ctrlKey || e.metaKey;
+    var k = e.key;
+    if (skriver(t)) {
+      if (mod && k.toLowerCase() === 's') { e.preventDefault(); lagre(); }
+      if (k === 'Escape') { t.blur(); }
+      return;
+    }
+    if (t && t.tagName === 'BUTTON' && (k === ' ' || k === 'Enter')) return;
+    if (mod) {
+      var kk = k.toLowerCase();
+      if (kk === 's') { e.preventDefault(); lagre(); }
+      else if (kk === 'z' && redigerer) { e.preventDefault(); if (e.shiftKey) gjorOm(); else angre(); }
+      else if (kk === 'y' && redigerer) { e.preventDefault(); gjorOm(); }
+      else if (kk === 'd' && redigerer && valgt) { e.preventDefault(); dupliser(); }
+      return;
+    }
+    if (e.altKey) return;
+    if (hjelp.classList.contains('k-pa')) { if (k === 'Escape' || k === '?') { visHjelp(false); e.preventDefault(); } return; }
+    if (root.classList.contains('k-blank-pa') && k !== 'b' && k !== 'B' && k !== '.') { root.classList.remove('k-blank-pa'); }
+    if (redigerer && valgt && /^Arrow/.test(k)) {
+      e.preventDefault();
+      var f = ramme(valgt), steg = (e.shiftKey ? 40 : 6) / cam.z;
+      var d = skjermDelta(k === 'ArrowLeft' ? -steg * cam.z : k === 'ArrowRight' ? steg * cam.z : 0, k === 'ArrowUp' ? -steg * cam.z : k === 'ArrowDown' ? steg * cam.z : 0);
+      var g = { }; startGruppe(g, f); brukGruppe(g, { x: f.x + d.x, y: f.y + d.y, s: f.s, r: f.r });
+      senereHistorikk(); tegnSti();
+      return;
+    }
+    switch (k) {
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': case 'Enter':
+        e.preventDefault(); if (redigerer) { gaTilIRedigering(pos + 1); } else neste(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); if (redigerer) { gaTilIRedigering(pos - 1); } else forrige(); break;
+      case 'Backspace': case 'Delete':
+        if (redigerer && valgt) { e.preventDefault(); slettValgt(); }
+        else if (!redigerer && k === 'Backspace') { e.preventDefault(); forrige(); }
+        break;
+      case 'Home': e.preventDefault(); gaTil(0); break;
+      case 'End': e.preventDefault(); gaTil(doc.sti.length - 1, { alleSteg: true }); break;
+      case 'o': case 'O': if (redigerer) flyTil(oversiktsVisning()); else visOversikt(); break;
+      case 'Escape':
+        if (redigerer && valgt) velg(null);
+        else if (oversikt || friVisning) gaTil(pos, { behold: true });
+        else if (!redigerer) visOversikt(true);
+        break;
+      case 'e': case 'E': veksleRedigering(); break;
+      case 'f': case 'F': fullskjerm(); break;
+      case 'n': case 'N': if (!redigerer) root.classList.toggle('k-vis-notater'); break;
+      case 'p': case 'P': if (!redigerer) apnePresentator(); break;
+      case 'l': case 'L': if (!redigerer) root.classList.toggle('k-laser-pa'); break;
+      case 'b': case 'B': case '.': if (!redigerer) root.classList.toggle('k-blank-pa'); break;
+      case '?': visHjelp(true); break;
+      default: return;
+    }
+  }
+  function gaTilIRedigering(i) {
+    if (!doc.sti.length) return;
+    pos = clamp(i, 0, doc.sti.length - 1);
+    flyTil(visningFor(doc.sti[pos]));
+    markerStiRad();
+  }
+  document.addEventListener('keydown', tast);
+
+  window.addEventListener('resize', function () {
+    W = innerWidth; H = innerHeight;
+    stov.storrelse();
+    zRef = oversiktsVisning(true).z;
+    sisteTransform = '';
+    if (!flight && !friVisning && !redigerer) {
+      var v = oversikt ? oversiktsVisning() : visningFor(doc.sti[pos]);
+      cam.x = v.x; cam.y = v.y; cam.z = v.z; cam.r = v.r;
+    }
+  });
+  window.addEventListener('hashchange', function () {
+    var n = parseInt(location.hash.slice(1), 10);
+    if (n >= 1 && n - 1 !== pos && !redigerer) gaTil(n - 1);
+  });
+  window.addEventListener('beforeunload', function (e) {
+    if (ulagret) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* ---------- Løkka ---------- */
+
+  function lokke(na) {
+    if (flight) stegFly(na);
+    brukKamera();
+    stov.tikk();
+    requestAnimationFrame(lokke);
+  }
+
+  /* ---------- Oppstart ---------- */
+
+  function start() {
+    stov.storrelse();
+    stov.tema();
+    byggVerden();
+    byggDokk();
+    var n = parseInt(location.hash.slice(1), 10);
+    if (doc.sti.length && n >= 1 && n <= doc.sti.length) {
+      pos = n - 1;
+      gaTil(pos, { straks: true });
+    } else if (doc.sti.length) {
+      // Åpning: start langt ute og fly inn til første ramme
+      var o = oversiktsVisning();
+      cam.x = o.x; cam.y = o.y; cam.z = o.z * 0.45; cam.r = -6;
+      setTimeout(function () { gaTil(0, { fly: { varighet: reduser ? 200 : 2300 } }); }, 350);
+    } else {
+      var o2 = oversiktsVisning(); cam.x = o2.x; cam.y = o2.y; cam.z = o2.z; cam.r = 0;
+      veksleRedigering(true);
+    }
+    requestAnimationFrame(lokke);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { Object.keys(els).forEach(function (k) { tilpass(els[k]); }); });
+
+    var utkast = null;
+    try { utkast = JSON.parse(lager.get(UTKAST) || 'null'); } catch (e) { utkast = null; }
+    if (utkast && utkast.doc && JSON.stringify(utkast.doc) !== JSON.stringify(doc)) {
+      var tid = new Date(utkast.tid).toLocaleString('no', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      toast('Du har ulagrede endringer fra ' + tid + '.', [
+        { tekst: 'Hent dem tilbake', primar: true, fn: function () { historikk.push(JSON.stringify(doc)); settDoc(JSON.stringify(utkast.doc)); veksleRedigering(true); } },
+        { tekst: 'Forkast', fn: function () { lager.del(UTKAST); } }
+      ], 0);
+    } else if (doc.sti.length && !lager.get('krizi-sett-hjelp')) {
+      setTimeout(function () { toast('→ eller mellomrom for neste · O for oversikt · E for å redigere'); }, 2600);
+      lager.set('krizi-sett-hjelp', '1');
+    }
+    aktivitet();
+  }
+
+  window.krizi = { neste: neste, forrige: forrige, gaTil: gaTil, rediger: veksleRedigering, oversikt: visOversikt, doc: function () { return doc; }, html: somHTML, versjon: VERSJON };
+  start();
+})();

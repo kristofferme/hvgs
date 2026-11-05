@@ -4,7 +4,7 @@
 //
 //   node bygg.mjs
 //
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -25,6 +25,17 @@ let html = src("index.html")
   .replace(/<!-- BYGG:CSS -->[\s\S]*?<!-- \/BYGG:CSS -->/, () => css)
   .replace(/<!-- BYGG:JS -->[\s\S]*?<!-- \/BYGG:JS -->/, () => js);
 
+// Logoene legges inn i fila.
+html = html.replace(/src="profil\/([a-z-]+\.png)"/g, (_, f) =>
+  `src="data:image/png;base64,${readFileSync(join(her, "src", "profil", f)).toString("base64")}"`);
+
+// Svar på plassholdere fra src/lokalt.json (lastet ned fra presentasjonen).
+const lokalFil = join(her, "src", "lokalt.json");
+let lokalt = {};
+if (existsSync(lokalFil)) lokalt = JSON.parse(readFileSync(lokalFil, "utf8"));
+html = html.replace(/(<script id="lokalt" type="application\/json">)[\s\S]*?(<\/script>)/,
+  (_, a, b) => a + JSON.stringify(lokalt).replace(/</g, "\\u003c") + b);
+
 writeFileSync(join(her, "index.html"), html);
 
 let plass = 0;
@@ -33,4 +44,4 @@ const tell = (o) => {
   else if (o && typeof o === "object") Object.values(o).forEach(tell);
 };
 tell(D);
-console.log(`Bygget eksamen2026/index.html (${(html.length / 1024).toFixed(0)} kB). Plassholdere igjen: ${plass}.`);
+console.log(`Bygget eksamen2026/index.html (${(html.length / 1024).toFixed(0)} kB). Plassholdere i innhold.js: ${plass}, hvorav ${Object.keys(lokalt).length} er fylt inn via lokalt.json.`);

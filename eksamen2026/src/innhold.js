@@ -3,9 +3,9 @@
    ALT INNHOLD BOR HER. Rediger tekst, datoer og rutiner i denne fila.
    --------------------------------------------------------------------------
    Slik skriver du:
-   [[Fyll inn: …]]  = plassholder. Vises med stiplet ramme og telles opp i
-                      Utforsk → Plassholdere. Bytt ut hele [[…]] med ekte
-                      innhold når den lokale rutinen er avklart.
+   [[Fyll inn: …]]  = plassholder. Vises med stiplet ramme. Kan fylles inn
+                      direkte i presentasjonen (tast R, eller Utforsk →
+                      Plassholdere) – eller her, ved å bytte ut hele [[…]].
    **tekst**        = utheving.
    type             = "nasjonal" (regel fra forskrift/Udir),
                       "lokal"    (rutine ved Hustadvika vgs / fylket),
@@ -34,8 +34,8 @@ window.EKSAMEN = (function () {
       ingress: "Det meste av en trygg eksamen avgjøres før den starter." },
     { nr: "02", navn: "Skriftlig eksamen", kort: "Skriftlig", periode: "4.–21. mai",
       ingress: "Tre uker der rutinene må sitte – for hver eneste kandidat." },
-    { nr: "03", navn: "Muntlig og muntlig-praktisk eksamen", kort: "Muntlig", periode: "Etter den skriftlige perioden",
-      ingress: "Sporet deler seg. Hver eksamensform har sitt eget løp – men alle starter med trekket 28. april." },
+    { nr: "03", navn: "Muntlig og praktisk eksamen", kort: "Muntlig", periode: "Etter den skriftlige perioden",
+      ingress: "Sporet deler seg i tre. Muntlig, muntlig-praktisk og praktisk eksamen har hver sine rammer – men alle starter med trekket 28. april." },
     { nr: "04", navn: "Roller og ansvar", kort: "Roller", periode: "Hele perioden",
       ingress: "Et veikryss. Hvem gjør hva – og når? Velg en rolle." },
     { nr: "05", navn: "Når noe ikke går som planlagt", kort: "Avvik", periode: "Når som helst",
@@ -46,7 +46,7 @@ window.EKSAMEN = (function () {
   /* Trekket – det som skjer 28. april */
   const TREKK = {
     punkter: [
-      { tekst: "Samme dag og klokkeslett for skriftlig og muntlig eksamen", type: "nasjonal" },
+      { tekst: "Samme dag og klokkeslett for skriftlig og muntlig eksamen. Fra 2026 er det Udir som fastsetter trekkdatoen for videregående.", type: "nasjonal", kilde: "udirTrekk" },
       { tekst: "Kunngjøres for elevene i [[Fyll inn: kanal, f.eks. Visma InSchool]]", type: "lokal" },
       { tekst: "Følg opp gruppa samme dag – både de som er trukket og de som ikke er det", type: "tips" },
     ],
@@ -62,6 +62,7 @@ window.EKSAMEN = (function () {
 
   /* ---------------- NØKKELDATOER ---------------- */
   const DATOER = {
+    tilrettelegging: { vis: "1. februar", type: "lokal", tekst: "Søknadsfrist for særskilt tilrettelegging av eksamen." },
     trekk: { vis: "28. april", kl: "09:00", iso: "2026-04-28", type: "nasjonal", kilde: "udirTrekk",
       tekst: "Trekket offentliggjøres – samme dag for skriftlig og muntlig eksamen." },
     forsteSkriftlige: { vis: "4. mai", iso: "2026-05-04", type: "nasjonal", kilde: "udirPlan", tekst: "Første dag for sentralt gitt skriftlig eksamen." },
@@ -70,7 +71,7 @@ window.EKSAMEN = (function () {
       tekst: "Muntlig, muntlig-praktisk og praktisk eksamen. Datoene settes lokalt og kommer etter den skriftlige perioden." },
     fellessensur: { vis: "17.–19. juni", iso: "2026-06-17", type: "nasjonal", kilde: "sfNordland", tekst: "Fellessensur for sentralt gitt skriftlig eksamen. Hvilken dag avhenger av fag." },
     sensurfrist: { vis: "19. juni", iso: "2026-06-19", type: "nasjonal", kilde: "sfNordland", tekst: "Sensurfrist for sentralt gitt skriftlig eksamen." },
-    klage: { vis: "10 dager", type: "nasjonal", kilde: "lovdata", tekst: "Klagefrist på eksamenskarakter regnes fra karakteren er gjort kjent. Hurtigklage har egen, kortere frist.", },
+    klage: { vis: "10 dager", type: "nasjonal", kilde: "lovdata", tekst: "Klagefrist på eksamenskarakter regnes fra karakteren er gjort kjent. Hurtigklage har egen, kortere frist." },
     hurtigklage: { vis: "23./24. juni", type: "nasjonal", kilde: "sfNordland", kontroller: true,
       tekst: "Frist for hurtigklage (studieforberedende fag og fellesfag). Kildene oppgir 23. juni kl. 23:59 og 24. juni – sjekk Udir/Privatistportalen." },
   };
@@ -104,47 +105,32 @@ window.EKSAMEN = (function () {
 
   /* ---------------- KAPITTEL 1: MILEPÆLER FØR EKSAMEN ---------------- */
   const MILEPAELER = {
-    oppmelding: {
-      naar: "[[Fyll inn: frist]]", naarEtikett: "Frist for kontroll",
-      tittel: "Oppmelding og kandidatkontroll",
-      ingress: "Skolen melder opp elevene. Faglærer er den som oppdager feil fagkode før det blir et problem.",
-      sjekkliste: [
-        { tekst: "Kandidatlistene for mine grupper er kontrollert – riktig elev i riktig fagkode", type: "tips" },
-        { tekst: "Elever med fritak, IV eller endret løp er avklart med [[Fyll inn: hvem]]", type: "lokal" },
-        { tekst: "Navn og opplysninger som er feil, er meldt til eksamensansvarlig innen [[Fyll inn: dato]]", type: "lokal" },
-        { tekst: "Privatister og elever som tar opp fag er kjent for faggruppa", type: "tips" },
-        { tekst: "Jeg vet hvem som er eksamensansvarlig og hvordan jeg når dem", type: "lokal" },
-      ],
-      fakta: { type: "nasjonal", tekst: "Fra 1. januar 2026 er det Utdanningsdirektoratet som fastsetter trekkdatoen for videregående – for skriftlig, muntlig, muntlig-praktisk og praktisk eksamen.", kilde: "udirTrekk" },
-      former: ["skriftlig", "muntlig", "muntlig-praktisk", "praktisk"],
-      roller: ["faglarer", "eksamensansvarlig"],
-    },
     tilrettelegging: {
-      naar: "[[Fyll inn: søknadsfrist]]", naarEtikett: "Søknadsfrist",
+      naar: "1. februar", naarEtikett: "Søknadsfrist",
       tittel: "Særskilt tilrettelegging",
       ingress: "Tilrettelegging må være søkt om og vedtatt før eksamen – ikke avklart i døra på eksamensdagen.",
       sjekkliste: [
-        { tekst: "Elever som trenger tilrettelegging, kjenner søknadsfristen og har søkt", type: "lokal" },
+        { tekst: "Elever som trenger tilrettelegging, kjenner fristen 1. februar og har søkt", type: "lokal" },
         { tekst: "Elever som bruker lese- og skrivestøtte (f.eks. IntoWords, Lingdys) har søkt særskilt tilrettelegging", type: "nasjonal" },
         { tekst: "Vedtak er fattet og kjent for eksamensansvarlig og vaktene", type: "lokal" },
         { tekst: "Tilretteleggingen eleven får på eksamen, ligner det eleven har brukt i opplæringen", type: "tips" },
       ],
-      fakta: { type: "nasjonal", tekst: "Kandidater som må bruke programmer for lese- og skrivestøtte, må søke om særskilt tilrettelegging. De kan da unntas fra kravet om sikker nettleser.", kilde: "udirSEB" },
+      fakta: { type: "nasjonal", tekst: "Kandidater som må bruke programmer for lese- og skrivestøtte, må søke om særskilt tilrettelegging. De kan da unntas fra kravet om sikker nettleser.", kilde: "udirSEBinfo" },
       former: ["skriftlig", "muntlig", "muntlig-praktisk", "praktisk"],
       roller: ["faglarer", "skoleledelse", "eksamensansvarlig", "elev"],
     },
     teknisk: {
-      naar: "[[Fyll inn: dato for testdag]]", naarEtikett: "Teknisk test",
-      tittel: "Teknisk klar: sikker nettleser",
-      ingress: "I fag med sikker nettleser låses maskinen. Eleven får bare tilgang til eksamen og noen få godkjente nettressurser.",
+      naar: "[[Fyll inn: dato for felles testdag]]", naarEtikett: "Teknisk test",
+      tittel: "Er maskinen klar?",
+      ingress: "Gå gjennom lista med elevene i god tid før 4. mai. Kryss av – maskinen viser hva som er klart.",
       enhet: [
-        { id: "os", tekst: "Windows eller macOS", detalj: "ChromeOS (Chromebook) og Linux støttes ikke.", type: "nasjonal" },
-        { id: "seb", tekst: "Safe Exam Browser installert", detalj: "Installeres i god tid etter Udirs veiledning på kandidat.udir.no.", type: "nasjonal" },
-        { id: "test", tekst: "Testet med eksempeloppgave", detalj: "Udir anbefaler en teknisk test med eksempeloppgaver. Lokal testdag: [[Fyll inn]].", type: "nasjonal" },
-        { id: "notat", tekst: "Notater skrevet ut", detalj: "Notater på PC eller i skyen kan ikke åpnes under eksamen. Skal de brukes, må de skrives ut.", type: "nasjonal" },
+        { id: "os", tekst: "Windows eller macOS", detalj: "Chromebook, nettbrett og Linux fungerer ikke.", type: "nasjonal" },
+        { id: "seb", tekst: "Siste versjon installert", detalj: "Lastet ned etter 1. mars, maskinen er startet på nytt. Mac: full disktilgang er slått på.", type: "nasjonal" },
+        { id: "test", tekst: "Testet med eksempeloppgave", detalj: "Eleven har åpnet og levert en eksempeloppgave i sikker nettleser.", type: "nasjonal" },
+        { id: "notat", tekst: "Notater skrevet ut", detalj: "Notater på PC eller i skyen kan ikke åpnes under eksamen.", type: "nasjonal" },
         { id: "strom", tekst: "Lader og reserveløsning", detalj: "Reservemaskiner og strøm i lokalet: [[Fyll inn: hvem har ansvar]].", type: "lokal" },
       ],
-      fakta: { type: "nasjonal", tekst: "Sikker nettleser innføres gradvis: noen fag våren 2026, flere høsten 2026 og de aller fleste skriftlige eksamener våren 2027.", kilde: "udirSEB" },
+      fakta: { type: "nasjonal", tekst: "Uten administratorrettigheter kan installasjonen stoppe. Hjelp på skolen: [[Fyll inn: hvem]].", kilde: "udirSEB" },
       former: ["skriftlig"],
       roller: ["faglarer", "eksamensansvarlig", "elev"],
     },
@@ -159,7 +145,7 @@ window.EKSAMEN = (function () {
         { tekst: "Den som kommer etter kl. 10:00, får ikke gjennomføre", type: "nasjonal" },
         { tekst: "Hva eleven gjør ved sykdom – og fristen for dokumentasjon: [[Fyll inn]]", type: "lokal" },
         { tekst: "Tillatte hjelpemidler i mitt fag er gjennomgått", type: "tips" },
-        { tekst: "Elevene har øvd under eksamenslike forhold – også uten internett", type: "tips" },
+        { tekst: "Elevene har øvd under eksamenslike forhold – også i sikker nettleser", type: "tips" },
       ],
       fakta: { type: "tips", tekst: "Elevrettet informasjon fra Udir ligger på kandidat.udir.no. Pek elevene dit – og gå gjennom det viktigste i timen.", kilde: "udirKandidat" },
       former: ["skriftlig", "muntlig", "muntlig-praktisk", "praktisk"],
@@ -185,7 +171,7 @@ window.EKSAMEN = (function () {
     },
   };
 
-  /* Nytt i 2026 – brukes i den store sekvensen i kapittel 1 */
+  /* Nytt i 2026 – den store sekvensen i kapittel 1 */
   const NYORDNING = {
     linjer: [
       { for: "Forberedelsesdag dagen før", na: "Ingen forberedelsesdel" },
@@ -197,27 +183,46 @@ window.EKSAMEN = (function () {
     kilde: "udirForberedelse",
   };
 
+  /* Sikker nettleser (Safe Exam Browser) – hva, hvilke fag, og hvordan øve */
+  const SEB = {
+    hva: "Safe Exam Browser låser maskinen. Eleven får bare tilgang til eksamen og de få nettressursene som er lenket i oppgavesettet – ingen andre programmer, filer eller nettsider. Programmet er ikke koblet til noen skytjeneste og henter ingen informasjon fra maskinen.",
+    hvaKilde: "udirSEBinfo",
+    innforing: [
+      { naar: "Våren 2026", hva: "Fag som allerede brukte den: engelsk, fremmedspråk, reiseliv og språk 2, geofag 2 og noen yrkesfag på Vg3.", kontroller: true, kilde: "udirSEBfag" },
+      { naar: "Høsten 2026", hva: "Flere fag.", kilde: "udirSEBfag" },
+      { naar: "Våren 2027", hva: "De aller fleste skriftlige eksamener.", kilde: "udirKI" },
+    ],
+    ovelse: [
+      { tittel: "Last ned siste versjon", tekst: "Udir bytter versjon 1. mars og 1. oktober. Last ned på nytt etter 1. mars, og avinstaller en gammel versjon først.", type: "nasjonal", kilde: "udirSEB" },
+      { tittel: "Installer og start på nytt", tekst: "Følg installasjonsguiden på kandidat.udir.no. Mac: slå på full disktilgang under Sikkerhet og personvern.", type: "nasjonal", kilde: "udirSEB" },
+      { tittel: "Åpne en eksempeloppgave", tekst: "Udir legger ut eksempeloppgaver som åpnes i sikker nettleser. Bruk dem i timen – gjerne flere ganger.", type: "nasjonal", kilde: "udirSEBinfo" },
+      { tittel: "Øv med hjelpemidlene", tekst: "Bare noen få nettressurser er åpne. La elevene bli kjent med dem før eksamensdagen.", type: "tips" },
+      { tittel: "Felles teknisk test", tekst: "Faglærer gjennomfører en teknisk test med gruppa: [[Fyll inn: dato og hvem fra IT som er med]]", type: "lokal" },
+    ],
+    unntak: "Elever med lese- og skrivestøtte som har vedtak om særskilt tilrettelegging, unntas fra kravet om sikker nettleser.",
+  };
+
   /* ---------------- KAPITTEL 2: EN EKSAMENSDAG (simulering) ---------------- */
   const EKSAMENSDAG = {
-    elev: "Ida",
+    elev: "Kari",
     fag: "Norsk hovedmål, Vg3",
     varighet: "5 timer",
     steg: [
-      { kl: "[[08:30]]", tittel: "Oppmøte", elev: "Ida finner navnet sitt og plassen sin i [[Fyll inn: lokale]]. Mobilen leveres [[Fyll inn: hvor]].",
+      { kl: "[[08:30]]", tittel: "Oppmøte", elev: "Kari finner navnet sitt og plassen sin i [[Fyll inn: lokale]]. Mobilen leveres [[Fyll inn: hvor]].",
         larer: "Vaktene er på plass [[Fyll inn: tid]]. Oppmøte registreres mot kandidatlista.", type: "lokal" },
-      { kl: "[[08:45]]", tittel: "Innlogging", elev: "Ida logger inn. I fag med sikker nettleser starter hun Safe Exam Browser, som låser maskinen.",
+      { kl: "[[08:45]]", tittel: "Innlogging", elev: "Kari logger inn. I fag med sikker nettleser starter hun Safe Exam Browser, som låser maskinen.",
         larer: "Påloggingsinformasjon deles ut av [[Fyll inn]]. Elever som ikke kommer inn, får hjelp med en gang – ikke vent til kl. 09:00.", type: "lokal" },
-      { kl: "09:00", tittel: "Eksamen starter", elev: "Oppgavesettet åpnes. Ida har ingen forberedelsesdel og ingen internett – bare hjelpemidlene som er tillatt.",
+      { kl: "09:00", tittel: "Eksamen starter", elev: "Oppgavesettet åpnes. Kari har ingen forberedelsesdel og ingen internett – bare hjelpemidlene som er tillatt.",
         larer: "Les opp de viktigste reglene. Fra nå av: ro i lokalet, og alle avvik noteres med klokkeslett.", type: "nasjonal" },
       { kl: "09:00–10:00", tittel: "Sene kandidater", elev: "Jonas kommer 09:40. Han får starte, men får ikke kompensert tapt tid.",
         larer: "Noter når han kom. Han slutter samtidig med de andre.", type: "nasjonal" },
       { kl: "10:00", tittel: "Døra stenges", elev: "Den som møter kl. 10:00 eller senere, får ikke gjennomføre eksamen.",
         larer: "Lokal regel om å forlate lokalet før kl. 10:00: [[Fyll inn]].", type: "nasjonal" },
-      { kl: "Underveis", tittel: "Uforutsett", elev: "Maskinen til Ida fryser i sju minutter.",
+      { kl: "Underveis", tittel: "Uforutsett", elev: "Maskinen til Kari fryser i sju minutter.",
         larer: "Noter tidspunkt og hva som skjedde. Eksamensvakten kan gi utvidet tid når noe uforutsett skjer. Se rutinen for tekniske problemer.", type: "nasjonal" },
-      { kl: "14:00", tittel: "Innlevering", elev: "Ida leverer og ser at besvarelsen er registrert som levert.",
+      { kl: "14:00", tittel: "Innlevering", elev: "Kari leverer og ser at besvarelsen er registrert som levert.",
         larer: "Sjekk at alle har levert før de forlater lokalet. Elever med utvidet tid fortsetter.", type: "tips" },
-      { kl: "Etterpå", tittel: "Avslutning", elev: "Ida går hjem. Karakteren kommer etter fellessensur i juni.",
+      { kl: "Etterpå", tittel: "Avslutning", elev: "Kari går hjem. Karakteren kommer etter fellessensur i juni.",
         larer: "Protokoll og avviksskjema leveres til eksamensansvarlig [[Fyll inn: hvor/hvordan]].", type: "lokal" },
     ],
   };
@@ -227,7 +232,7 @@ window.EKSAMEN = (function () {
     faser: ["Før", "Under", "Etter"],
     rader: [
       { rolle: "faglarer", celler: [
-        "Kontrollerer kandidatlister og fagkoder. Forbereder elevene på ny ordning og hjelpemidler.",
+        "Forbereder elevene på ny ordning og hjelpemidler, og øver i sikker nettleser.",
         "[[Fyll inn: er faglærer tilgjengelig på telefon under eksamen i eget fag?]]",
         "Setter standpunkt senest dagen før eksamenskarakteren blir kjent." ] },
       { rolle: "eksamensvakt", celler: [
@@ -251,14 +256,15 @@ window.EKSAMEN = (function () {
     { tittel: "Meld videre", tekst: "Skjemaet leveres den som har ansvar for teknisk gjennomføring. Skolen melder til fylkeskommunen, som melder til Udir.", type: "lokal", kilde: "udirTeknisk" },
   ];
 
-  /* ---------------- KAPITTEL 3: MUNTLIG ---------------- */
+  /* ---------------- KAPITTEL 3: MUNTLIG, MUNTLIG-PRAKTISK OG PRAKTISK ---------------- */
   const SPOR = [
-    { id: "muntlig", tittel: "Muntlig", tekst: "Samtale mellom kandidat og eksaminator, med utgangspunkt i en forberedelsesdel.",
+    { id: "muntlig", tittel: "Muntlig", eksempel: "Samtale med utgangspunkt i en forberedelsesdel",
       forberedelse: "24 timer", gjennomforing: "Inntil 30 min", type: "nasjonal", kilde: "lovdata" },
-    { id: "muntlig-praktisk", tittel: "Muntlig-praktisk", tekst: "Kandidaten løser en praktisk oppgave og drøfter den muntlig.",
-      forberedelse: "[[Fyll inn: lokal ramme]]", gjennomforing: "[[Fyll inn]]", type: "lokal" },
-    { id: "praktisk", tittel: "Praktisk", tekst: "Kandidaten viser kompetansen gjennom praktisk arbeid.",
-      forberedelse: "[[Fyll inn: lokal ramme]]", gjennomforing: "[[Fyll inn]]", type: "lokal" },
+    { id: "muntlig-praktisk", tittel: "Muntlig-praktisk", eksempel: "F.eks. realfag: praktisk oppgave og samtale",
+      forberedelse: "[[Fyll inn: lokal ramme]]", gjennomforing: "45 min", type: "lokal" },
+    { id: "praktisk", tittel: "Praktisk", eksempel: "Tverrfaglig praktisk eksamen, Vg2 yrkesfag",
+      forberedelse: "Egne regler", gjennomforing: "Egne regler", type: "lokal",
+      merknad: "Tverrfaglig praktisk eksamen har egne regler: [[Fyll inn: hvor retningslinjene finnes]]" },
   ];
 
   const MUNTLIG = {
@@ -270,7 +276,6 @@ window.EKSAMEN = (function () {
       konsekvenser: [
         { tekst: "Opplæringen fortsetter etter trekket. Planlegg perioden mellom trekk og eksamen – for de som skal opp, og for de som ikke skal.", type: "tips" },
         { tekst: "Kandidaten får vite eksamensdag og tidspunkt [[Fyll inn: når og hvordan]].", type: "lokal" },
-        { tekst: "Forberedelsesdelen ved muntlig eksamen varer 24 timer.", type: "nasjonal" },
       ],
     },
     forberedelse: {
@@ -280,21 +285,28 @@ window.EKSAMEN = (function () {
       punkter: [
         { tekst: "Eksaminator lager oppgaven/temaet i tråd med læreplanen.", type: "nasjonal" },
         { tekst: "Slik får kandidaten forberedelsesdelen: [[Fyll inn: f.eks. Teams eller papir, og klokkeslett]]", type: "lokal" },
-        { tekst: "Om og hvordan faglærer kan veilede i forberedelsestiden: [[Fyll inn]]", type: "lokal" },
+        { tekst: "Forberedelsesdagen gir ikke egne timer til eksaminator.", type: "lokal" },
       ],
     },
     gjennomforing: {
-      minutter: 30,
-      tekst: "Eksaminasjonen varer inntil 30 minutter per kandidat ved muntlig eksamen.",
-      kilde: "lovdata",
-      eksempel: [
-        { min: 10, tekst: "Kandidaten presenterer" },
-        { min: 20, tekst: "Samtale med eksaminator" },
-      ],
-      eksempelMerknad: "Eksempel på fordeling – ikke en regel. Følg lokale retningslinjer.",
+      tekst: "Eksamenstiden er ulik for de tre formene.",
       punkter: [
-        { tekst: "Én av sensorene er eksaminator og har hovedansvaret for å gi oppgaver og stille spørsmål.", type: "nasjonal" },
-        { tekst: "Protokollmal og hvor den leveres: [[Fyll inn]]", type: "lokal" },
+        { tekst: "Muntlig: inntil 30 minutter per kandidat.", type: "nasjonal", kilde: "lovdata" },
+        { tekst: "Muntlig-praktisk, f.eks. i realfagene: 45 minutter.", type: "lokal" },
+        { tekst: "Tverrfaglig praktisk eksamen, Vg2 yrkesfag: egne regler for varighet og gjennomføring.", type: "lokal" },
+        { tekst: "Eksaminator leder eksamen og stiller spørsmål. Protokollmal: [[Fyll inn: hvor den ligger]]", type: "nasjonal" },
+      ],
+    },
+    parti: {
+      tall: [
+        { vis: "5–7", tekst: "kandidater per parti – ett parti per dag" },
+        { vis: "1", tekst: "sensor per parti, i tillegg til eksaminator" },
+        { vis: "6 t", tekst: "til eksaminator per eksamensdag" },
+      ],
+      punkter: [
+        { tekst: "Sensor 1 er eksaminator – normalt faglæreren.", type: "lokal" },
+        { tekst: "Forberedelsesdagen gir ikke egne timer.", type: "lokal" },
+        { tekst: "Eksamen er en del av faget.", type: "lokal" },
       ],
     },
     sensur: {
@@ -302,19 +314,17 @@ window.EKSAMEN = (function () {
       hovedregelKilde: "udirMuntlig",
       punkter: [
         { tekst: "Ved lokalt gitt muntlig, praktisk og muntlig-praktisk eksamen skal faglæreren være sensor dersom fylkeskommunen ønsker det.", type: "nasjonal", kilde: "lovdata" },
-        { tekst: "Det skal være to sensorer. Én av dem er eksaminator.", type: "nasjonal", kilde: "lovdata", kontroller: true },
-        { tekst: "Hvordan og når kandidaten får karakteren: [[Fyll inn]]", type: "lokal" },
+        { tekst: "Sensor 1 (eksaminator) og sensor 2 setter karakteren sammen. Kandidaten får den [[Fyll inn: når og hvordan]].", type: "lokal" },
         { tekst: "Ved muntlig eksamen kan det bare klages på formelle feil. Får eleven medhold, annulleres karakteren, og eleven kan ta ny eksamen med nye sensorer.", type: "nasjonal", kilde: "udirMuntlig" },
       ],
     },
     ansvar: {
       faser: ["Trekk", "Kunngjøring", "Forberedelse", "Gjennomføring", "Sensur"],
       rader: [
-        { rolle: "faglarer", celler: ["Følger opp gruppa etter trekket", "Sier fra om feil i kandidatlista", "[[Fyll inn: veiledning?]]", "Ofte eksaminator", "Setter standpunkt senest dagen før"] },
-        { rolle: "eksaminator", celler: ["", "", "Lager og gir forberedelsesdelen", "Leder eksaminasjonen", "Setter karakter med sensor"] },
-        { rolle: "sensor", celler: ["", "Får tilsendt [[Fyll inn: hva]]", "Setter seg inn i oppgaven", "Lytter, kan stille spørsmål", "Setter karakter, signerer protokoll"] },
-        { rolle: "eksamensansvarlig", celler: ["Kunngjør trekket", "Lager eksamensplan med tid og rom", "", "Rom og logistikk", "Samler protokoller"] },
-        { rolle: "skoleledelse", celler: ["Har ansvar for at trekket gjennomføres riktig", "", "", "Avgjør ved avvik", "Behandler klager"] },
+        { rolle: "eksaminator", celler: ["Følger opp gruppa etter trekket", "Sier fra om feil i oppsettet", "Lager og gir forberedelsesdelen", "Leder eksamen", "Setter karakter med sensor 2. Standpunkt senest dagen før eksamen"] },
+        { rolle: "sensor", celler: ["", "Får tilsendt [[Fyll inn: hva]]", "Setter seg inn i oppgaven og læreplanen", "Lytter, kan stille spørsmål", "Setter karakter, signerer protokoll"] },
+        { rolle: "eksamensansvarlig", celler: ["Kunngjør trekket", "Setter opp partier (5–7 per dag), rom og sensorer", "", "Rom og logistikk", "Samler protokoller"] },
+        { rolle: "skoleledelse", celler: ["Ansvar for at trekket gjennomføres riktig", "", "", "Avgjør ved avvik", "Behandler klager"] },
       ],
     },
   };
@@ -322,32 +332,32 @@ window.EKSAMEN = (function () {
   /* ---------------- KAPITTEL 4: ROLLER ---------------- */
   const ROLLER = [
     { id: "faglarer", navn: "Faglærer", kort: "Kjenner eleven og faget",
-      ansvar: "Forbereder elevene, kontrollerer kandidatlister, setter standpunkt til rett tid – og er ofte eksaminator.",
+      ansvar: "Forbereder elevene, øver i sikker nettleser, setter standpunkt til rett tid – og er sensor 1 (eksaminator) på muntlig.",
       samarbeid: ["elev", "eksaminator", "eksamensansvarlig", "sensor"],
       oppgaver: [
-        { fase: "for", tekst: "Kontrollere at elevene er meldt opp i riktige fagkoder", stopp: "k1-oppmelding" },
-        { fase: "for", tekst: "Sørge for at elever med behov har søkt tilrettelegging", stopp: "k1-tilrettelegging" },
+        { fase: "for", tekst: "Sørge for at elever med behov har søkt tilrettelegging innen 1. februar", stopp: "k1-tilrettelegging" },
         { fase: "for", tekst: "Forberede elevene på ny ordning: ingen forberedelsesdel, ingen internett", stopp: "k1-nyordning" },
-        { fase: "for", tekst: "Gå gjennom hjelpemidler og la elevene øve under eksamenslike forhold", stopp: "k1-info" },
+        { fase: "for", tekst: "Øve med elevene i sikker nettleser med eksempeloppgaver", stopp: "k1-seb" },
+        { fase: "for", tekst: "Gå gjennom hjelpemidler og eksamensregler", stopp: "k1-info" },
         { fase: "trekk", tekst: "Følge opp gruppa etter trekket 28. april", stopp: "k1-trekk" },
         { fase: "skriftlig", tekst: "Sette standpunkt senest dagen før eksamenskarakteren blir kjent", stopp: "k1-standpunkt" },
-        { fase: "muntlig", tekst: "Sette standpunkt senest dagen før muntlig eksamen", stopp: "k3-sensur" },
-        { fase: "muntlig", tekst: "Være eksaminator når det er bestemt", stopp: "k3-gjennomforing" },
+        { fase: "muntlig", tekst: "Sette standpunkt senest dagen før muntlig eksamen", stopp: "k1-standpunkt" },
+        { fase: "muntlig", tekst: "Være sensor 1 (eksaminator) for egne elever", stopp: "k3-parti" },
       ] },
-    { id: "eksaminator", navn: "Eksaminator", kort: "Leder den muntlige eksamenen",
-      ansvar: "Den av sensorene som har hovedansvaret for å gi oppgaver og stille spørsmål til kandidaten.",
+    { id: "eksaminator", navn: "Eksaminator", kort: "Sensor 1 – leder eksamen",
+      ansvar: "Sensor 1 – normalt faglæreren. Lager oppgavene, leder eksamen og setter karakter sammen med sensor 2. Får 6 timer per eksamensdag.",
       samarbeid: ["sensor", "faglarer", "elev", "eksamensansvarlig"],
       oppgaver: [
         { fase: "muntlig", tekst: "Lage oppgave/tema til forberedelsesdelen i tråd med læreplanen", stopp: "k3-forberedelse" },
         { fase: "muntlig", tekst: "Gi forberedelsesdelen til rett tid: [[Fyll inn]]", stopp: "k3-forberedelse" },
-        { fase: "muntlig", tekst: "Lede eksaminasjonen – inntil 30 minutter ved muntlig", stopp: "k3-gjennomforing" },
-        { fase: "etter", tekst: "Sette karakter sammen med sensor og føre protokoll", stopp: "k3-sensur" },
+        { fase: "muntlig", tekst: "Lede eksamen – 30 min muntlig, 45 min muntlig-praktisk", stopp: "k3-gjennomforing" },
+        { fase: "etter", tekst: "Sette karakter sammen med sensor 2 og føre protokoll", stopp: "k3-sensur" },
       ] },
-    { id: "sensor", navn: "Sensor", kort: "Vurderer sammen med eksaminator",
-      ansvar: "Vurderer prestasjonen opp mot læreplanen og leter etter kompetansen eleven har.",
+    { id: "sensor", navn: "Sensor", kort: "Sensor 2 – én per parti",
+      ansvar: "Én sensor per parti på 5–7 kandidater. Vurderer sammen med eksaminator og leter etter kompetansen eleven har.",
       samarbeid: ["eksaminator", "eksamensansvarlig"],
       oppgaver: [
-        { fase: "muntlig", tekst: "Sette seg inn i læreplanen og oppgaven før eksaminasjonen", stopp: "k3-forberedelse" },
+        { fase: "muntlig", tekst: "Sette seg inn i læreplanen og oppgaven før eksamen", stopp: "k3-forberedelse" },
         { fase: "muntlig", tekst: "Lytte, notere og eventuelt stille spørsmål", stopp: "k3-gjennomforing" },
         { fase: "etter", tekst: "Sette karakter og signere protokollen", stopp: "k3-sensur" },
         { fase: "etter", tekst: "Melde forfall straks til [[Fyll inn: hvem]]", stopp: "k5-sensor" },
@@ -363,15 +373,14 @@ window.EKSAMEN = (function () {
         { fase: "etter", tekst: "Kontrollere innlevering og levere protokoll", stopp: "k2-ansvar" },
       ] },
     { id: "eksamensansvarlig", navn: "Eksamensansvarlig", kort: "Holder i hele løpet",
-      ansvar: "Oppmelding, eksamensplan, lokaler, vakter, teknisk beredskap og avvik. Kontaktpunktet for alle andre.",
+      ansvar: "Eksamensplan, lokaler, vakter, partier og sensorer, teknisk beredskap og avvik. Kontaktpunktet for alle andre.",
       samarbeid: ["faglarer", "eksaminator", "sensor", "eksamensvakt", "skoleledelse", "elev"],
       oppgaver: [
-        { fase: "for", tekst: "Melde opp kandidater og følge opp feil", stopp: "k1-oppmelding" },
-        { fase: "for", tekst: "Organisere teknisk test av sikker nettleser", stopp: "k1-teknisk" },
+        { fase: "for", tekst: "Organisere felles teknisk test av sikker nettleser", stopp: "k1-teknisk" },
         { fase: "trekk", tekst: "Kunngjøre trekket 28. april kl. 09:00", stopp: "k1-trekk" },
         { fase: "skriftlig", tekst: "Lokaler, vaktlister og teknisk beredskap", stopp: "k2-ansvar" },
         { fase: "skriftlig", tekst: "Ta imot og melde tekniske feil videre", stopp: "k2-teknisk" },
-        { fase: "muntlig", tekst: "Lage plan for muntlig: dato, tid, rom, sensorer", stopp: "k3-ansvar" },
+        { fase: "muntlig", tekst: "Sette opp partier (5–7 per dag), rom og sensorer", stopp: "k3-parti" },
         { fase: "etter", tekst: "Følge opp sykdom, dokumentasjon og ny eksamen", stopp: "k5-syk" },
       ] },
     { id: "skoleledelse", navn: "Skoleledelsen", kort: "Har det overordnede ansvaret",
@@ -387,8 +396,8 @@ window.EKSAMEN = (function () {
       ansvar: "Møter forberedt, til rett tid, med lovlige hjelpemidler – og sier fra med en gang hvis noe skjer.",
       samarbeid: ["faglarer", "eksamensvakt", "eksaminator", "eksamensansvarlig"],
       oppgaver: [
-        { fase: "for", tekst: "Installere og teste sikker nettleser", stopp: "k1-teknisk" },
-        { fase: "for", tekst: "Søke tilrettelegging innen fristen", stopp: "k1-tilrettelegging" },
+        { fase: "for", tekst: "Søke tilrettelegging innen 1. februar", stopp: "k1-tilrettelegging" },
+        { fase: "for", tekst: "Installere, oppdatere og teste sikker nettleser", stopp: "k1-teknisk" },
         { fase: "trekk", tekst: "Sjekke trekket 28. april kl. 09:00", stopp: "k1-trekk" },
         { fase: "skriftlig", tekst: "Møte før kl. 09:00 – senest før kl. 10:00", stopp: "k5-sent" },
         { fase: "skriftlig", tekst: "Kontakte skolen straks ved sykdom og levere dokumentasjon", stopp: "k5-syk" },
@@ -451,7 +460,7 @@ window.EKSAMEN = (function () {
         { tekst: "Han må klare seg uten", riktig: false },
       ],
       regel: "Kandidater som må bruke lese- og skrivestøtte, må søke særskilt tilrettelegging, og kan unntas fra kravet om sikker nettleser. Uten vedtak skal vakten ikke improvisere egne løsninger.",
-      regelType: "nasjonal", kilde: "udirSEB",
+      regelType: "nasjonal", kilde: "udirSEBinfo",
       gjor: ["Sjekk lista over tilrettelegging for lokalet", "Kontakt eksamensansvarlig – ikke gi tilgang på egen hånd", "Noter tidspunkt; tapt tid kan kompenseres"],
       kontakt: "[[Fyll inn: eksamensansvarlig]]",
     },
@@ -467,16 +476,16 @@ window.EKSAMEN = (function () {
       gjor: ["Noter klokkeslett, hva du så og hvem som var vitner", "Meld straks til [[Fyll inn: eksamensansvarlig/rektor]]", "Følg lokal rutine for mistanke om fusk: [[Fyll inn]]"],
       kontakt: "[[Fyll inn: rektor/eksamensansvarlig]]",
     },
-    { id: "sensor", nr: "06", tittel: "En sensor melder forfall", situasjon: "Kvelden før muntlig eksamen melder sensoren seg syk.",
+    { id: "sensor", nr: "06", tittel: "En sensor melder forfall", situasjon: "Kvelden før muntlig eksamen melder sensor 2 seg syk. Partiet har seks kandidater.",
       sporsmal: "Hva gjør du som eksaminator?",
       valg: [
         { tekst: "Gjennomfører alene og setter karakter selv", riktig: false },
         { tekst: "Melder straks fra til eksamensansvarlig, som skaffer ny sensor", riktig: true },
         { tekst: "Utsetter eksamen på egen hånd", riktig: false },
       ],
-      regel: "Det skal være to sensorer ved lokalt gitt muntlig eksamen. Eksaminator kan ikke sette karakter alene.",
-      regelType: "nasjonal", kilde: "lovdata", kontroller: true,
-      gjor: ["Meld fra straks – også om kvelden – til [[Fyll inn: hvem/telefon]]", "Eksamensansvarlig finner ny sensor eller avgjør endring", "Kandidaten informeres av [[Fyll inn: hvem]]"],
+      regel: "Hvert parti har én sensor i tillegg til eksaminator. Eksaminator kan ikke sette karakter alene.",
+      regelType: "lokal",
+      gjor: ["Meld fra straks – også om kvelden – til [[Fyll inn: hvem/telefon]]", "Eksamensansvarlig finner ny sensor eller avgjør endring", "Kandidatene informeres av [[Fyll inn: hvem]]"],
       kontakt: "[[Fyll inn: eksamensansvarlig, telefon utenom arbeidstid]]",
     },
   ];
@@ -484,8 +493,8 @@ window.EKSAMEN = (function () {
   /* ---------------- EPILOG ---------------- */
   const FEIL = [
     { myte: "«Elevene får forberedelsesdag dagen før.»", fakta: "Forberedelsesdelen er fjernet på sentralt gitt skriftlig eksamen (med noen få unntak).", kilde: "udirForberedelse" },
-    { myte: "«Sikker nettleser fikser vi på eksamensdagen.»", fakta: "Installer og test i god tid. Chromebook og Linux støttes ikke.", kilde: "udirSEB" },
-    { myte: "«Feil i oppmeldingen ordner seg.»", fakta: "Kontroller kandidatlistene innen [[Fyll inn: frist]]. Feil fagkode er vanskelig å rette sent.", kilde: null },
+    { myte: "«Sikker nettleser fikser vi på eksamensdagen.»", fakta: "Last ned siste versjon etter 1. mars og øv med eksempeloppgaver i god tid. Chromebook, nettbrett og Linux fungerer ikke.", kilde: "udirSEB" },
+    { myte: "«Muntlig planlegger vi når trekket kommer.»", fakta: "Trekket kommer 28. april. Partier på 5–7 kandidater per dag, rom og sensorer må være klare.", kilde: null },
     { myte: "«Standpunkt setter vi før trekket, som før.»", fakta: "Standpunkt i eksamensfag settes senest dagen før eksamenskarakteren blir kjent (skriftlig) eller dagen før eksamen (muntlig).", kilde: "udirTrekk" },
     { myte: "«Avvik husker vi etterpå.»", fakta: "Alt noteres med klokkeslett, der og da. Uten notat blir det vanskelig å gi tid tilbake og å behandle klager.", kilde: null },
   ];
@@ -497,7 +506,7 @@ window.EKSAMEN = (function () {
       { rolle: "Rektor / avdelingsleder", hvem: "[[Fyll inn: navn]]", kontakt: "[[Fyll inn: telefon]]" },
       { rolle: "Felles informasjon", hvem: "[[Fyll inn: Teams-kanal eller mappe]]", kontakt: "" },
     ],
-    nasjonalt: ["udirEksamen", "udirKandidat", "udirPlan", "udirMuntlig", "lovdata", "mrfylke"],
+    nasjonalt: ["udirEksamen", "udirKandidat", "udirSEB", "udirPlan", "udirMuntlig", "lovdata", "mrfylke"],
   };
 
   /* ---------------- KILDER ---------------- */
@@ -507,7 +516,9 @@ window.EKSAMEN = (function () {
     udirTrekk: { navn: "Udir – Endringer i eksamenstrekket og standpunkt for videregående", url: "https://www.udir.no/eksamen-og-prover/eksamen/slik-endrer-vi-eksamen/eksamenstrekk-standpunkt-vgs/" },
     udirForberedelse: { navn: "Udir – Fjerning av forberedelsesdel til skriftlig sentralt gitt eksamen", url: "https://www.udir.no/eksamen-og-prover/eksamen/slik-endrer-vi-eksamen/forberedelsedel-skriftlig-eksamen/" },
     udirKI: { navn: "Udir – Gjør grep for å hindre bruk av KI på eksamen (pressemelding, april 2026)", url: "https://www.udir.no/presse/pressemeldinger/strammer-inn-for-a-hindre-bruk-av-ki-pa-eksamen/" },
-    udirSEB: { navn: "Udir – Installasjonsguide for Safe Exam Browser", url: "https://kandidat.udir.no/sebguide" },
+    udirSEB: { navn: "Udir – Installasjonsguide for Safe Exam Browser", url: "https://kandidat.udir.no/seb/installasjonsguide" },
+    udirSEBinfo: { navn: "Udir – Informasjon om Safe Exam Browser", url: "https://kandidat.udir.no/seb" },
+    udirSEBfag: { navn: "Udir – Eksamensfag med sikker nettleser", url: "https://www.udir.no/eksamen-og-prover/eksamen/slik-endrer-vi-eksamen/eksamensfag-med-sikker-nettleser/" },
     udirKandidat: { navn: "Udir – Informasjon til kandidater", url: "https://kandidat.udir.no/" },
     udirMuntlig: { navn: "Udir – Regler for muntlig og muntlig-praktisk eksamen", url: "https://www.udir.no/eksamen-og-prover/eksamen/muntlig-eksamen/" },
     udirTeknisk: { navn: "Udir – Tekniske problemer under gjennomføring av eksamen (skjema)", url: "https://www.udir.no/contentassets/45c8dcc48a934c9ba99766be679bf4b3/brukerstotte-tekniske-problem-eksamen-bokmal.pdf" },
@@ -518,6 +529,6 @@ window.EKSAMEN = (function () {
     utdanningsnytt: { navn: "Utdanningsnytt – Blir rekordtidlig eksamenstrekk i videregående", url: "https://www.utdanningsnytt.no/eksamen-eksamensdato-muntlig-eksamen/blir-rekordtidlig-eksamenstrekk-i-videregaende/459024" },
   };
 
-  return { META, KAPITLER, TREKK, FORMER, DATOER, KALENDER, TALL, MILEPAELER, NYORDNING, EKSAMENSDAG, SKRIFTLIG_ANSVAR,
+  return { META, KAPITLER, TREKK, FORMER, DATOER, KALENDER, TALL, MILEPAELER, NYORDNING, SEB, EKSAMENSDAG, SKRIFTLIG_ANSVAR,
     TEKNISK_RUTINE, SPOR, MUNTLIG, ROLLER, FASER, SCENARIOER, FEIL, HJELP, KILDER };
 })();

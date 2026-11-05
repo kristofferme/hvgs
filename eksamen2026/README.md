@@ -11,7 +11,9 @@ sendes på e-post.
 
 ## To moduser
 
-**Presentasjonsmodus** (standard) – for storskjerm foran kollegiet.
+**Presentasjonsmodus** (standard) – for storskjerm foran kollegiet. Ingen
+menyer dukker opp; bare kapittelnavn, logo og en tynn framdriftslinje.
+Musepekeren skjules når den står i ro. Alt styres med tastene:
 
 | Tast | Hva |
 | --- | --- |
@@ -22,6 +24,7 @@ sendes på e-post.
 | `Home` `End` | Start / slutt |
 | `F` | Fullskjerm |
 | `M` | Rolig bevegelse (respekterer også systeminnstillingen) |
+| `R` | Fyll inn plassholdere direkte i presentasjonen |
 | `?` | Hurtigtaster |
 
 **Utforskermodus** (`E`) – for lærerne etter møtet.
@@ -31,7 +34,7 @@ sendes på e-post.
 - **Oppslag**: alt innhold i kronologisk rekkefølge, med søk og utskrift.
 - **Mitt ansvar**: én rolle, oppgavene fordelt på fasene, med lenke til stoppet.
 - **Rutiner**: alle avviksrutinene samlet – kan skrives ut til eksamenslokalet.
-- **Plassholdere**: liste over lokale opplysninger som mangler.
+- **Plassholdere**: alle lokale opplysninger som mangler, med et felt for hver.
 - **Kilder**.
 
 Lenker til et bestemt stopp: `index.html#k3-forberedelse` (legg til `/2` for steg 2).
@@ -41,9 +44,9 @@ Lenker til et bestemt stopp: `index.html#k3-forberedelse` (legg til `/2` for ste
 | Kapittel | Innhold |
 | --- | --- |
 | Prolog | 2026 · tittel · hovedspørsmålet · kart over hele perioden |
-| 01 Før eksamen | Oppmelding, tilrettelegging, ny ordning (ingen forberedelsesdel, ingen internett), sikker nettleser, elevinformasjon, nye standpunktregler, trekket 28. april |
+| 01 Før eksamen | Tilrettelegging (frist 1. februar), ny ordning (ingen forberedelsesdel, ingen internett), sikker nettleser – hva, hvilke fag og hvordan øve, sjekkliste for elevmaskinen, elevinformasjon, nye standpunktregler, trekket 28. april |
 | 02 Skriftlig | Perioden i tall, kalender 4.–21. mai, simulering av en eksamensdag, før/under/etter, rutine ved tekniske problemer |
-| 03 Muntlig | Sporet deler seg i muntlig, muntlig-praktisk og praktisk: trekk og kunngjøring, 24 t forberedelse, inntil 30 min, sensur og klage, ansvarsfordeling |
+| 03 Muntlig og praktisk | Sporet deler seg i muntlig, muntlig-praktisk (f.eks. realfag, 45 min) og praktisk (tverrfaglig praktisk eksamen Vg2 yrkesfag, egne regler): trekk, forberedelse, eksamenstid, partier og sensorer (5–7 kandidater per parti og dag, én sensor per parti, 6 t per eksamensdag til eksaminator), sensur og klage, ansvarsfordeling |
 | 04 Roller | Interaktivt ansvarsnettverk – velg rolle, se oppgavene, fremhev dem på tidslinjen |
 | 05 Avvik | Seks scenarioer med spørsmål, svar, regel, rutine og kontakt |
 | Epilog | Datoer, ansvar, feil vi skal unngå, hvor du finner hjelp |
@@ -74,23 +77,33 @@ Hvert punkt er merket med hva slags opplysning det er:
 | **Tips** | Anbefaling og praktiske råd |
 | *Kontroller* | Kildene spriker, eller ordlyden bør sjekkes mot siste versjon |
 
-### Plassholdere
+### Plassholdere – fyll inn direkte i presentasjonen
 
 Lokale datoer og rutiner er **ikke funnet på**. Der opplysningen mangler, står
-det en plassholder:
+det en stiplet plassholder. Den enkleste måten å fylle dem inn på:
+
+1. Åpne `index.html` og trykk `R`. Klikk på en stiplet plassholder, skriv svaret
+   og trykk Enter. Teksten vises med en gang.
+2. Eller trykk `E` → **Plassholdere** og fyll inn alle feltene i én liste.
+3. Trykk **Lagre som ny fil**. Du får en ny `eksamen-2026.html` der svarene
+   ligger inne i fila. Det er den du deler med kollegene.
+
+Svarene huskes også i nettleseren til du lagrer. «Last ned verdiene (JSON)» gir
+en `lokalt.json`. Legg den i `src/` og kjør `node bygg.mjs`, så kommer svarene
+med når presentasjonen bygges fra kildene.
+
+Du kan også bytte ut plassholderen i `src/innhold.js`:
 
 ```js
 naar: "[[Fyll inn: frist]]",
 ```
 
-Den vises med stiplet ramme og «FYLL INN» i presentasjonen, og alle er listet
-under Utforsk → Plassholdere. Bytt ut hele `[[…]]` med den faktiske teksten.
+Bytt da ut hele `[[…]]` med den faktiske teksten.
 `[[08:30]]` (uten «Fyll inn») vises som «BEKREFT 08:30» – et eksempel som må
 bekreftes.
 
-Det som må avklares lokalt før presentasjonen brukes, er blant annet:
-frister for kontroll av kandidatlister og søknad om tilrettelegging, dato for
-teknisk test, kanal for kunngjøring av trekket, oppmøtetid og lokaler,
+Det som må avklares lokalt før presentasjonen brukes, er blant annet: dato for
+felles teknisk test, kanal for kunngjøring av trekket, oppmøtetid og lokaler,
 periode for muntlig eksamen i Møre og Romsdal, rammer for muntlig-praktisk og
 praktisk eksamen, rutine for sykdom og dokumentasjonsfrist, og
 kontaktpersoner (eksamensansvarlig, IT, ledelse).
@@ -116,3 +129,5 @@ Kilder. Fagkodene i kalenderen er et utvalg – kontroller alltid i
 - Sjekklister huskes per nettleser (localStorage) – ingen data sendes noe sted.
 - Skrifter: Poppins, Big Shoulders Display og JetBrains Mono (SIL OFL), lagt inn
   i `src/fonter.css`.
+- Logoene ligger i `src/profil/` (hvit tekst for mørke flater, svart for lyse)
+  og legges inn i fila ved bygging.

@@ -9,6 +9,8 @@
 
   const D = window.EKSAMEN;
   const doc = document, root = doc.documentElement, body = doc.body;
+  // Fila slik den ble lastet – brukes når plassholderne lagres inn i en ny fil.
+  const ORIGINAL = "<!doctype html>\n" + root.outerHTML;
   const $ = (s, r = doc) => r.querySelector(s);
   const $$ = (s, r = doc) => Array.from(r.querySelectorAll(s));
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -25,21 +27,46 @@
   };
 
   /* ---------------------------------------------------------------------
+     Plassholdere. Hver [[…]] får en fast nøkkel. Verdier kommer fra fila
+     (<script id="lokalt">) og fra det som er fylt inn i denne nettleseren.
+     --------------------------------------------------------------------- */
+  const LOKALT_FIL = (() => { try { const el = doc.getElementById("lokalt"); return el ? JSON.parse(el.textContent || "{}") : {}; } catch (e) { return {}; } })();
+  let LOKALT = Object.assign({}, LOKALT_FIL, store.get("lokalt", {}));
+  const PH = [];
+  (function tagg(o, path) {
+    Object.keys(o).forEach((k) => {
+      const v = o[k], p = path ? `${path}.${k}` : k;
+      if (typeof v === "string") {
+        if (v.indexOf("[[") < 0) return;
+        let n = 0;
+        const list = [];
+        o[k] = v.replace(/\[\[(.+?)\]\]/g, (_, t) => { const key = `${p}~${n++}`; list.push({ key, tekst: t, path: p, obj: o, prop: k }); return `[[#${key}|${t}]]`; });
+        PH.push(...list);
+      } else if (v && typeof v === "object") tagg(v, p);
+    });
+  })(D, "");
+  const phVerdi = (key) => (key && LOKALT[key]) || "";
+  const igjen = () => PH.filter((p) => !phVerdi(p.key)).length;
+
+  /* ---------------------------------------------------------------------
      Tekst
      --------------------------------------------------------------------- */
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   function fmt(s) {
     if (s == null) return "";
     return esc(s)
-      .replace(/\[\[(.+?)\]\]/g, (_, t) => {
+      .replace(/\[\[(?:#([^|]+)\|)?(.+?)\]\]/g, (_, key, t) => {
+        const kAttr = key ? ` data-ph="${key}"` : "";
+        const v = phVerdi(key);
+        if (v) return `<span class="ph-v"${kAttr}>${esc(v)}</span>`;
         const m = t.match(/^Fyll inn:?\s*(.*)$/i);
         const lbl = m ? "Fyll inn" : "Bekreft";
         const txt = m ? m[1] : t;
-        return `<span class="ph" title="Plassholder – fylles ut i innhold.js"><b>${lbl}</b>${txt ? `<span>${txt}</span>` : ""}</span>`;
+        return `<span class="ph"${kAttr} title="Plassholder – tast R og klikk for å fylle inn"><b>${lbl}</b>${txt ? `<span>${txt}</span>` : ""}</span>`;
       })
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   }
-  const plain = (s) => String(s || "").replace(/\[\[(?:Fyll inn:?\s*)?(.*?)\]\]/gi, "$1").replace(/\*\*/g, "");
+  const plain = (s) => String(s || "").replace(/\[\[(?:#([^|]+)\|)?(?:Fyll inn:?\s*)?(.*?)\]\]/gi, (_, key, t) => phVerdi(key) || t).replace(/\*\*/g, "");
   const TAGNAVN = { nasjonal: "Nasjonal regel", lokal: "Lokal rutine", tips: "Tips" };
   const tag = (t, k) => (t ? `<span class="tag t-${t}">${TAGNAVN[t]}${k ? '<em>Kontroller</em>' : ""}</span>` : "");
   const src = (key) => {
@@ -102,10 +129,10 @@
     cams: [{ x: 0 }, { x: 1000 }, { x: 2350 }], lx: [1150, 1700, 2350] });
   st("p-kart", 0, "kart", 1900, 0, { lay: "overview", t: "Kartet over reisen", d: "Kart", hd: "Januar – juni" });
   st("k1-portal", 1, "portal", X1, 750, { lay: "v-left", t: "Før eksamen", d: "01", hd: "Januar – april" });
-  st("k1-oppmelding", 1, "milepael", X1, 1350, { lay: "v-left", data: "oppmelding", t: "Oppmelding og kandidatkontroll", d: "Frist", hd: "Før eksamen" });
-  st("k1-tilrettelegging", 1, "milepael", X1, 1950, { lay: "v-left", data: "tilrettelegging", t: "Særskilt tilrettelegging", d: "Frist", hd: "Før eksamen" });
-  st("k1-nyordning", 1, "nyordning", X1, 2550, { lay: "v-left", t: "Ny eksamensordning", d: "Nytt", hd: "Gjelder fra våren 2026" });
-  st("k1-teknisk", 1, "teknisk", X1, 3150, { lay: "v-left", data: "teknisk", t: "Sikker nettleser", d: "Test", hd: "Før eksamen", former: ["skriftlig"] });
+  st("k1-tilrettelegging", 1, "milepael", X1, 1350, { lay: "v-left", data: "tilrettelegging", t: "Særskilt tilrettelegging", d: "01.02", hd: "Søknadsfrist 1. februar" });
+  st("k1-nyordning", 1, "nyordning", X1, 1950, { lay: "v-left", t: "Ny eksamensordning", d: "Nytt", hd: "Gjelder fra våren 2026" });
+  st("k1-seb", 1, "seb", X1, 2550, { lay: "v-left", t: "Sikker nettleser", d: "SEB", hd: "Safe Exam Browser", former: ["skriftlig"] });
+  st("k1-teknisk", 1, "teknisk", X1, 3150, { lay: "v-left", data: "teknisk", t: "Er maskinen klar?", d: "Test", hd: "Før eksamen", former: ["skriftlig"] });
   st("k1-info", 1, "milepael", X1, 3750, { lay: "v-left", data: "info", t: "Informasjon til elevene", d: "Info", hd: "Før eksamen" });
   st("k1-standpunkt", 1, "standpunkt", X1, 4350, { lay: "v-left", data: "standpunkt", t: "Standpunkt", d: "Ny", hd: "Nytt i 2026" });
   st("k1-trekk", 1, "trekk", 3800, Y0, { lay: "h-bottom", t: "Trekket", d: "28.04", hd: "28. april · kl. 09:00", tema: "dark", stor: true });
@@ -115,13 +142,14 @@
   st("k2-simulering", 2, "simulering", mx("2026-05-05"), Y0, { lay: "h-bottom", t: "En eksamensdag", d: "05.05", hd: "Tirsdag 5. mai" });
   st("k2-ansvar", 2, "swim", 10500, Y0, { lay: "h-bottom", data: "skriftlig", t: "Før, under, etter", d: "Ansvar", hd: "Skriftlig eksamen" });
   st("k2-teknisk", 2, "rutine", 11250, Y0, { lay: "h-bottom", t: "Når teknikken svikter", d: "Rutine", hd: "Skriftlig eksamen" });
-  st("k3-portal", 3, "portal", 11900, Y0, { lay: "lanes", t: "Muntlig eksamen", d: "03", hd: "Etter skriftlig periode" });
+  st("k3-portal", 3, "portal", 11900, Y0, { lay: "lanes", t: "Muntlig og praktisk eksamen", d: "03", hd: "Etter skriftlig periode" });
   st("k3-spor", 3, "spor", 13300, Y0, { lay: "lanes", t: "Tre eksamensformer", d: "Spor", hd: "Muntlig · muntlig-praktisk · praktisk" });
   st("k3-trekk", 3, "trekkmuntlig", 14000, Y0, { lay: "lanes", t: "Trekk og kunngjøring", d: "28.04", hd: "Trekk 28. april" });
   st("k3-forberedelse", 3, "forberedelse", 14700, Y0, { lay: "lanes", t: "Forberedelse", d: "24 t", hd: "Forberedelsesdelen" });
-  st("k3-gjennomforing", 3, "gjennomforing", 15400, Y0, { lay: "lanes", t: "Gjennomføring", d: "30 min", hd: "Eksaminasjonen" });
-  st("k3-sensur", 3, "sensur", 16100, Y0, { lay: "lanes", cam: { ay: 0.86 }, t: "Vurdering og sensur", d: "Sensur", hd: "Samme dag som eksamen" });
-  st("k3-ansvar", 3, "swim", 16800, Y0, { lay: "lanes", cam: { ay: 0.9 }, data: "muntlig", t: "Ansvarsfordeling", d: "Ansvar", hd: "Muntlig eksamen" });
+  st("k3-gjennomforing", 3, "gjennomforing", 15400, Y0, { lay: "lanes", t: "Eksamenstid", d: "Tid", hd: "Eksamenstid" });
+  st("k3-parti", 3, "parti", 16100, Y0, { lay: "lanes", cam: { ay: 0.84 }, t: "Partier og sensorer", d: "5–7", hd: "Partier og sensorer" });
+  st("k3-sensur", 3, "sensur", 16800, Y0, { lay: "lanes", cam: { ay: 0.86 }, t: "Vurdering og sensur", d: "Sensur", hd: "Vurdering og sensur" });
+  st("k3-ansvar", 3, "swim", 17450, Y0, { lay: "lanes", cam: { ay: 0.9 }, data: "muntlig", t: "Ansvarsfordeling", d: "Ansvar", hd: "Muntlig og praktisk eksamen" });
   st("k4-roller", 4, "roller", KRYSS, Y0, { lay: "cross", t: "Roller og ansvar", d: "04", hd: "Hele perioden", former: ALLE_FORMER });
   st("k5-intro", 5, "hindringer", 20100, Y0, { lay: "hump", t: "Når noe ikke går som planlagt", d: "05", hd: "Når som helst" });
   const SCEN_FORM = { sent: ["skriftlig"], syk: ALLE_FORMER, teknisk: ["skriftlig"], hjelpemidler: ["skriftlig"], regelverk: ["skriftlig"], sensor: ["muntlig", "muntlig-praktisk", "praktisk"] };
@@ -378,6 +406,9 @@
      data-s="n" på et element = vises fra steg n.
      --------------------------------------------------------------------- */
   const SC = {};
+  const merke = $("#merke");
+  const LOGO = { lys: merke ? $(".lg-lys", merke).getAttribute("src") : "", mork: merke ? $(".lg-mork", merke).getAttribute("src") : "" };
+  const logo = (cls, s) => (LOGO.lys ? `<span class="logo ${cls}"${s != null ? ` data-s="${s}"` : ""}><img class="lg-lys" src="${LOGO.lys}" alt="${esc(D.META.skole)}"><img class="lg-mork" src="${LOGO.mork}" alt="${esc(D.META.skole)}"></span>` : `<p class="eyebrow">${fmt(D.META.skole)}</p>`);
 
   SC.prolog = () => {
     const q = esc(D.META.sporsmal).replace(/(vite|gjøre|være forberedt på)/g, "<em>$1</em>");
@@ -385,9 +416,9 @@
       steps: 3,
       html: `
       ${waEl(0, 0, `<div class="pr-year" data-so="0" aria-label="2026">${[..."2026"].map((c, i) => `<span style="--i:${i}">${c}</span>`).join("")}</div>`)}
-      ${waEl(300, 0, `<div class="pr-title" data-so="1"><p class="eyebrow">${fmt(D.META.skole)}</p><h1>Eksamen<br>våren 2026</h1><p class="pr-sub">${fmt(D.META.undertittel)}</p></div>`, "up")}
+      ${waEl(300, 0, `<div class="pr-title" data-so="1">${logo("pr-logo")}<h1>Eksamen<br>våren 2026</h1><p class="pr-sub">${fmt(D.META.undertittel)}</p></div>`, "up")}
       ${waEl(1650, 0, `<div class="pr-q" data-so="2"><p class="eyebrow">Spørsmålet vi skal svare på</p><p class="pr-qt">${q}</p></div>`, "up")}
-      <p class="pr-hint" data-s="0">Piltast eller mellomrom for å starte reisen · <kbd>E</kbd> for å utforske på egen hånd</p>`,
+      <p class="pr-hint" data-s="0">→ starter reisen · <kbd>E</kbd> utforsk · <kbd>?</kbd> hurtigtaster</p>`,
     };
   };
 
@@ -442,6 +473,20 @@
         <h2 class="ny-h" data-s="0">Skriftlig eksamen er strammet inn.</h2>
         <div class="ny-lines">${n.linjer.map((l, i) => `<div class="ny-row" data-s="${i + 1}"><s class="ny-for"><span>${fmt(l.for)}</span></s><span class="ny-na">${fmt(l.na)}</span></div>`).join("")}</div>
         <div class="ny-foot" data-s="${n.linjer.length + 1}"><p><strong>Hvorfor?</strong> ${fmt(n.hvorfor)}</p><p><strong>Unntak:</strong> ${fmt(n.unntak)}</p>${src(n.kilde)}${src("udirKI")}</div></div>`,
+    };
+  };
+
+  SC.seb = () => {
+    const X = D.SEB;
+    return {
+      steps: 3,
+      html: `<div class="sc seb">
+        <header class="mi-head">${eyebrow(`Sikker nettleser · Safe Exam Browser`)}
+          <h2 data-flip>Maskinen låses.</h2><p class="lede" data-s="0">${fmt(X.hva)} ${src(X.hvaKilde)}</p></header>
+        <ol class="seb-tl" data-s="1">${X.innforing.map((r, i) => `<li style="--i:${i}"><i></i><b>${fmt(r.naar)}</b><span>${fmt(r.hva)}</span>${r.kontroller ? tag("nasjonal", true) : ""}</li>`).join("")}</ol>
+        <div class="seb-ov" data-s="2"><p class="eyebrow">Slik øver dere</p>
+          <ol class="ru seb-ru">${X.ovelse.map((r, i) => `<li style="--i:${i}"><span class="ru-n">${String(i + 1).padStart(2, "0")}</span><h3>${fmt(r.tittel)}</h3><p>${fmt(r.tekst)}</p>${tag(r.type)}</li>`).join("")}</ol>
+          <p class="seb-unntak">${fmt(X.unntak)} ${src("udirSEB")}</p></div></div>`,
     };
   };
 
@@ -580,7 +625,7 @@
       html: `<div class="sc sw-sc"><header>${eyebrow(s.data === "skriftlig" ? "Skriftlig eksamen · Ansvar" : "Muntlig eksamen · Ansvar")}<h2 data-s="0">${tittel}</h2></header>
         <div class="sw" style="--cols:${A.faser.length}">
           <div class="sw-corner"></div>${A.faser.map((f, j) => `<div class="sw-ph" data-s="${j}"><i></i>${esc(f)}</div>`).join("")}
-          ${A.rader.map((r) => `<div class="sw-role">${esc(R[r.rolle].navn)}</div>${r.celler.map((c, j) => `<div class="sw-c${c ? "" : " tom"}" data-s="${j}">${c ? fmt(c) : ""}</div>`).join("")}`).join("")}
+          ${A.rader.map((r) => `<div class="sw-role">${esc(R[r.rolle].navn)}${s.data === "muntlig" ? `<small>${esc(R[r.rolle].kort)}</small>` : ""}</div>${r.celler.map((c, j) => `<div class="sw-c${c ? "" : " tom"}" data-s="${j}">${c ? fmt(c) : ""}</div>`).join("")}`).join("")}
         </div></div>`,
     };
   };
@@ -592,10 +637,10 @@
   });
 
   SC.spor = (s) => ({
-    steps: 3,
-    html: `<div class="sc spor"><header>${eyebrow("Tre eksamensformer · tre løp")}<h2 data-s="0">Samme start. Ulike spor.</h2>
-      <p class="lede" data-s="2">Alle tre starter med trekket 28. april. Datoene settes lokalt og kommer etter den skriftlige perioden: ${fmt(D.DATOER.muntligPeriode.vis)} ${tag("lokal")}</p></header></div>
-      ${laneLabels(s.x + 400, (p) => `<b>${fmt(p.tittel)}</b><span>${fmt(p.tekst)}</span>`, 1)}`,
+    steps: 2,
+    html: `<div class="sc spor"><header>${eyebrow("Tre eksamensformer")}<h2 data-flip>Samme start.<br>Tre løp.</h2>
+      <p class="lede" data-s="0">Trekket 28. april gjelder alle. Datoene settes lokalt: ${fmt(D.DATOER.muntligPeriode.vis)}</p></header></div>
+      ${laneLabels(s.x + 380, (p) => `<b>${fmt(p.tittel)}</b><span>${fmt(p.eksempel)}</span>`, 1)}`,
   });
 
   SC.trekkmuntlig = (s) => {
@@ -607,8 +652,7 @@
           <div class="tm-bar"><span class="tm-l">${fmt(T.for.tekst)}</span><span class="tm-b"><i style="--w:${T.for.uker / 4}"></i></span><span class="tm-v">ca. ${T.for.uker} uke</span></div>
           <div class="tm-bar na"><span class="tm-l">${fmt(T.na.tekst)}</span><span class="tm-b"><i style="--w:1"></i></span><span class="tm-v">opptil ca. ${T.na.uker} uker</span></div>
           <p class="tm-note">${fmt(T.forklaring)} ${src(T.kilde)}</p></div>
-        ${pts(T.konsekvenser, 1)}</div>
-        ${laneLabels(s.x + 400, (p) => `<b>${fmt(p.tittel)}</b><span>Trekk 28. april kl. 09:00</span>`, 2)}`,
+        ${pts(T.konsekvenser, 1)}</div>`,
     };
   };
 
@@ -620,7 +664,7 @@
         <div class="fb-clock" data-flip><span class="fb-h">24</span><span class="fb-sep">:</span><span class="fb-m">00</span><span class="fb-sep">:</span><span class="fb-s">00</span></div>
         <p class="lede fb-l" data-s="0">${fmt(F.tekst)} ${src(F.kilde)}</p>
         ${pts(F.punkter, 1)}</div>
-        ${laneLabels(s.x + 400, (p) => `<b>${fmt(p.tittel)}</b><span>Forberedelse: ${fmt(p.forberedelse)}</span>`, 2)}`,
+        ${laneLabels(s.x + 380, (p) => `<b>${fmt(p.tittel)}</b><strong class="ll-v">${fmt(p.forberedelse)}</strong>`, 2)}`,
       mount(el) {
         const t0 = Date.now();
         const draw = () => {
@@ -638,17 +682,22 @@
 
   SC.gjennomforing = (s) => {
     const G = D.MUNTLIG.gjennomforing;
-    const C = 2 * Math.PI * 120;
-    let acc = 0;
-    const segs = G.eksempel.map((e, i) => { const a = acc; acc += e.min; return `<circle class="rg-s s${i}" r="120" cx="150" cy="150" style="--len:${(e.min / G.minutter) * C - 6};--off:${-(a / G.minutter) * C};--C:${C}"/>`; }).join("");
     return {
-      steps: 3,
-      html: `<div class="sc gj"><header>${eyebrow(`Gjennomføring · ${tag("nasjonal")}`)}<h2 data-s="0">Inntil 30 minutter per kandidat.</h2><p class="gj-src" data-s="0">${fmt(G.tekst)} ${src(G.kilde)}</p></header>
-        <div class="gj-ring" data-s="0"><svg viewBox="0 0 300 300"><circle class="rg-bg" r="120" cx="150" cy="150"/>${segs}</svg>
-          <div class="gj-c"><b>30</b><span>min</span></div>
-          <ul class="gj-leg">${G.eksempel.map((e, i) => `<li class="s${i}"><i></i>${e.min} min · ${fmt(e.tekst)}</li>`).join("")}<li class="gj-merk">${tag("tips")} ${fmt(G.eksempelMerknad)}</li></ul></div>
+      steps: 2,
+      html: `<div class="sc tid"><header>${eyebrow("Gjennomføring")}<h2 data-flip>30 minutter. 45 minutter.<br>Eller egne regler.</h2><p class="lede" data-s="0">${fmt(G.tekst)}</p></header>
         ${pts(G.punkter, 1)}</div>
-        ${laneLabels(s.x + 400, (p) => `<b>${fmt(p.tittel)}</b><span>Varighet: ${fmt(p.gjennomforing)}</span>`, 2)}`,
+        ${laneLabels(s.x + 380, (p) => `<b>${fmt(p.tittel)}</b><strong class="ll-v">${fmt(p.gjennomforing)}</strong>`, 0)}`,
+    };
+  };
+
+  SC.parti = () => {
+    const P = D.MUNTLIG.parti;
+    const dots = Array.from({ length: 7 }, (_, i) => `<i class="${i < 5 ? "fast" : "kan"}"></i>`).join("");
+    return {
+      steps: P.tall.length + 1,
+      html: `<div class="sc pa"><header>${eyebrow(`Partier og sensorer · ${tag("lokal")}`)}<h2 data-flip>Ett parti. Én dag.</h2></header>
+        <div class="pa-nums">${P.tall.map((t, i) => `<div class="pa-n n${i}" data-s="${i}"><b>${fmt(t.vis)}</b>${i === 0 ? `<span class="pa-dots" aria-hidden="true">${dots}</span>` : ""}<p>${fmt(t.tekst)}</p></div>`).join("")}</div>
+        ${pts(P.punkter, P.tall.length)}</div>`,
     };
   };
 
@@ -743,7 +792,7 @@
   }
 
   SC.datoer = () => {
-    const keys = ["trekk", "forsteSkriftlige", "sisteSkriftlige", "muntligPeriode", "fellessensur", "sensurfrist", "klage", "hurtigklage"];
+    const keys = ["tilrettelegging", "trekk", "forsteSkriftlige", "sisteSkriftlige", "muntligPeriode", "fellessensur", "sensurfrist", "klage", "hurtigklage"];
     return {
       steps: 2,
       html: `<div class="sc ep da"><header>${eyebrow("Epilog · Vi er i mål")}<h2 data-s="0">De viktigste datoene</h2></header>
@@ -780,7 +829,7 @@
 
   SC.slutt = () => ({
     steps: 2,
-    html: `<div class="sc fin"><p class="eyebrow" data-s="0">${fmt(D.META.skole)} · ${fmt(D.META.tittel)}</p>
+    html: `<div class="sc fin">${logo("fin-logo", 0)}
       <p class="fin-q" data-flip>${fmt(D.META.sluttbudskap)}</p>
       <p class="fin-hint" data-s="1">Hele reisen – fra januar til juni. Trykk <kbd>E</kbd> for å bruke presentasjonen som oppslagsverk.</p></div>`,
   });
@@ -827,6 +876,7 @@
     body.dataset.tema = s.tema;
     body.classList.toggle("is-overview", s.lay === "overview" || !!(s.cams && s.cams[step] && s.cams[step].overview));
     body.dataset.kap = s.kap;
+    body.dataset.stopp = s.id;
     nodesEl.classList.toggle("kal", !!s.kal);
     if (cur && !cur.dead) leave(cur, dx / dl, dy / dl);
     enter(s, i, step, dur, dx / dl, dy / dl);
@@ -958,16 +1008,6 @@
   /* ---------------------------------------------------------------------
      Utforskermodus
      --------------------------------------------------------------------- */
-  const PH = (() => {
-    const out = [];
-    const walk = (o, path) => {
-      if (typeof o === "string") { const m = o.match(/\[\[(.+?)\]\]/g); if (m) m.forEach((x) => out.push({ path, tekst: x.slice(2, -2), hel: o })); return; }
-      if (Array.isArray(o)) o.forEach((v, i) => walk(v, `${path}[${i}]`));
-      else if (o && typeof o === "object") Object.keys(o).forEach((k) => walk(o[k], path ? `${path}.${k}` : k));
-    };
-    walk(D, "");
-    return out;
-  })();
 
   function renderUbar() {
     ubar.innerHTML = `<nav class="ub" aria-label="Utforsk">
@@ -976,7 +1016,7 @@
       <button data-tab="oppslag" aria-pressed="${state.tab === "oppslag"}">Oppslag</button>
       <button data-tab="ansvar" aria-pressed="${state.tab === "ansvar"}">Mitt ansvar</button>
       <button data-tab="rutiner" aria-pressed="${state.tab === "rutiner"}">Rutiner</button>
-      <button data-tab="plass" aria-pressed="${state.tab === "plass"}">Plassholdere <b>${PH.length}</b></button>
+      <button data-tab="plass" aria-pressed="${state.tab === "plass"}">Plassholdere <b>${igjen()}</b></button>
       <button data-tab="kilder" aria-pressed="${state.tab === "kilder"}">Kilder</button>
       <span class="ub-sp"></span>
       <button class="ub-pres" data-act="pres">Presentasjonsmodus</button></nav>
@@ -1048,10 +1088,12 @@
       case "simulering": return `<ol>${D.EKSAMENSDAG.steg.map((x) => `<li><strong>${fmt(x.kl)} ${fmt(x.tittel)}.</strong> ${fmt(x.larer)} ${tag(x.type)}</li>`).join("")}</ol>`;
       case "swim": { const A = s.data === "skriftlig" ? D.SKRIFTLIG_ANSVAR : D.MUNTLIG.ansvar; return A.rader.map((r) => `<p><strong>${esc(R[r.rolle].navn)}:</strong> ${r.celler.map((c, j) => (c ? `<em>${esc(A.faser[j])}</em> ${fmt(c)}` : "")).filter(Boolean).join(" · ")}</p>`).join(""); }
       case "rutine": return `<ol>${D.TEKNISK_RUTINE.map((r) => `<li><strong>${fmt(r.tittel)}.</strong> ${fmt(r.tekst)} ${tag(r.type)}</li>`).join("")}</ol>`;
-      case "spor": return `<ul>${D.SPOR.map((p) => `<li><strong>${fmt(p.tittel)}:</strong> ${fmt(p.tekst)} Forberedelse: ${fmt(p.forberedelse)}. Gjennomføring: ${fmt(p.gjennomforing)}. ${tag(p.type)}</li>`).join("")}</ul><p>${fmt(D.DATOER.muntligPeriode.tekst)} ${fmt(D.DATOER.muntligPeriode.vis)}</p>`;
+      case "spor": return `<ul>${D.SPOR.map((p) => `<li><strong>${fmt(p.tittel)}</strong> (${fmt(p.eksempel)}): forberedelse ${fmt(p.forberedelse)}, eksamenstid ${fmt(p.gjennomforing)}. ${p.merknad ? fmt(p.merknad) : ""} ${tag(p.type)}</li>`).join("")}</ul><p>${fmt(D.DATOER.muntligPeriode.tekst)} ${fmt(D.DATOER.muntligPeriode.vis)}</p>`;
+      case "seb": return `<p>${fmt(D.SEB.hva)} ${src(D.SEB.hvaKilde)}</p><ul>${D.SEB.innforing.map((r) => `<li><strong>${fmt(r.naar)}:</strong> ${fmt(r.hva)}${r.kontroller ? " " + tag("nasjonal", true) : ""} ${src(r.kilde)}</li>`).join("")}</ul><p><strong>Slik øver dere:</strong></p><ol>${D.SEB.ovelse.map((r) => `<li><strong>${fmt(r.tittel)}.</strong> ${fmt(r.tekst)} ${tag(r.type)} ${src(r.kilde)}</li>`).join("")}</ol><p>${fmt(D.SEB.unntak)}</p>`;
+      case "parti": return `<ul>${D.MUNTLIG.parti.tall.map((t) => `<li><strong>${fmt(t.vis)}</strong> ${fmt(t.tekst)}</li>`).join("")}</ul>${li(D.MUNTLIG.parti.punkter)}`;
       case "trekkmuntlig": return `<p>${fmt(D.MUNTLIG.trekk.forklaring)} ${src(D.MUNTLIG.trekk.kilde)}</p>${li(D.MUNTLIG.trekk.konsekvenser)}`;
       case "forberedelse": return `<p>${fmt(D.MUNTLIG.forberedelse.tekst)} ${src(D.MUNTLIG.forberedelse.kilde)}</p>${li(D.MUNTLIG.forberedelse.punkter)}`;
-      case "gjennomforing": return `<p>${fmt(D.MUNTLIG.gjennomforing.tekst)} ${src(D.MUNTLIG.gjennomforing.kilde)}</p>${li(D.MUNTLIG.gjennomforing.punkter)}<p>${tag("tips")} ${D.MUNTLIG.gjennomforing.eksempel.map((e) => `${e.min} min ${fmt(e.tekst).toLowerCase()}`).join(", ")}. ${fmt(D.MUNTLIG.gjennomforing.eksempelMerknad)}</p>`;
+      case "gjennomforing": return `<p>${fmt(D.MUNTLIG.gjennomforing.tekst)}</p>${li(D.MUNTLIG.gjennomforing.punkter)}`;
       case "sensur": return `<p><strong>${fmt(D.MUNTLIG.sensur.hovedregel)}</strong></p>${li(D.MUNTLIG.sensur.punkter)}`;
       case "roller": return `<p>Se fanen <button class="lnk" data-tab="ansvar">Mitt ansvar</button>.</p>`;
       case "scenario": { const X = D.SCENARIOER.find((x) => x.id === s.data); return `<p><em>${fmt(X.situasjon)}</em></p><p>${tag(X.regelType, X.kontroller)} ${fmt(X.regel)} ${src(X.kilde)}</p><ol>${X.gjor.map((g) => `<li>${fmt(g)}</li>`).join("")}</ol><p><strong>Kontakt:</strong> ${fmt(X.kontakt)}</p>`; }
@@ -1060,6 +1102,95 @@
       case "hjelp": return `<ul>${D.HJELP.lokalt.map((h) => `<li><strong>${fmt(h.rolle)}:</strong> ${fmt(h.hvem)} ${fmt(h.kontakt)}</li>`).join("")}</ul>`;
       default: return "";
     }
+  }
+
+  const GRUPPE = { META: "Om innholdet", TREKK: "Trekket", DATOER: "Datoer", MILEPAELER: "Før eksamen", SEB: "Sikker nettleser", EKSAMENSDAG: "Eksamensdagen", SKRIFTLIG_ANSVAR: "Skriftlig – ansvar", TEKNISK_RUTINE: "Tekniske problemer", SPOR: "Eksamensformer", MUNTLIG: "Muntlig og praktisk", ROLLER: "Roller", SCENARIOER: "Når noe ikke går som planlagt", FEIL: "Feil vi skal unngå", HJELP: "Kontakter" };
+  const phHint = (p) => { const m = p.tekst.match(/^Fyll inn:?\s*(.*)$/i); return m ? (m[1] || "Fyll inn") : `Bekreft: ${p.tekst}`; };
+  const phKontekst = (p) => fmt(p.obj[p.prop]).split(`data-ph="${p.key}"`).join(`data-ph="${p.key}" data-cur`);
+
+  /* Fyll inn plassholdere direkte i presentasjonen */
+  function setLokal(key, val) {
+    val = String(val || "").trim();
+    if (val) LOKALT[key] = val; else delete LOKALT[key];
+    store.set("lokalt", LOKALT);
+    rerender();
+    const n = $(".ph-n", panel); if (n) n.textContent = igjen();
+    const b = $('[data-tab="plass"] b', ubar); if (b) b.textContent = igjen();
+    const inp = $(`.ph-in[data-key="${CSS.escape(key)}"]`, panel);
+    if (inp && inp !== doc.activeElement) inp.value = phVerdi(key);
+    if (inp) inp.closest("li").classList.toggle("fylt", !!phVerdi(key));
+  }
+  // Bygg scenen på nytt der den står, uten kamerabevegelse.
+  function rerender() {
+    if (!cur || cur.dead) return;
+    const s = cur.stop, old = cur.el;
+    if (cur.def.destroy) cur.def.destroy();
+    const def = SC[s.scene](s);
+    const el = doc.createElement("section");
+    el.className = old.className; el.style.cssText = old.style.cssText; el.setAttribute("aria-label", old.getAttribute("aria-label") || "");
+    el.innerHTML = def.html;
+    cur.el = el; cur.def = def;
+    if (def.mount) def.mount.call(def, el);
+    applyStep(cur, cur.step, true);
+    $$("[data-s], [data-so]", el).forEach((e) => (e.style.transition = "none"));
+    $$("[data-flip]", el).forEach((f) => f.classList.add("flipped"));
+    el.classList.add("in");
+    stage.replaceChild(el, old);
+    requestAnimationFrame(() => $$("[data-s], [data-so]", el).forEach((e) => (e.style.transition = "")));
+    wa = $$(".wa", el).map((w) => ({ el: w, x: +w.dataset.wx, y: +w.dataset.wy, vis: true }));
+    if (def.step) def.step(cur.step, el);
+    dirty = true;
+  }
+  const ed = doc.createElement("div");
+  ed.id = "phedit"; ed.hidden = true; ed.setAttribute("role", "dialog");
+  app.appendChild(ed);
+  const redigHint = doc.createElement("p");
+  redigHint.id = "redig-hint";
+  redigHint.innerHTML = `<b>Fyll inn</b> Klikk på en stiplet plassholder · <kbd>R</kbd> avslutter · Lagre som ny fil under Utforsk → Plassholdere`;
+  app.appendChild(redigHint);
+  function setRedig(on) { state.redig = on; root.classList.toggle("redig", on); if (!on) lukkEditor(); }
+  function lukkEditor() { ed.hidden = true; ed.innerHTML = ""; }
+  function apneEditor(el) {
+    const key = el.dataset.ph, p = PH.find((x) => x.key === key);
+    if (!p) return;
+    ed.dataset.key = key;
+    ed.innerHTML = `<p class="eyebrow">Fyll inn</p><p class="pe-ctx">${phKontekst(p)}</p>
+      <textarea rows="2" placeholder="${esc(phHint(p))}">${esc(phVerdi(key))}</textarea>
+      <div class="pe-b"><button class="btn" data-pe="ok">Lagre <kbd>Enter</kbd></button><button class="lnk" data-pe="tom">Tøm</button><button class="lnk" data-pe="x">Avbryt</button></div>`;
+    ed.hidden = false;
+    const r = el.getBoundingClientRect(), w = ed.offsetWidth, h = ed.offsetHeight;
+    ed.style.left = `${clamp(r.left, 12, W - w - 12)}px`;
+    ed.style.top = `${r.bottom + 10 + h < H - 12 ? r.bottom + 10 : Math.max(12, r.top - h - 10)}px`;
+    const ta = $("textarea", ed); ta.focus(); ta.select();
+  }
+  ed.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pe]"); if (!b) return;
+    if (b.dataset.pe === "ok") setLokal(ed.dataset.key, $("textarea", ed).value);
+    else if (b.dataset.pe === "tom") setLokal(ed.dataset.key, "");
+    lukkEditor();
+  });
+  ed.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); setLokal(ed.dataset.key, $("textarea", ed).value); lukkEditor(); }
+    else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); lukkEditor(); }
+  });
+  doc.addEventListener("click", (e) => {
+    if (!state.redig || e.target.closest("#phedit")) return;
+    const ph = e.target.closest("[data-ph]");
+    if (!ph || ph.closest("#panel")) { if (!ed.hidden && !e.target.closest("#panel")) lukkEditor(); return; }
+    e.preventDefault(); e.stopPropagation();
+    apneEditor(ph);
+  }, true);
+  function lastNed(navn, innhold, type) {
+    const a = doc.createElement("a");
+    a.href = URL.createObjectURL(new Blob([innhold], { type }));
+    a.download = navn;
+    doc.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  function lagreFil() {
+    const json = JSON.stringify(LOKALT, null, 1).replace(/</g, "\\u003c");
+    const ny = ORIGINAL.replace(/(<script id="lokalt" type="application\/json">)[\s\S]*?(<\/script>)/, (_, a, b) => a + json + b);
+    lastNed("eksamen-2026.html", ny, "text/html");
   }
 
   const PANELS = {
@@ -1092,10 +1223,12 @@
     },
     plass() {
       const g = {};
-      PH.forEach((p) => { const k = p.path.split(/[.[]/)[0]; (g[k] = g[k] || []).push(p); });
-      return `<header class="pn-h"><p class="eyebrow">For eksamensansvarlig</p><h2>${PH.length} plassholdere</h2>
-        <p class="lede">Dette er lokale rutiner og opplysninger som ikke finnes i nasjonale kilder. Fyll dem inn i <code>src/innhold.js</code> og kjør <code>node bygg.mjs</code>. Søk etter teksten under for å finne stedet.</p><div class="pn-tools"><button class="btn" data-act="print">Skriv ut lista</button></div></header>
-        <div class="ph-l">${Object.keys(g).map((k) => `<section><h3>${esc(k)}</h3><ul>${g[k].map((p) => `<li><code>${esc(p.path)}</code><span>${fmt("[[" + p.tekst + "]]")}</span></li>`).join("")}</ul></section>`).join("")}</div>`;
+      PH.forEach((p) => { const k = p.path.split(".")[0]; (g[k] = g[k] || []).push(p); });
+      return `<header class="pn-h"><p class="eyebrow">Lokale opplysninger</p><h2><span class="ph-n">${igjen()}</span> av ${PH.length} gjenstår</h2>
+        <p class="lede">Skriv svarene rett inn her – de vises med en gang i presentasjonen. Du kan også trykke <kbd>R</kbd> og klikke på en stiplet plassholder i selve presentasjonen.</p>
+        <div class="pn-tools"><button class="btn" data-act="lagre">Lagre som ny fil</button><button class="btn" data-act="redig">Fyll inn i presentasjonen <kbd>R</kbd></button><button class="btn" data-act="json">Last ned verdiene (JSON)</button><button class="lnk" data-act="nullstill">Nullstill</button></div>
+        <p class="mut">Svarene huskes i denne nettleseren. Trykk «Lagre som ny fil» og del den nye fila – da får alle kollegene med seg svarene.</p></header>
+        <div class="ph-l">${Object.keys(g).map((k) => `<section><h3>${esc(GRUPPE[k] || k)}</h3><ul>${g[k].map((p) => `<li class="${phVerdi(p.key) ? "fylt" : ""}"><p class="ph-ctx">${phKontekst(p)}</p><input class="ph-in" data-key="${esc(p.key)}" value="${esc(phVerdi(p.key))}" placeholder="${esc(phHint(p))}" aria-label="${esc(phHint(p))}"></li>`).join("")}</ul></section>`).join("")}</div>`;
     },
     kilder() {
       return `<header class="pn-h"><p class="eyebrow">Kilder</p><h2>Hvor kommer innholdet fra?</h2>
@@ -1118,6 +1251,7 @@
     <div><dt><kbd>E</kbd></dt><dd>Utforskermodus – kart, oppslag, mitt ansvar</dd></div>
     <div><dt><kbd>F</kbd></dt><dd>Fullskjerm</dd></div>
     <div><dt><kbd>M</kbd></dt><dd>Rolig bevegelse av/på</dd></div>
+    <div><dt><kbd>R</kbd></dt><dd>Fyll inn plassholdere direkte i presentasjonen</dd></div>
     <div><dt><kbd>Esc</kbd></dt><dd>Lukk</dd></div></dl>
     <p class="mut">Tips: Klikk på et stoppested på tidslinjen for å hoppe dit.</p><button class="btn" data-act="help">Lukk</button></div>`;
   const toggleHelp = (on) => { help.hidden = on == null ? !help.hidden : !on; };
@@ -1133,7 +1267,7 @@
     if (e.target.closest && e.target.closest("input, textarea, select")) { if (e.key === "Escape") e.target.blur(); return; }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key;
-    if (k === "Escape") { if (!help.hidden) toggleHelp(false); else if (!panel.hidden) closePanel(); else if (state.mode === "utf") setMode("pres"); return; }
+    if (k === "Escape") { if (!ed.hidden) lukkEditor(); else if (!help.hidden) toggleHelp(false); else if (!panel.hidden) closePanel(); else if (state.redig) setRedig(false); else if (state.mode === "utf") setMode("pres"); return; }
     if (!panel.hidden && ["ArrowUp", "ArrowDown", "PageUp", "PageDown", " ", "Home", "End"].includes(k)) return; // la panelet rulle
     if (k === "ArrowRight" || k === "ArrowDown" || (k === " " && !e.shiftKey)) { e.preventDefault(); if (state.kartFri) returnToStop(); else next(); }
     else if (k === "ArrowLeft" || k === "ArrowUp" || (k === " " && e.shiftKey)) { e.preventDefault(); if (state.kartFri) returnToStop(); else prev(); }
@@ -1145,6 +1279,7 @@
     else if (k === "e" || k === "E") setMode(state.mode === "utf" ? "pres" : "utf");
     else if (k === "f" || k === "F") fullscreen();
     else if (k === "m" || k === "M") setRM(!RM);
+    else if (k === "r" || k === "R") { closePanel(); setRedig(!state.redig); }
     else if (k === "?" || k === "h" || k === "H") toggleHelp();
     else return;
     wake();
@@ -1171,6 +1306,10 @@
       else if (a === "lukk") closePanel();
       else if (a === "norolle") setRolle(null);
       else if (a === "print") window.print();
+      else if (a === "lagre") lagreFil();
+      else if (a === "json") lastNed("lokalt.json", JSON.stringify(LOKALT, null, 2), "application/json");
+      else if (a === "redig") { closePanel(); setRedig(true); }
+      else if (a === "nullstill") { if (confirm("Fjerne alle svar som er fylt inn i denne nettleseren?")) { LOKALT = Object.assign({}, LOKALT_FIL); store.set("lokalt", {}); rerender(); openPanel("plass"); } }
       return;
     }
     const tab = t.closest("[data-tab]");
@@ -1190,7 +1329,13 @@
     const pg = t.closest(".pg-t");
     if (pg) { goTo(+pg.dataset.i, fullt(+pg.dataset.i)); if (state.mode === "utf") renderUbar(); }
   });
+  let phT;
   panel.addEventListener("input", (e) => {
+    if (e.target.classList.contains("ph-in")) {
+      const t = e.target;
+      clearTimeout(phT); phT = setTimeout(() => setLokal(t.dataset.key, t.value), 350);
+      return;
+    }
     if (e.target.classList.contains("pn-q")) {
       state.q = e.target.value;
       const pos = e.target.selectionStart;

@@ -1,0 +1,352 @@
+/* ==========================================================================
+   Grensesnitt – farger arves fra presentasjonens palett
+   ========================================================================== */
+
+.k-ui { position: absolute; inset: 0; pointer-events: none; z-index: 10; font-family: var(--f-ui); color: var(--ui-ink); }
+.k-ui > * { pointer-events: auto; }
+.k-ui button, .k-ui input, .k-ui textarea { font: inherit; color: inherit; }
+.k-ui :focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
+
+.k-glass {
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-line);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+}
+
+.k-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; pointer-events: none; }
+.k-progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--a1), var(--a2)); transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 12px var(--a1); }
+
+.k-dock, .k-verktoy, .k-panel, .k-popover, .k-toast, .k-tilbake, .k-notater {
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-line);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+}
+
+.k-dock {
+  position: absolute;
+  left: 50%;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.4s ease, transform 0.4s var(--ease-ut), left 0.4s var(--ease-ut);
+  max-width: calc(100vw - 32px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.k-dock::-webkit-scrollbar { display: none; }
+@media (min-width: 721px) { .k-root.k-editing:not(.k-panel-skjult) .k-dock { left: calc(50% - 186px); max-width: calc(100vw - 420px); } }
+.k-root.k-skjul-ui:not(.k-editing) .k-dock { opacity: 0; transform: translate(-50%, 12px); pointer-events: none; }
+.k-sep { width: 1px; height: 24px; background: var(--ui-line); margin: 0 4px; flex: none; }
+
+.k-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 650;
+  white-space: nowrap;
+  flex: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.k-btn:hover { background: var(--ui-hover); }
+.k-btn:active { transform: scale(0.96); }
+.k-btn svg { width: 19px; height: 19px; flex: none; }
+.k-btn.k-ikon-knapp { padding: 0; width: 38px; justify-content: center; }
+.k-btn.k-primar { background: var(--ui-accent); color: var(--ui-accent-ink); }
+.k-btn.k-primar:hover { filter: brightness(1.08); background: var(--ui-accent); }
+.k-btn.k-primar-lys { background: color-mix(in srgb, var(--ui-accent) 18%, transparent); color: var(--ui-ink); }
+.k-btn.k-fare:hover { background: rgba(255, 80, 80, 0.18); color: #ff8080; }
+.k-btn.k-pa-knapp, .k-btn.k-aktiv-knapp { background: color-mix(in srgb, var(--ui-accent) 22%, transparent); }
+.k-btn[disabled] { opacity: 0.35; pointer-events: none; }
+.k-btn.k-ulagret::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ui-accent); margin-left: -2px; }
+.k-teller-ui { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ui-ink-2); padding: 0 6px; min-width: 54px; text-align: center; }
+
+.k-tilbake {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.k-root.k-fri-visning:not(.k-editing) .k-tilbake { opacity: 1; pointer-events: auto; }
+
+/* --- Verktøylinje ved valgt ramme --- */
+.k-verktoy {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: none;
+  align-items: center;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 15px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  z-index: 3;
+}
+.k-root.k-editing .k-verktoy.k-pa { display: flex; animation: k-ui-inn 0.25s var(--ease-ut) both; }
+.k-root.k-drar .k-verktoy { opacity: 0; pointer-events: none; }
+.k-verktoy .k-btn { height: 34px; }
+.k-verktoy .k-btn.k-ikon-knapp { width: 34px; }
+.k-kob-input { width: 180px; height: 32px; box-sizing: border-box; border-radius: 9px; border: 1px solid var(--ui-line); background: var(--ui-hover); padding: 0 10px; font-size: 13.5px; }
+@keyframes k-ui-inn { from { opacity: 0; transform: translateY(6px) scale(0.98); } }
+
+/* --- Popover --- */
+.k-popover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: none;
+  padding: 10px;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
+  max-width: min(440px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  z-index: 20;
+  background: var(--ui-solid);
+}
+.k-popover.k-pa { display: block; animation: k-ui-inn 0.22s var(--ease-ut) both; }
+.k-valg { display: flex; flex-wrap: wrap; gap: 6px; }
+.k-valg-liste { flex-direction: column; align-items: stretch; min-width: 220px; }
+.k-valg-liste .k-btn { justify-content: flex-start; }
+.k-chip {
+  border: 1px solid var(--ui-line);
+  background: var(--ui-hover);
+  border-radius: 99px;
+  padding: 7px 13px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.2;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.k-chip:hover { border-color: color-mix(in srgb, var(--ui-accent) 60%, transparent); }
+.k-chip.k-pa { background: var(--ui-accent); color: var(--ui-accent-ink); border-color: transparent; }
+.k-fargepanel { display: flex; flex-direction: column; gap: 10px; min-width: 300px; }
+
+.k-maler { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: min(520px, calc(100vw - 44px)); }
+.k-mal {
+  border: 1px solid var(--ui-line);
+  background: var(--ui-hover);
+  border-radius: 12px;
+  padding: 6px 6px 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.k-mal:hover { transform: translateY(-2px); border-color: var(--ui-accent); }
+.k-mal-vindu {
+  position: relative;
+  height: 92px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: radial-gradient(120% 120% at 40% 30%, var(--bg-2), var(--bg));
+  display: grid;
+  place-items: center;
+  color: var(--ui-ink-2);
+}
+.k-mal-vindu > .k-frame { position: absolute; transform-origin: 50% 50%; opacity: 1 !important; }
+.k-mal-vindu > svg { width: 30px; height: 30px; }
+
+/* --- Panel --- */
+.k-panel {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: calc(12px + env(safe-area-inset-right, 0px));
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+  transform: translateX(calc(100% + 40px));
+  transition: transform 0.45s var(--ease-ut);
+  overflow: hidden;
+  user-select: text;
+  -webkit-user-select: text;
+  touch-action: auto;
+  background: color-mix(in srgb, var(--ui-solid) 90%, transparent);
+}
+.k-root.k-editing:not(.k-panel-skjult) .k-panel { transform: none; }
+.k-panel-hode { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 14px 10px 18px; border-bottom: 1px solid var(--ui-line); }
+.k-panel-hode h3 { margin: 0; font-size: 15px; font-weight: 800; }
+.k-panel-hode small { display: block; font-size: 11.5px; color: var(--ui-ink-2); font-weight: 600; margin-top: 2px; }
+.k-panel-kropp { flex: 1; overflow-y: auto; padding: 14px 18px 22px; display: flex; flex-direction: column; gap: 16px; overscroll-behavior: contain; }
+.k-felt { display: flex; flex-direction: column; gap: 7px; }
+.k-felt > label, .k-etikett { font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 800; color: var(--ui-ink-2); }
+.k-stabel { display: flex; flex-direction: column; gap: 10px; }
+.k-panel textarea, .k-panel input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid var(--ui-line);
+  background: color-mix(in srgb, var(--bg) 40%, transparent);
+  font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.k-panel input[type="text"] { font-family: var(--f-ui); font-size: 15px; font-weight: 650; }
+.k-panel textarea:focus, .k-panel input:focus, .k-kob-input:focus { outline: 2px solid var(--ui-accent); outline-offset: -1px; border-color: transparent; }
+.k-hint { font-size: 12px; line-height: 1.6; color: var(--ui-ink-2); }
+.k-hint code { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; padding: 1px 5px; border-radius: 5px; background: var(--ui-hover); color: var(--ui-ink); white-space: nowrap; }
+.k-hint b { color: var(--ui-ink); }
+.k-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: 12px; background: var(--ui-hover); }
+.k-seg button { border: 0; background: transparent; padding: 7px 10px; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ui-ink-2); }
+.k-seg button[aria-pressed="true"] { background: var(--ui-solid); color: var(--ui-ink); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18); }
+.k-seg-liten { margin-right: 4px; }
+.k-farger { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+.k-farger button { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.k-farger button[aria-pressed="true"] { border-color: var(--ui-ink); }
+.k-farger .k-auto { background: conic-gradient(var(--a1), var(--a2), var(--a3), var(--a1)); }
+.k-farger input[type="color"], .k-egen-farge input { width: 28px; height: 28px; border: 0; padding: 0; background: none; cursor: pointer; }
+.k-bryter { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 650; cursor: pointer; line-height: 1.35; }
+.k-bryter input { width: 18px; height: 18px; accent-color: var(--ui-accent); flex: none; }
+.k-knapperad { display: flex; flex-wrap: wrap; gap: 6px; }
+.k-knapperad .k-btn { background: var(--ui-hover); height: 34px; font-size: 13px; }
+.k-knapperad .k-btn.k-primar { background: var(--ui-accent); }
+.k-glider { width: 100%; accent-color: var(--ui-accent); }
+.k-detaljer summary, .k-seksjon summary { cursor: pointer; font-size: 12.5px; font-weight: 750; color: var(--ui-ink-2); }
+.k-detaljer[open] summary { margin-bottom: 8px; }
+.k-seksjon { border-top: 1px solid var(--ui-line); padding-top: 12px; }
+.k-seksjon summary { font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 800; list-style-position: outside; }
+.k-seksjon-kropp { padding-top: 10px; }
+
+.k-stilkort {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 12px 12px 14px;
+  border-radius: 14px;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--a1) 18%, transparent), color-mix(in srgb, var(--a2) 14%, transparent));
+  border: 1px solid var(--ui-line);
+}
+.k-stilkort small { display: block; font-size: 11px; color: var(--ui-ink-2); font-weight: 700; }
+.k-stilkort b { font-size: 15px; }
+.k-stiler { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.k-stil { border: 2px solid transparent; border-radius: 12px; padding: 0; overflow: hidden; cursor: pointer; text-align: left; background: var(--ui-hover); }
+.k-stil.k-pa { border-color: var(--ui-accent); }
+.k-stil-prov { display: block; height: 46px; position: relative; }
+.k-stil-prov i { position: absolute; left: 8px; bottom: 4px; font-size: 20px; font-style: normal; line-height: 1; }
+.k-stil-prov em { position: absolute; top: 7px; width: 8px; height: 8px; border-radius: 50%; }
+.k-stil-prov em:nth-of-type(1) { right: 26px; }
+.k-stil-prov em:nth-of-type(2) { right: 16px; }
+.k-stil-prov em:nth-of-type(3) { right: 6px; }
+.k-stil b { display: block; padding: 4px 8px 6px; font-size: 11.5px; font-weight: 750; }
+.k-paletter { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.k-palett { aspect-ratio: 1; border-radius: 10px; border: 2px solid var(--ui-line); cursor: pointer; padding: 0; display: flex; align-items: flex-end; justify-content: center; gap: 2px; padding-bottom: 5px; }
+.k-palett.k-pa { border-color: var(--ui-accent); box-shadow: 0 0 0 2px var(--ui-accent); }
+.k-palett i { width: 6px; height: 6px; border-radius: 50%; }
+.k-egne-farger { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 8px; }
+.k-egen-farge { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 650; color: var(--ui-ink-2); cursor: pointer; }
+
+.k-sti-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.k-sti-liste li { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 10px; border-radius: 10px; background: var(--ui-hover); font-size: 13.5px; font-weight: 650; cursor: pointer; }
+.k-sti-liste li.k-her { outline: 2px solid var(--ui-accent); outline-offset: -2px; }
+.k-sti-liste li.k-dra-over { box-shadow: 0 -3px 0 var(--ui-accent); }
+.k-sti-liste .k-nr { font-variant-numeric: tabular-nums; color: var(--ui-ink-2); width: 20px; flex: none; font-size: 12px; font-weight: 800; }
+.k-sti-liste .k-navn { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-sti-liste .k-mini { border: 0; background: none; color: var(--ui-ink-2); width: 26px; height: 26px; border-radius: 7px; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.k-sti-liste .k-mini:hover { background: var(--ui-hover); color: var(--ui-ink); }
+.k-sti-liste .k-mini svg { width: 15px; height: 15px; }
+.k-sti-liste .k-mini[disabled] { opacity: 0.3; }
+
+/* --- Markering, merker, hover og hjelpelinjer --- */
+.k-sel, .k-hover { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; z-index: 4; display: none; }
+.k-root.k-editing .k-sel.k-pa { display: block; }
+.k-root.k-editing:not(.k-drar) .k-hover.k-pa { display: block; }
+.k-hover { border: 1.5px dashed color-mix(in srgb, var(--ui-accent) 70%, transparent); border-radius: 10px; }
+.k-sel-boks { position: absolute; inset: 0; border: 1.5px solid var(--ui-accent); border-radius: 10px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); }
+.k-h { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; background: #fff; border: 2px solid var(--ui-accent); border-radius: 4px; pointer-events: auto; touch-action: none; box-sizing: border-box; }
+.k-h[data-h="scale"] { cursor: nwse-resize; }
+.k-h[data-h="scale"].k-ne, .k-h[data-h="scale"].k-sw { cursor: nesw-resize; }
+.k-h[data-h="rot"] { border-radius: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; cursor: grab; left: 50%; top: -34px; }
+.k-h[data-h="rot"]::after { content: ""; position: absolute; left: 50%; top: 100%; width: 1.5px; height: 18px; background: var(--ui-accent); transform: translateX(-50%); }
+.k-root.k-skrivemodus .k-h { display: none; }
+.k-merker { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.k-root:not(.k-editing) .k-merker { display: none; }
+.k-merke {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--ui-accent);
+  color: var(--ui-accent-ink);
+  font: 800 11.5px var(--f-ui);
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  padding: 0;
+}
+.k-merke.k-utenfor { background: var(--ui-solid); color: var(--ui-ink-2); border: 1.5px dashed var(--ui-ink-2); }
+.k-guide { position: absolute; left: 0; top: 0; background: var(--a3); display: none; pointer-events: none; box-shadow: 0 0 6px var(--a3); }
+.k-guide.k-pa { display: block; }
+.k-root.k-editing .k-stage { cursor: grab; }
+.k-root.k-editing .k-frame { cursor: move; }
+.k-root.k-drar .k-stage, .k-root.k-drar .k-frame { cursor: grabbing; }
+.k-root.k-kobler .k-frame { cursor: crosshair; }
+.k-root.k-kobler .k-frame:hover { outline: 4px solid var(--ui-accent); }
+
+/* --- Toast, hjelp, notater, laser, blank, slipp --- */
+.k-toaster { position: absolute; top: calc(18px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; z-index: 30; }
+.k-toast { pointer-events: auto; display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 16px; border-radius: 14px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3); font-size: 14px; font-weight: 650; max-width: min(560px, calc(100vw - 40px)); animation: k-toast-inn 0.45s var(--ease-ut) both; }
+.k-toast .k-btn { height: 30px; font-size: 13px; background: var(--ui-hover); }
+.k-toast .k-btn.k-primar { background: var(--ui-accent); }
+.k-toast.k-ut { animation: k-toast-ut 0.35s ease both; }
+@keyframes k-toast-inn { from { opacity: 0; transform: translateY(-12px) scale(0.97); } }
+@keyframes k-toast-ut { to { opacity: 0; transform: translateY(-8px); } }
+
+.k-hjelp { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, 0.5); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; padding: 16px; }
+.k-hjelp.k-pa { opacity: 1; pointer-events: auto; }
+.k-hjelp > div { width: min(660px, 100%); max-height: calc(100% - 32px); overflow-y: auto; background: var(--ui-solid); color: var(--ui-ink); border: 1px solid var(--ui-line); border-radius: 22px; padding: 26px 28px; box-sizing: border-box; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5); }
+.k-hjelp h2 { margin: 0 0 4px; font-family: var(--f-disp); font-weight: var(--disp-w); font-style: var(--disp-stil); font-size: 32px; text-transform: var(--disp-case); }
+.k-hjelp p { margin: 0 0 18px; color: var(--ui-ink-2); font-size: 14px; }
+.k-hjelp dl { display: grid; grid-template-columns: auto 1fr; gap: 9px 18px; margin: 0; font-size: 14px; }
+.k-hjelp dt { text-align: right; white-space: nowrap; }
+.k-hjelp dd { margin: 0; color: var(--ui-ink-2); }
+.k-hjelp h4 { grid-column: 1 / -1; margin: 12px 0 0; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ui-accent); }
+kbd { font: 700 12px var(--f-ui); padding: 3px 7px; border-radius: 6px; border: 1px solid var(--ui-line); border-bottom-width: 2px; background: var(--ui-hover); color: var(--ui-ink); }
+
+.k-notater { position: absolute; left: calc(16px + env(safe-area-inset-left, 0px)); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); width: min(440px, calc(100vw - 32px)); max-height: 40vh; overflow-y: auto; padding: 16px 18px; box-sizing: border-box; border-radius: 16px; font-size: 16px; line-height: 1.5; white-space: pre-wrap; display: none; }
+.k-root.k-vis-notater:not(.k-editing) .k-notater { display: block; }
+.k-notater b { display: block; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ui-accent); margin-bottom: 6px; }
+
+.k-laser { position: absolute; left: 0; top: 0; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: #ff3b3b; box-shadow: 0 0 10px 3px rgba(255, 50, 50, 0.85), 0 0 34px 10px rgba(255, 40, 40, 0.35); pointer-events: none; display: none; z-index: 35; }
+.k-root.k-laser-pa .k-laser { display: block; }
+.k-root.k-laser-pa, .k-root.k-laser-pa * { cursor: none !important; }
+.k-blank { position: absolute; inset: 0; background: #000; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+.k-root.k-blank-pa .k-blank { opacity: 1; pointer-events: auto; }
+.k-dropp { position: absolute; inset: 14px; border: 3px dashed var(--ui-accent); border-radius: 24px; display: none; place-items: center; font: 800 22px var(--f-ui); color: var(--ui-ink); background: rgba(0, 0, 0, 0.25); z-index: 45; pointer-events: none; }
+.k-root.k-dropp-pa .k-dropp { display: grid; }
+
+@media (max-width: 720px) {
+  .k-panel { left: 8px; right: 8px; width: auto; top: auto; height: 50vh; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); transform: translateY(calc(100% + 100px)); }
+  .k-btn .k-tekst { display: none; }
+  .k-btn { padding: 0 9px; }
+  .k-maler { grid-template-columns: repeat(2, 1fr); }
+  .k-paletter { grid-template-columns: repeat(6, 1fr); }
+}

@@ -1,0 +1,174 @@
+/* ==========================================================================
+   Krizi 2 – grunnlag
+   Fargene og skriftene settes av motoren fra presentasjonens stil.
+   Verdiene her er bare reserve før skriptet har kjørt.
+   ========================================================================== */
+
+:root {
+  --bg: #060b18;
+  --bg-2: #0d1d38;
+  --flate: #111d36;
+  --ink: #eef3ff;
+  --ink-2: #b3c2de;
+  --a1: #5ef2c5;
+  --a2: #9a86ff;
+  --a3: #4cc3ff;
+  --a-ink: #111318;
+  --mork: 1;
+  --korn: 0.07;
+  --f-disp: "Fraunces", Georgia, serif;
+  --f-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --f-ui: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --disp-w: 600;
+  --disp-stil: normal;
+  --disp-spor: -0.02em;
+  --disp-case: none;
+  --h1: 2.5em;
+  --line: color-mix(in srgb, var(--ink) 15%, transparent);
+  --ease-ut: cubic-bezier(0.2, 0.75, 0.2, 1);
+  --ease-sprett: cubic-bezier(0.25, 1.4, 0.4, 1);
+
+  --ui-bg: color-mix(in srgb, var(--bg-2) 80%, transparent);
+  --ui-solid: color-mix(in srgb, var(--flate) 92%, var(--ink) 8%);
+  --ui-ink: var(--ink);
+  --ui-ink-2: var(--ink-2);
+  --ui-line: color-mix(in srgb, var(--ink) 13%, transparent);
+  --ui-hover: color-mix(in srgb, var(--ink) 9%, transparent);
+  --ui-accent: var(--a1);
+  --ui-accent-ink: var(--a-ink);
+  color-scheme: dark;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+.k-root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(130% 95% at 50% 35%, var(--bg-2), var(--bg) 72%);
+  font-family: var(--f-body);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: background 0.8s ease;
+}
+.k-root.k-idle { cursor: none; }
+
+.k-sky, .k-bg, .k-fx, .k-grain, .k-vignett, .k-stage, .k-layer, .k-stemning, .k-kutt, .k-fokuslys { position: absolute; inset: 0; }
+.k-bg, .k-fx { width: 100%; height: 100%; pointer-events: none; }
+.k-fx { z-index: 6; }
+
+/* Himmel: store, myke lysflekker – synlig i verdener som trenger lys */
+.k-sky { pointer-events: none; overflow: hidden; opacity: 0; transition: opacity 1s ease; }
+[data-verden="nordlys"] .k-sky { opacity: 1; }
+[data-verden="stjerner"] .k-sky, [data-verden="bokeh"] .k-sky, [data-verden="hav"] .k-sky, [data-verden="konstellasjon"] .k-sky { opacity: 0.55; }
+[data-verden="blekk"] .k-sky, [data-verden="topografi"] .k-sky { opacity: 0.3; }
+.k-sky i {
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  filter: blur(60px);
+  animation: k-drift 46s ease-in-out infinite alternate;
+}
+.k-sky i:nth-child(1) { background: radial-gradient(circle, color-mix(in srgb, var(--a1) 32%, transparent), transparent 65%); left: -18vmax; top: -24vmax; }
+.k-sky i:nth-child(2) { background: radial-gradient(circle, color-mix(in srgb, var(--a2) 30%, transparent), transparent 65%); right: -22vmax; top: 10vmax; animation-duration: 58s; animation-delay: -20s; }
+.k-sky i:nth-child(3) { background: radial-gradient(circle, color-mix(in srgb, var(--a3) 20%, transparent), transparent 65%); left: 20vmax; bottom: -36vmax; animation-duration: 64s; animation-delay: -35s; }
+@keyframes k-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(8vmax, 5vmax, 0) scale(1.15); }
+  100% { transform: translate3d(-6vmax, 9vmax, 0) scale(0.92); }
+}
+
+/* Stemning: bakgrunnen tones mot rammens farge */
+.k-stemning {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+  background: radial-gradient(90% 80% at 50% 50%, color-mix(in srgb, var(--st, transparent) 38%, transparent), transparent 75%);
+}
+
+.k-grain {
+  pointer-events: none;
+  opacity: var(--korn);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index: 5;
+}
+[data-verden="papir"] .k-grain { opacity: calc(var(--korn) * 2.2); mix-blend-mode: multiply; filter: invert(1); }
+.k-vignett {
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(120% 100% at 50% 45%, transparent 55%, color-mix(in srgb, var(--bg) calc(var(--mork) * 55% + 18%), transparent) 100%);
+}
+
+.k-stage { overflow: hidden; }
+.k-world, .k-layer > div { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.k-layer { pointer-events: none; }
+.k-layer.k-front { z-index: 3; }
+
+.k-kutt { background: var(--bg); opacity: 0; pointer-events: none; z-index: 8; }
+
+.k-fokuslys {
+  pointer-events: none;
+  z-index: 7;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), transparent 0, transparent 130px, rgba(0, 0, 0, 0.78) 210px);
+}
+.k-root.k-lys-pa .k-fokuslys { opacity: 1; }
+
+/* SVG-laget på lerretet: sti og koblinger */
+.k-lerret-svg { position: absolute; overflow: visible; pointer-events: none; --iz: 1; }
+.k-lerret-svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.k-t-all { stroke: var(--ink); stroke-opacity: 0.14; stroke-width: calc(1.5px * var(--iz)); }
+.k-t-done { stroke: var(--a1); stroke-opacity: 0.6; stroke-width: calc(2.2px * var(--iz)); }
+.k-sti-prikker .k-t-all, .k-sti-prikker .k-t-done { stroke-dasharray: calc(0.1px * var(--iz)) calc(10px * var(--iz)); stroke-width: calc(3.5px * var(--iz)); }
+.k-sti-prikker .k-t-done { stroke-width: calc(4.5px * var(--iz)); }
+.k-sti-skjult .k-t-all, .k-sti-skjult .k-t-done { display: none; }
+.k-root.k-editing .k-t-all { stroke-opacity: 0.3; }
+
+.k-kobling { --kf: var(--ink-2); }
+.k-kob-linje, .k-kob-hode { stroke: var(--kf); stroke-width: var(--sw); stroke-dasharray: 1; stroke-dashoffset: 0; }
+.k-kob-stiplet .k-kob-linje { stroke-dasharray: calc(var(--sw) * 0.4) calc(var(--sw) * 3); }
+.k-kob-treff { stroke: transparent; stroke-width: calc(var(--sw) * 6); }
+.k-root.k-editing .k-kob-treff { pointer-events: stroke; cursor: pointer; }
+.k-kobling.k-valgt .k-kob-linje, .k-kobling.k-valgt .k-kob-hode { stroke: var(--ui-accent); }
+.k-kob-tekst { fill: var(--ink); font-family: var(--f-body); font-weight: 700; paint-order: stroke; stroke: var(--bg); stroke-linejoin: round; }
+
+/* Pynt */
+.k-pynt { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; color: var(--ink); }
+.k-pynt-tekst { font-family: var(--f-disp); font-weight: 800; font-size: 400px; line-height: 0.9; white-space: nowrap; letter-spacing: -0.04em; text-transform: var(--disp-case); }
+.k-pynt-ring { width: 1000px; height: 1000px; border-radius: 50%; border: 3px solid var(--a1); box-sizing: border-box; }
+.k-pynt-glod { width: 1400px; height: 1400px; border-radius: 50%; background: radial-gradient(circle, var(--a1), transparent 62%); }
+.k-pynt-prikk { width: 40px; height: 40px; border-radius: 50%; background: var(--a1); }
+.k-pynt-bilde { width: 1200px; }
+.k-pynt-bilde img { width: 100%; display: block; }
+.k-pynt-svg svg { display: block; overflow: visible; }
+.k-snurr > * { animation: k-snurr 90s linear infinite; }
+.k-svev > * { animation: k-svev 9s ease-in-out infinite alternate; }
+@keyframes k-snurr { to { transform: rotate(360deg); } }
+@keyframes k-svev { from { transform: translateY(-3%); } to { transform: translateY(3%); } }
+
+/* Landingspuls */
+.k-puls {
+  position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; box-sizing: border-box;
+  border: 6px solid var(--a1); border-radius: 40px;
+}
+.k-puls::after { content: ""; position: absolute; inset: 0; border-radius: inherit; border: inherit; animation: k-puls 1.3s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+.k-puls { border: 0; }
+.k-puls::after { border: 6px solid var(--a1); }
+.k-puls-sirkel::after { border-radius: 50%; }
+@keyframes k-puls { from { transform: scale(1); opacity: 0.55; } to { transform: scale(1.12); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .k-sky i, .k-snurr > *, .k-svev > * { animation: none; }
+}

@@ -1,0 +1,198 @@
+/* ==========================================================================
+   Rammer: form × rammestil × innhold
+   ========================================================================== */
+
+.k-frame {
+  --a: var(--a1);
+  --hl: color-mix(in srgb, var(--a) 38%, transparent);
+  --rad: 40px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 96px 124px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 44px;
+  line-height: 1.4;
+  transition: opacity 0.9s ease;
+}
+.k-form-kort { border-radius: var(--rad); }
+.k-form-sirkel { border-radius: 50%; text-align: center; align-items: center; padding: 150px 140px; }
+.k-form-blob { border-radius: var(--blob, 50%); text-align: center; align-items: center; padding: 150px 170px; }
+.k-form-fri { padding: 40px; }
+.k-form-sirkel .k-inner, .k-form-blob .k-inner { align-items: center; }
+.k-form-sirkel ul, .k-form-sirkel ol, .k-form-blob ul, .k-form-blob ol { text-align: left; }
+
+/* --- Rammestiler --- */
+.k-rs-glass {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--ink) 10%, transparent), color-mix(in srgb, var(--ink) 2.5%, transparent));
+  border: 2px solid var(--line);
+  box-shadow: 0 50px 140px rgba(0, 0, 0, calc(0.12 + 0.36 * var(--mork))), inset 0 1px 0 color-mix(in srgb, var(--ink) 12%, transparent);
+}
+.k-rs-solid {
+  background: var(--flate);
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 0 var(--line), 0 40px 100px -20px rgba(0, 0, 0, calc(0.18 + 0.4 * var(--mork)));
+}
+.k-rs-papir {
+  --rad: 8px;
+  background:
+    linear-gradient(175deg, color-mix(in srgb, var(--flate) 100%, transparent), color-mix(in srgb, var(--flate) 92%, var(--ink) 8%)),
+    var(--flate);
+  box-shadow: 0 1px 0 var(--line), 0 26px 40px -24px rgba(0, 0, 0, 0.45), 0 70px 120px -50px rgba(0, 0, 0, 0.4);
+}
+.k-rs-papir.k-form-kort::before {
+  content: "";
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  width: 230px;
+  height: 62px;
+  transform: translateX(-50%) rotate(-2.5deg);
+  background: color-mix(in srgb, var(--a2) 40%, rgba(255, 255, 255, 0.45));
+  opacity: 0.85;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+.k-rs-linje { border: 3px solid color-mix(in srgb, var(--ink) 72%, transparent); }
+.k-rs-linje.k-form-kort { --rad: 4px; }
+.k-rs-linje.k-form-kort::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.k-rs-skisse { background: color-mix(in srgb, var(--ink) 3%, transparent); }
+.k-skisse { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.k-skisse path { fill: none; stroke: color-mix(in srgb, var(--ink) 82%, transparent); stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.k-rs-neon {
+  background: color-mix(in srgb, var(--a) 6%, transparent);
+  border: 3px solid var(--a);
+  box-shadow: 0 0 46px color-mix(in srgb, var(--a) 55%, transparent), inset 0 0 70px color-mix(in srgb, var(--a) 20%, transparent);
+}
+.k-rs-neon h1, .k-rs-neon h2 { text-shadow: 0 0 30px color-mix(in srgb, var(--a) 70%, transparent); }
+.k-rs-lapp {
+  --rad: 6px;
+  --ink: var(--lapp-ink, var(--a-ink));
+  --ink-2: color-mix(in srgb, var(--lapp-ink, var(--a-ink)) 80%, transparent);
+  --a: var(--lapp-ink, var(--a-ink));
+  --line: color-mix(in srgb, var(--lapp-ink, var(--a-ink)) 22%, transparent);
+  --hl: color-mix(in srgb, #ffffff 45%, transparent);
+  background: linear-gradient(170deg, color-mix(in srgb, var(--lapp-bg, var(--a1)) 100%, #fff 0%), color-mix(in srgb, var(--lapp-bg, var(--a1)) 88%, #000 12%));
+  box-shadow: 0 40px 60px -30px rgba(0, 0, 0, 0.55), 0 8px 14px -6px rgba(0, 0, 0, 0.2);
+}
+.k-rs-ingen, .k-form-fri { background: none; border: 0; box-shadow: none; }
+.k-form-fri.k-rs-papir::before, .k-form-fri.k-rs-linje::after { display: none; }
+.k-form-fri .k-skisse { display: none; }
+
+/* Fokus: når vi står i en ramme, trer resten tilbake */
+.k-root.k-fokus .k-frame:not(.k-aktiv) { opacity: 0.3; }
+.k-root.k-editing .k-frame, .k-root.k-oversikt .k-frame { opacity: 1 !important; }
+
+/* --- Innhold --- */
+.k-inner { display: flex; flex-direction: column; gap: 0.5em; width: 100%; min-width: 0; }
+.k-frame h1, .k-frame h2, .k-frame p, .k-frame ul, .k-frame ol, .k-frame figure, .k-frame blockquote { margin: 0; }
+.k-frame h1, .k-frame h2 {
+  font-family: var(--f-disp);
+  font-weight: var(--disp-w);
+  font-style: var(--disp-stil);
+  letter-spacing: var(--disp-spor);
+  text-transform: var(--disp-case);
+  text-wrap: balance;
+  font-optical-sizing: auto;
+}
+.k-frame h1 { font-size: var(--h1); line-height: 1.02; }
+.k-frame h2 { font-size: calc(var(--h1) * 0.6); line-height: 1.08; }
+.k-frame p { color: var(--ink-2); text-wrap: pretty; }
+.k-frame strong { color: var(--ink); font-weight: 750; }
+.k-frame em { font-style: italic; }
+.k-frame a { color: var(--a); text-decoration-thickness: 0.06em; text-underline-offset: 0.15em; }
+.k-frame code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.86em; padding: 0.06em 0.3em; border-radius: 0.25em; background: var(--line); }
+.k-eyebrow { font-size: 0.5em; text-transform: uppercase; letter-spacing: 0.24em; font-weight: 800; color: var(--a); }
+.k-frame ul, .k-frame ol { padding-left: 1.15em; display: flex; flex-direction: column; gap: 0.32em; color: var(--ink-2); }
+.k-frame li::marker { color: var(--a); font-weight: 800; }
+.k-stat { display: flex; flex-direction: column; gap: 0.1em; }
+.k-num {
+  font-family: var(--f-disp);
+  font-size: 4.4em;
+  font-weight: var(--disp-w);
+  font-style: var(--disp-stil);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  background: linear-gradient(115deg, var(--a), var(--a2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-variant-numeric: tabular-nums;
+  padding-bottom: 0.05em;
+}
+.k-rs-lapp .k-num { background: none; color: var(--ink); }
+.k-cap { font-size: 0.8em; color: var(--ink-2); }
+.k-frame blockquote { font-family: var(--f-disp); font-style: italic; font-size: 1.55em; line-height: 1.18; color: var(--ink); }
+.k-frame blockquote::before { content: "\201C"; display: block; font-size: 2.4em; line-height: 0.6; height: 0.42em; color: var(--a); font-style: normal; }
+.k-frame cite { display: block; margin-top: 0.7em; font-family: var(--f-body); font-style: normal; font-size: 0.42em; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2); font-weight: 700; }
+.k-frame mark { color: inherit; padding: 0 0.06em; background: linear-gradient(transparent 56%, var(--hl) 56%, var(--hl) 94%, transparent 94%) no-repeat 0 0 / 100% 100%; }
+.k-ikon { font-size: 3.2em; line-height: 1; }
+.k-cols { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 1.4em; align-items: start; }
+.k-col { display: flex; flex-direction: column; gap: 0.5em; min-width: 0; }
+.k-frame hr { border: 0; height: 0.06em; background: var(--line); width: 100%; margin: 0.15em 0; }
+.k-img-ramme { overflow: hidden; border-radius: 0.5em; }
+.k-img img, .k-img video { display: block; max-width: 100%; max-height: 12em; margin: 0 auto; object-fit: contain; -webkit-user-drag: none; }
+.k-form-fri .k-img img, .k-form-fri .k-img video { max-height: none; width: 100%; }
+.k-img figcaption { font-size: 0.55em; color: var(--ink-2); margin-top: 0.6em; text-align: center; }
+.k-tom .k-inner::before { content: "Tom ramme – dobbeltklikk for å skrive"; color: var(--ink-2); opacity: 0.55; font-size: 0.7em; }
+
+/* Håndtegnede markeringer */
+.k-u, .k-ring, .k-stryk { position: relative; display: inline-block; }
+.k-ann { position: absolute; overflow: visible; pointer-events: none; }
+.k-ann path { fill: none; stroke: var(--a); stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.k-u .k-ann { left: -2%; width: 104%; bottom: -0.16em; height: 0.3em; }
+.k-u .k-ann path { stroke-width: 5; }
+.k-ring .k-ann { left: -10%; top: -22%; width: 120%; height: 144%; }
+.k-ring .k-ann path { stroke-width: 4.5; }
+.k-stryk .k-ann { left: -3%; top: 38%; width: 106%; height: 0.25em; }
+.k-stryk .k-ann path { stroke-width: 5.5; stroke: color-mix(in srgb, var(--a) 85%, var(--ink)); }
+.k-stryk { color: color-mix(in srgb, currentColor 65%, transparent); }
+
+/* Ord som skifter */
+.k-roter { display: inline-grid; vertical-align: bottom; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.k-ro { grid-area: 1 / 1; opacity: 0; transform: translateY(100%); color: var(--a); transition: transform 0.7s var(--ease-ut), opacity 0.5s ease; white-space: nowrap; }
+.k-ro.k-pa { opacity: 1; transform: none; }
+.k-ro.k-ut { opacity: 0; transform: translateY(-100%); }
+
+/* Stolper */
+.k-stolper { display: flex; flex-direction: column; gap: 0.42em; width: 100%; }
+.k-stolpe { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 2fr) auto; align-items: center; gap: 0.6em; font-size: 0.82em; }
+.k-st-navn { color: var(--ink); font-weight: 650; text-align: left; }
+.k-st-spor { height: 0.7em; border-radius: 99px; background: var(--line); overflow: hidden; }
+.k-st-spor i { display: block; height: 100%; width: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--a), var(--a2)); transform-origin: 0 50%; transform: scaleX(var(--v)); }
+.k-st-tall { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--ink); min-width: 3.2em; text-align: right; }
+
+/* Prosess */
+.k-flyt { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35em 0.2em; }
+.k-fl-steg { display: inline-flex; align-items: center; gap: 0.45em; padding: 0.45em 0.8em 0.45em 0.45em; border-radius: 99px; background: color-mix(in srgb, var(--a) 14%, transparent); border: 2px solid color-mix(in srgb, var(--a) 40%, transparent); font-weight: 650; font-size: 0.85em; }
+.k-fl-nr { display: grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--a); color: var(--a-ink); font-weight: 800; font-size: 0.8em; flex: none; }
+.k-rs-lapp .k-fl-nr { color: var(--lapp-bg, var(--a1)); }
+.k-fl-pil { width: 1.5em; height: 0.6em; overflow: visible; flex: none; }
+.k-fl-pil path { fill: none; stroke: var(--a); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+
+/* Redigering direkte i rammen */
+.k-skriver {
+  outline: 3px dashed color-mix(in srgb, var(--a) 80%, transparent);
+  outline-offset: 0.18em;
+  border-radius: 0.08em;
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+  white-space: pre-wrap;
+  caret-color: var(--a);
+}
+.k-skriver * { user-select: text; -webkit-user-select: text; }
+.k-root.k-editing .k-frame.k-valgt [data-l] { cursor: text; }
+.k-root.k-editing .k-frame.k-valgt [data-l]:hover:not(.k-skriver) { outline: 2px solid color-mix(in srgb, var(--ui-accent) 45%, transparent); outline-offset: 0.12em; border-radius: 0.08em; }
